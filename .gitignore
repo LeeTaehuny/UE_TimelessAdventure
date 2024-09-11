@@ -72,3 +72,12 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Assets
+Content/Arrows/*
+Content/Scifi_Arsenal_Vol3_1/*
+Content/Sci-FiMeleeWeaponPack/*
+Content/Staff/*
+Content/Survivor_girl_V01/*
+Content/Weapon_Pack/*
+Content/IthrisCemetery/*
