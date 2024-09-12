@@ -81,3 +81,11 @@ Content/Staff/*
 Content/Survivor_girl_V01/*
 Content/Weapon_Pack/*
 Content/IthrisCemetery/*
+
+# Assets
+Content/Animations_Warrior/*
+Content/ModularLostRuinKit/*
+Content/Assets/*
+
+# Rider
+Plugins/Developer/RiderLink/
