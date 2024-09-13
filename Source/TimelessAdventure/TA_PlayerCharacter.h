@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/AnimUpdateInterface.h"
-#include "InputActionValue.h"
 #include "TA_PlayerCharacter.generated.h"
 
 UCLASS()
@@ -23,6 +22,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void PostInitializeComponents() override;
 
 // Camera Component
 protected:
@@ -32,17 +32,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<class UCameraComponent> CameraComp;
 
-// Input Mapping Context & Input Action
+// Components
 protected:
-	UPROPERTY(EditAnywhere, Category = "InputAction")
-	TObjectPtr<class UInputMappingContext> IMC_Player;
-
-	UPROPERTY(EditAnywhere, Category = "InputAction")
-	TObjectPtr<class UInputAction> IA_Move;
-
-	UPROPERTY(EditAnywhere, Category = "InputAction")
-	TObjectPtr<class UInputAction> IA_Look;
-
-	void BasicMove(const FInputActionValue& Value);
-	void BasicLook(const FInputActionValue& Value);
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UTA_InputComponent> TA_InputComponent;
 };
