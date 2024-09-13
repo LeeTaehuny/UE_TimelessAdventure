@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+Ôªø// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -10,10 +10,10 @@
 UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
-	PS_Idle,	// ¿œπ›
-	PS_Walk,	// ∞»±‚
-	PS_Dash,	// ¥ﬁ∏Æ±‚
-	PS_Ghost,	// π´¿˚
+	PS_Walk,	// ÏùºÎ∞ò(Í±∑Í∏∞)
+	PS_Dash,	// Îã¨Î¶¨Í∏∞
+	PS_Combat,  // Ï†ÑÌà¨
+	PS_Ghost,	// Î¨¥Ï†Å
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -64,6 +64,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Anims")
 	TObjectPtr<class UAnimMontage> RollMontage;
 
+	void OnRollMontageEnd(class UAnimMontage* Montage, bool bInterrupted);
+
 // Owner Player
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -76,9 +78,13 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	EPlayerState PlayerState;
 
+	EPlayerState PrevState;
+
 	UPROPERTY(VisibleAnywhere, Category = "Settings")
 	float WalkSpeed;
 
 	UPROPERTY(VisibleAnywhere, Category = "Settings")
 	float DashSpeed;
+
+	FVector2D MovementVector;
 };

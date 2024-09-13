@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "AnimUpdateInterface.generated.h"
+#include "PlayerComponentInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UAnimUpdateInterface : public UInterface
+class UPlayerComponentInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UAnimUpdateInterface : public UInterface
 /**
  * 
  */
-class TIMELESSADVENTURE_API IAnimUpdateInterface
+class TIMELESSADVENTURE_API IPlayerComponentInterface
 {
 	GENERATED_BODY()
 

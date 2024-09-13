@@ -1,14 +1,15 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/AnimUpdateInterface.h"
+#include "Interface/PlayerComponentInterface.h"
 #include "TA_PlayerCharacter.generated.h"
 
 UCLASS()
-class TIMELESSADVENTURE_API ATA_PlayerCharacter : public ACharacter, public IAnimUpdateInterface
+class TIMELESSADVENTURE_API ATA_PlayerCharacter : public ACharacter, public IAnimUpdateInterface, public IPlayerComponentInterface
 {
 	GENERATED_BODY()
 

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "TA_InputComponent.h"
@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "Animation/AnimMontage.h"
+#include "Interface/PlayerComponentInterface.h"
 
 UTA_InputComponent::UTA_InputComponent()
 {
@@ -25,6 +26,7 @@ void UTA_InputComponent::BeginPlay()
 	
 	if (!IsValid(OwnerPlayer)) return;
 
+	// InputMappingContext Setting
 	APlayerController* PlayerController = Cast<APlayerController>(OwnerPlayer->GetController());
 	if (PlayerController && IMC_Player)
 	{
@@ -64,7 +66,7 @@ void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
 	if (!IsValid(OwnerPlayer)) return;
 
 	// value extraction
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	MovementVector = Value.Get<FVector2D>();
 
 	// Controller rotation Yaw value
 	const FRotator Rotation = OwnerPlayer->Controller->GetControlRotation();
@@ -94,7 +96,9 @@ void UTA_InputComponent::BasicLook(const FInputActionValue& Value)
 void UTA_InputComponent::DashStart()
 {
 	if (!IsValid(OwnerPlayer)) return;
+	if (PlayerState != EPlayerState::PS_Walk) return;
 
+	// Set State (PS_Dush)
 	ChangeState(EPlayerState::PS_Dash);
 }
 
@@ -108,14 +112,39 @@ void UTA_InputComponent::DashEnd()
 void UTA_InputComponent::BasicRoll()
 {
 	if (!IsValid(OwnerPlayer)) return;
+	if (PlayerState == EPlayerState::PS_Ghost) return;
+
+	PrevState = PlayerState;
 
 	ChangeState(EPlayerState::PS_Ghost);
 
 	UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
+		// Controller rotation Yaw value
+		const FRotator Rotation = OwnerPlayer->Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// Get forward and right directions based on rotation(Yaw) (Y: forward, X : right)
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		FRotator TargetRot = (ForwardDirection * MovementVector.X + RightDirection * MovementVector.Y).Rotation();
+
+		OwnerPlayer->SetActorRotation(TargetRot);
+
 		AnimInstance->Montage_Play(RollMontage);
+
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindUObject(this, &UTA_InputComponent::OnRollMontageEnd);
+
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, RollMontage);
 	}
+}
+
+void UTA_InputComponent::OnRollMontageEnd(UAnimMontage* Montage, bool bInterrupted)
+{
+	ChangeState(PrevState);
 }
 
 void UTA_InputComponent::ChangeState(EPlayerState NewState)
@@ -124,16 +153,15 @@ void UTA_InputComponent::ChangeState(EPlayerState NewState)
 
 	switch (NewState)
 	{
-	case EPlayerState::PS_Idle:
-		break;
 	case EPlayerState::PS_Walk:
 		OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 		break;
 	case EPlayerState::PS_Dash:
 		OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
 		break;
+	case EPlayerState::PS_Combat:
+		break;
 	case EPlayerState::PS_Ghost:
-
 		break;
 	}
 
