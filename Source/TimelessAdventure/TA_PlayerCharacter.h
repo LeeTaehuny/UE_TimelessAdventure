@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/AnimUpdateInterface.h"
+#include "InputActionValue.h"
 #include "TA_PlayerCharacter.generated.h"
 
 UCLASS()
@@ -41,4 +42,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Look;
+
+	void BasicMove(const FInputActionValue& Value);
+	void BasicLook(const FInputActionValue& Value);
 };
