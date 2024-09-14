@@ -55,7 +55,7 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 
 	EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicLook);
 	EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicMove);
-	EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, OwnerPlayer.Get(), &ACharacter::Jump);
+	EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &UTA_InputComponent::BasicJump);
 	EnhancedInputComponent->BindAction(IA_Roll, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicRoll);
 	EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &UTA_InputComponent::DashStart);
 	EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Completed, this, &UTA_InputComponent::DashEnd);
@@ -96,6 +96,11 @@ void UTA_InputComponent::BasicLook(const FInputActionValue& Value)
 void UTA_InputComponent::DashStart()
 {
 	if (!IsValid(OwnerPlayer)) return;
+	if (PlayerState == EPlayerState::PS_Ghost)
+	{
+		TempState = EPlayerState::PS_Dash;
+		return;
+	}
 	if (PlayerState != EPlayerState::PS_Walk) return;
 
 	// Set State (PS_Dush)
@@ -105,6 +110,11 @@ void UTA_InputComponent::DashStart()
 void UTA_InputComponent::DashEnd()
 {
 	if (!IsValid(OwnerPlayer)) return;
+	if (PlayerState == EPlayerState::PS_Ghost)
+	{
+		TempState = EPlayerState::PS_Walk;
+		return;
+	}
 
 	ChangeState(EPlayerState::PS_Walk);
 }
@@ -113,10 +123,16 @@ void UTA_InputComponent::BasicRoll()
 {
 	if (!IsValid(OwnerPlayer)) return;
 	if (PlayerState == EPlayerState::PS_Ghost) return;
-
-	PrevState = PlayerState;
+	if (OwnerPlayer->GetCharacterMovement()->IsFalling()) return;
+	if (PlayerState == EPlayerState::PS_Walk || PlayerState == EPlayerState::PS_Dash)
+	{
+		TempState = PlayerState;
+	}
 
 	ChangeState(EPlayerState::PS_Ghost);
+	
+
+	float Mult = TempState == EPlayerState::PS_Dash ? 1.3f : 1.0f;
 
 	UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
 	if (AnimInstance)
@@ -133,7 +149,7 @@ void UTA_InputComponent::BasicRoll()
 
 		OwnerPlayer->SetActorRotation(TargetRot);
 
-		AnimInstance->Montage_Play(RollMontage);
+		AnimInstance->Montage_Play(RollMontage, Mult);
 
 		FOnMontageEnded EndDelegate;
 		EndDelegate.BindUObject(this, &UTA_InputComponent::OnRollMontageEnd);
@@ -142,9 +158,19 @@ void UTA_InputComponent::BasicRoll()
 	}
 }
 
+void UTA_InputComponent::BasicJump()
+{
+	if (PlayerState == EPlayerState::PS_Ghost) return;
+
+	if (IsValid(OwnerPlayer))
+	{
+		OwnerPlayer->Jump();
+	}
+}
+
 void UTA_InputComponent::OnRollMontageEnd(UAnimMontage* Montage, bool bInterrupted)
 {
-	ChangeState(PrevState);
+		ChangeState(TempState);
 }
 
 void UTA_InputComponent::ChangeState(EPlayerState NewState)

@@ -40,6 +40,7 @@ protected:
 	void DashStart();
 	void DashEnd();
 	void BasicRoll();
+	void BasicJump();
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -78,7 +79,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	EPlayerState PlayerState;
 
-	EPlayerState PrevState;
+	EPlayerState TempState;
 
 	UPROPERTY(VisibleAnywhere, Category = "Settings")
 	float WalkSpeed;
