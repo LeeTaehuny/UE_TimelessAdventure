@@ -22,4 +22,5 @@ class TIMELESSADVENTURE_API IPlayerComponentInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual class UTA_CombatComponent* GetCombatComponent() = 0;
 };

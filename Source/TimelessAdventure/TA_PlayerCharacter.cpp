@@ -3,6 +3,7 @@
 
 #include "TA_PlayerCharacter.h"
 #include "TA_InputComponent.h"
+#include "TA_CombatComponent.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -31,6 +32,7 @@ ATA_PlayerCharacter::ATA_PlayerCharacter()
 	SpringArmComp->bUsePawnControlRotation = true;
 
 	TA_InputComponent = CreateDefaultSubobject<UTA_InputComponent>(TEXT("InputComponent"));
+	TA_CombatComponent = CreateDefaultSubobject<UTA_CombatComponent>(TEXT("TA_CombatComponent"));
 }
 
 void ATA_PlayerCharacter::BeginPlay()
@@ -55,7 +57,5 @@ void ATA_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 void ATA_PlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	TA_InputComponent->SetOwnerPlayer(this);
 }
 

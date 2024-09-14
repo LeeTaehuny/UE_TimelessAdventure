@@ -25,6 +25,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
 
+// Getter
+public:
+	FORCEINLINE virtual class UTA_CombatComponent* GetCombatComponent() override { return TA_CombatComponent; }
+
 // Camera Component
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
@@ -37,4 +41,7 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UTA_InputComponent> TA_InputComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UTA_CombatComponent> TA_CombatComponent;
 };
