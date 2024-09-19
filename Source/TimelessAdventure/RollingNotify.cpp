@@ -17,7 +17,6 @@ void URollingNotify::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequence
 			//Character->GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 		}
 		UE_LOG(LogTemp, Warning, TEXT("RollingNotify Begin triggered for %f seconds"), TotalDuration);
-		// 캐릭터의 현재 위치를 얻어서 표시
 		
 	}
 }
