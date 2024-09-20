@@ -3,6 +3,7 @@
 
 #include "TA_InputComponent.h"
 #include "TA_CombatComponent.h"
+#include "Player/TA_PlayerCharacter.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -11,7 +12,6 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "Animation/AnimMontage.h"
-#include "Interface/PlayerComponentInterface.h"
 
 UTA_InputComponent::UTA_InputComponent()
 {
@@ -27,7 +27,7 @@ void UTA_InputComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	OwnerPlayer = Cast<ACharacter>(GetOwner());
+	OwnerPlayer = Cast<ATA_PlayerCharacter>(GetOwner());
 }
 
 void UTA_InputComponent::BeginPlay()
@@ -54,10 +54,7 @@ void UTA_InputComponent::BeginPlay()
 	OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	
 	// ZeroHealthDelegate에 함수 매핑
-	if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
-	{
-		ComponentInterface->GetCombatComponent()->ZeroHealthDelegate.AddUObject(this, &UTA_InputComponent::DashEnd);
-	}
+	OwnerPlayer->GetCombatComponent()->ZeroHealthDelegate.AddUObject(this, &UTA_InputComponent::DashEnd);
 	
 }
 
@@ -70,18 +67,16 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 {
 	if (!IsValid(OwnerPlayer)) return;
 
-	if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
-	{
-		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-		EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicLook);
-		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicMove);
-		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &UTA_InputComponent::BasicJump);
-		EnhancedInputComponent->BindAction(IA_Roll, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicRoll);
-		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &UTA_InputComponent::DashStart);
-		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Completed, this, &UTA_InputComponent::DashEnd);
-		EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Started, ComponentInterface->GetCombatComponent(), &UTA_CombatComponent::Attack);
-	}
+	EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicLook);
+	EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicMove);
+	EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &UTA_InputComponent::BasicJump);
+	EnhancedInputComponent->BindAction(IA_Roll, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicRoll);
+	EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &UTA_InputComponent::DashStart);
+	EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Completed, this, &UTA_InputComponent::DashEnd);
+	EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Started, OwnerPlayer->GetCombatComponent(), &UTA_CombatComponent::Attack);
+	
 }
 
 void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
@@ -126,11 +121,8 @@ void UTA_InputComponent::DashStart()
 	// 플레이어의 상태가 Walk가 아닌 경우 Dash 불가
 	if (PlayerState != EPlayerState::PS_Walk) return;
 
-	if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
-	{
-		// 지속적으로 체력을 사용한다고 설정
-		ComponentInterface->GetCombatComponent()->SetUseHealth(true);
-	}
+	// 지속적으로 체력을 사용한다고 설정
+	OwnerPlayer->GetCombatComponent()->SetUseHealth(true);
 
 	// 상태 변경 (Dush)
 	ChangeState(EPlayerState::PS_Dash);
@@ -151,11 +143,8 @@ void UTA_InputComponent::DashEnd()
 	// 상태 변경 (Walk)
 	ChangeState(EPlayerState::PS_Walk);
 
-	if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
-	{
-		// 지속적으로 체력을 사용하지 않겠다고 설정
-		ComponentInterface->GetCombatComponent()->SetUseHealth(false);
-	}
+	// 지속적으로 체력을 사용하지 않겠다고 설정
+	OwnerPlayer->GetCombatComponent()->SetUseHealth(false);
 }
 
 void UTA_InputComponent::BasicRoll()
@@ -164,51 +153,48 @@ void UTA_InputComponent::BasicRoll()
 	if (PlayerState == EPlayerState::PS_Roll) return;
 	if (OwnerPlayer->GetCharacterMovement()->IsFalling()) return;
 
-	if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
+	// 현재 체력에서 구르기가 가능한 경우
+	if (OwnerPlayer->GetCombatComponent()->GetHealthPercent() > RollHealthPercent)
 	{
-		// 현재 체력에서 구르기가 가능한 경우
-		if (ComponentInterface->GetCombatComponent()->GetHealthPercent() > RollHealthPercent)
+		// 체력 즉시 사용
+		OwnerPlayer->GetCombatComponent()->UpdateHealth(true, RollHealthPercent);
+
+		// 현재 플레이어의 상태(걷기/달리기) 임시 저장
+		if (PlayerState == EPlayerState::PS_Walk || PlayerState == EPlayerState::PS_Dash)
 		{
-			// 체력 즉시 사용
-			ComponentInterface->GetCombatComponent()->UpdateHealth(true, RollHealthPercent);
+			TempState = PlayerState;
+		}
 
-			// 현재 플레이어의 상태(걷기/달리기) 임시 저장
-			if (PlayerState == EPlayerState::PS_Walk || PlayerState == EPlayerState::PS_Dash)
-			{
-				TempState = PlayerState;
-			}
+		// 상태 변경 (PS_Roll)
+		ChangeState(EPlayerState::PS_Roll);
 
-			// 상태 변경 (PS_Roll)
-			ChangeState(EPlayerState::PS_Roll);
+		// 임시 저장된 상태에 따라 재생 계수 설정 (걷기 : 1, 달리기 : 1.3)
+		float Mult = TempState == EPlayerState::PS_Dash ? 1.3f : 1.0f;
 
-			// 임시 저장된 상태에 따라 재생 계수 설정 (걷기 : 1, 달리기 : 1.3)
-			float Mult = TempState == EPlayerState::PS_Dash ? 1.3f : 1.0f;
+		UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			// Controller rotation Yaw 값 저장
+			const FRotator Rotation = OwnerPlayer->Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-			UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
-			if (AnimInstance)
-			{
-				// Controller rotation Yaw 값 저장
-				const FRotator Rotation = OwnerPlayer->Controller->GetControlRotation();
-				const FRotator YawRotation(0, Rotation.Yaw, 0);
+			// Yaw값을 기준으로 전방과 우측 방향 가져오기 (Y: forward, X : right)
+			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-				// Yaw값을 기준으로 전방과 우측 방향 가져오기 (Y: forward, X : right)
-				const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-				const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			// 전방, 우측 방향을 기준으로 회전해야 하는 방향 구하기 (입력 값)
+			FRotator TargetRot = (ForwardDirection * MovementVector.X + RightDirection * MovementVector.Y).Rotation();
 
-				// 전방, 우측 방향을 기준으로 회전해야 하는 방향 구하기 (입력 값)
-				FRotator TargetRot = (ForwardDirection * MovementVector.X + RightDirection * MovementVector.Y).Rotation();
+			// 마지막으로 입력된 방향에 따라 즉시 회전
+			OwnerPlayer->SetActorRotation(TargetRot);
 
-				// 마지막으로 입력된 방향에 따라 즉시 회전
-				OwnerPlayer->SetActorRotation(TargetRot);
+			// 구르기 몽타주 재생
+			AnimInstance->Montage_Play(RollMontage, Mult);
 
-				// 구르기 몽타주 재생
-				AnimInstance->Montage_Play(RollMontage, Mult);
-
-				// 구르기 몽타주 종료 시 호출될 함수 바인딩
-				FOnMontageEnded EndDelegate;
-				EndDelegate.BindUObject(this, &UTA_InputComponent::OnRollMontageEnd);
-				AnimInstance->Montage_SetEndDelegate(EndDelegate, RollMontage);
-			}
+			// 구르기 몽타주 종료 시 호출될 함수 바인딩
+			FOnMontageEnded EndDelegate;
+			EndDelegate.BindUObject(this, &UTA_InputComponent::OnRollMontageEnd);
+			AnimInstance->Montage_SetEndDelegate(EndDelegate, RollMontage);
 		}
 	}
 }
@@ -232,10 +218,13 @@ void UTA_InputComponent::OnRollMontageEnd(UAnimMontage* Montage, bool bInterrupt
 	if (TempState == EPlayerState::PS_Dash)
 	{
 		// 체력 감소 설정
-		if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
-		{
-			ComponentInterface->GetCombatComponent()->SetUseHealth(true);
-		}
+		OwnerPlayer->GetCombatComponent()->SetUseHealth(true);
+	}
+	// 임시 상태가 걷기 상태인 경우
+	else if (TempState == EPlayerState::PS_Walk)
+	{
+		// 체력 회복 설정
+		OwnerPlayer->GetCombatComponent()->SetUseHealth(false);
 	}
 }
 

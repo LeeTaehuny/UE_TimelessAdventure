@@ -2,6 +2,7 @@
 
 
 #include "TA_CombatComponent.h"
+#include "Player/TA_PlayerCharacter.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -24,7 +25,7 @@ void UTA_CombatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	OwnerPlayer = Cast<ACharacter>(GetOwner());
+	OwnerPlayer = Cast<ATA_PlayerCharacter>(GetOwner());
 }
 
 void UTA_CombatComponent::BeginPlay()
