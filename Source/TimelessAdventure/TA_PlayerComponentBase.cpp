@@ -3,6 +3,8 @@
 
 #include "TA_PlayerComponentBase.h"
 
+#include "GameFramework/Character.h"
+
 UTA_PlayerComponentBase::UTA_PlayerComponentBase()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -24,3 +26,9 @@ void UTA_PlayerComponentBase::TickComponent(float DeltaTime, ELevelTick TickType
 
 }
 
+void UTA_PlayerComponentBase::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	OwnerPlayer = Cast<ACharacter>(GetOwner());
+}

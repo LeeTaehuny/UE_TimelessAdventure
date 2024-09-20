@@ -11,10 +11,10 @@
 UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
-	PS_Walk,	// 일반(걷기)
-	PS_Dash,	// 달리기
-	PS_Combat,  // 전투
-	PS_Roll,	// 구르기
+	PS_Walk,	// normal(walk)
+	PS_Dash,	// run
+	PS_Combat,  // combat
+	PS_Roll,	// roll
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -32,17 +32,17 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// 입력을 전달받기 위한 함수
+	// function for input
 	void AddInput(UInputComponent* PlayerInputComponent);
 
 // Input Mapping Context & Input Action
 protected:
-	void BasicMove(const FInputActionValue& Value);	// 플레이어 이동
-	void BasicLook(const FInputActionValue& Value);	// 시야 회전
-	void DashStart();								// 달리기 시작
-	void DashEnd();									// 달리기 종료
-	void BasicRoll();								// 구르기
-	void BasicJump();								// 점프
+	void BasicMove(const FInputActionValue& Value);	// player move
+	void BasicLook(const FInputActionValue& Value);	// Look
+	void DashStart();								// sprint start
+	void DashEnd();									// sprint end
+	void BasicRoll();								// roll
+	void BasicJump();								// jumping
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -64,37 +64,37 @@ protected:
 
 // Animations
 protected:
-	// 구르기 AminMontage
+	// roll AminMontage
 	UPROPERTY(EditAnywhere, Category = "Anims")
 	TObjectPtr<class UAnimMontage> RollMontage;
 
-	// RollMontage가 종료되면 호출되는 함수
+	// called function when finished playing RollMontage
 	void OnRollMontageEnd(class UAnimMontage* Montage, bool bInterrupted);
 
 // Member
 private:
 
-	// 상태 변경 함수
+	// change state function
 	void ChangeState(EPlayerState NewState);
 
-	// 플레이어의 현재 상태
+	// player status
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	EPlayerState PlayerState;
 
-	// 걷기 속도
+	// walk speed
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float WalkSpeed;
 
-	// 달리기 속도
+	// run speed
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float DashSpeed;
 
-	// 임시 상태 저장용 변수
+	// variable for saving temp state
 	EPlayerState TempState;
-	// 임시 이동 입력값 저장용 변수
+	// variable for saving temp movement value
 	FVector2D MovementVector;
 
-	// 구르기에 사용될 체력 퍼센트
+	// Stamina for roll
 	UPROPERTY(EditAnywhere, Category = "Settings")
-	float RollHealthPercent;
+	float RollStaminaPercent;
 };

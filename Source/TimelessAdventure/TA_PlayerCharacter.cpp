@@ -43,8 +43,6 @@ void ATA_PlayerCharacter::BeginPlay()
 void ATA_PlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
 }
 
 void ATA_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

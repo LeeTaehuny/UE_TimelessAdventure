@@ -24,29 +24,29 @@ public:
 
 // Getter & Setter
 public:
-	// 체력 퍼센트 반환 함수
-	float GetHealthPercent();
-	// 체력 지속 증가/감소 설정 함수 (true : 감소, false : 증가)
-	void SetUseHealth(bool Value);
-	// 체력 즉시 증가/감소 설정 함수 (true : 감소, fasle : 증가 | Percent : 처리할 체력 퍼센트)
-	void UpdateHealth(bool Value, float Percent);
+	// Return Stamian
+	float GetStaminaPercent();
+	// Stamina Increase(false)/Decrease(true)
+	void SetUseStamina(bool Value);
+	// Stamina instant increase/decrease function (true : Decrese, fasle : Increase | Percent : Stamina Percent)
+	void UpdateStamina(bool Value, float Percent);
 
 // Delegate
 public:
-	// 체력이 0이 되면 사용할 델리게이트
+	// Stamina Zero
 	FOnZeroHealthDelegate ZeroHealthDelegate;
 
 private:
-	// 게임 시작시 호출되는 초기화 함수 (BeginPlay)
+	// Initialize (BeginPlay)
 	void Init();
 
 private:
-	// 체력
+	// Stamina
 	UPROPERTY(EditAnywhere, Category = "Stat")
-	float MaxHealth;
+	float MaxStamina;
 
 	UPROPERTY(VisibleAnywhere, Category = "Stat")
-	float CurrentHealth;
+	float CurrentStamina;
 
 	// Hp
 	UPROPERTY(EditAnywhere, Category = "Stat")
@@ -55,10 +55,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Stat")
 	float CurrrentHp;
 
-	// 지속 체력 증가/감소 판별 (true : 감소, false : 증가)
-	bool bUseHealth;
+	// Judgment Stamina increase/decrease (true : decrease, false : increase)
+	bool bUseStamina;
 	
 	UPROPERTY(EditAnywhere, Category = "Stat")
-	// 지속 체력 증가/감소량 
-	float UseHealthPercent;
+	// Stamina increase/decrease amount 
+	float UseStaminaPercent;
 };
