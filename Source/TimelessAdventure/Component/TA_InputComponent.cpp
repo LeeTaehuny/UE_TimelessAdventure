@@ -5,29 +5,16 @@
 #include "TA_CombatComponent.h"
 #include "Player/TA_PlayerCharacter.h"
 
-#include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
-#include "Animation/AnimMontage.h"
 
 UTA_InputComponent::UTA_InputComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	bWantsInitializeComponent = true;
 
-	WalkSpeed = 300.0f;
-	DashSpeed = 600.0f;
-	RollHealthPercent = 0.2f;
-}
-
-void UTA_InputComponent::InitializeComponent()
-{
-	Super::InitializeComponent();
-
-	OwnerPlayer = Cast<ATA_PlayerCharacter>(GetOwner());
+	PlayerState = EPlayerState::PS_Combat;
 }
 
 void UTA_InputComponent::BeginPlay()
@@ -49,13 +36,6 @@ void UTA_InputComponent::BeginPlay()
 			OwnerPlayer->EnableInput(PlayerController);
 		}
 	}
-
-	// 플레이어의 초기 이동속도는 걷기 속도로 지정
-	OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	
-	// ZeroHealthDelegate에 함수 매핑
-	OwnerPlayer->GetCombatComponent()->ZeroHealthDelegate.AddUObject(this, &UTA_InputComponent::DashEnd);
-	
 }
 
 void UTA_InputComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -75,14 +55,13 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(IA_Roll, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicRoll);
 	EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &UTA_InputComponent::DashStart);
 	EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Completed, this, &UTA_InputComponent::DashEnd);
-	EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Started, OwnerPlayer->GetCombatComponent(), &UTA_CombatComponent::Attack);
+	EnhancedInputComponent->BindAction(IA_LeftClick, ETriggerEvent::Started, this, &UTA_InputComponent::LeftClick);
 	
 }
 
 void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
 {
-	if (!IsValid(OwnerPlayer)) return;
-	if (PlayerState == EPlayerState::PS_Combat) return;
+	if (!IsValid(OwnerPlayer->GetCombatComponent())) return;
 
 	MovementVector = Value.Get<FVector2D>();
 
@@ -94,8 +73,7 @@ void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-	OwnerPlayer->AddMovementInput(ForwardDirection, MovementVector.X);
-	OwnerPlayer->AddMovementInput(RightDirection, MovementVector.Y);
+	OwnerPlayer->GetCombatComponent()->Walk(ForwardDirection, RightDirection, MovementVector);
 }
 
 void UTA_InputComponent::BasicLook(const FInputActionValue& Value)
@@ -110,145 +88,52 @@ void UTA_InputComponent::BasicLook(const FInputActionValue& Value)
 
 void UTA_InputComponent::DashStart()
 {
-	if (!IsValid(OwnerPlayer)) return;
+	if (!IsValid(OwnerPlayer->GetCombatComponent())) return;
 
-	// 플레이어가 구르기 상태인 경우
-	if (PlayerState == EPlayerState::PS_Roll)
-	{
-		// 데쉬 상태 임시 저장후 반환
-		TempState = EPlayerState::PS_Dash;
-		return;
-	}
-	// 플레이어의 상태가 Walk가 아닌 경우 Dash 불가
-	if (PlayerState != EPlayerState::PS_Walk) return;
-
-	// 지속적으로 체력을 사용한다고 설정
-	OwnerPlayer->GetCombatComponent()->SetUseHealth(true);
-
-	// 상태 변경 (Dush)
-	ChangeState(EPlayerState::PS_Dash);
+	OwnerPlayer->GetCombatComponent()->DashStart();
 }
 
 void UTA_InputComponent::DashEnd()
 {
-	if (!IsValid(OwnerPlayer)) return;
-	if (PlayerState == EPlayerState::PS_Combat) return;
+	if (!IsValid(OwnerPlayer->GetCombatComponent())) return;
 
-	// 플레이어가 구르기 상태인 경우
-	if (PlayerState == EPlayerState::PS_Roll)
-	{
-		// 걷기 상태 임시 저장 후 반환
-		TempState = EPlayerState::PS_Walk;
-		return;
-	}
-
-	// 상태 변경 (Walk)
-	ChangeState(EPlayerState::PS_Walk);
-
-	// 지속적으로 체력을 사용하지 않겠다고 설정
-	OwnerPlayer->GetCombatComponent()->SetUseHealth(false);
+	OwnerPlayer->GetCombatComponent()->DashEnd();
 }
 
 void UTA_InputComponent::BasicRoll()
 {
-	if (!IsValid(OwnerPlayer)) return;
-	if (PlayerState == EPlayerState::PS_Roll) return;
-	if (OwnerPlayer->GetCharacterMovement()->IsFalling()) return;
+	if (!IsValid(OwnerPlayer->GetCombatComponent())) return;
 
-	// 현재 체력에서 구르기가 가능한 경우
-	if (OwnerPlayer->GetCombatComponent()->GetHealthPercent() > RollHealthPercent)
-	{
-		// 체력 즉시 사용
-		OwnerPlayer->GetCombatComponent()->UpdateHealth(true, RollHealthPercent);
-
-		// 현재 플레이어의 상태(걷기/달리기) 임시 저장
-		if (PlayerState == EPlayerState::PS_Walk || PlayerState == EPlayerState::PS_Dash)
-		{
-			TempState = PlayerState;
-		}
-
-		// 상태 변경 (PS_Roll)
-		ChangeState(EPlayerState::PS_Roll);
-
-		// 임시 저장된 상태에 따라 재생 계수 설정 (걷기 : 1, 달리기 : 1.3)
-		float Mult = TempState == EPlayerState::PS_Dash ? 1.3f : 1.0f;
-
-		UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
-		if (AnimInstance)
-		{
-			// Controller rotation Yaw 값 저장
-			const FRotator Rotation = OwnerPlayer->Controller->GetControlRotation();
-			const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-			// Yaw값을 기준으로 전방과 우측 방향 가져오기 (Y: forward, X : right)
-			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-			// 전방, 우측 방향을 기준으로 회전해야 하는 방향 구하기 (입력 값)
-			FRotator TargetRot = (ForwardDirection * MovementVector.X + RightDirection * MovementVector.Y).Rotation();
-
-			// 마지막으로 입력된 방향에 따라 즉시 회전
-			OwnerPlayer->SetActorRotation(TargetRot);
-
-			// 구르기 몽타주 재생
-			AnimInstance->Montage_Play(RollMontage, Mult);
-
-			// 구르기 몽타주 종료 시 호출될 함수 바인딩
-			FOnMontageEnded EndDelegate;
-			EndDelegate.BindUObject(this, &UTA_InputComponent::OnRollMontageEnd);
-			AnimInstance->Montage_SetEndDelegate(EndDelegate, RollMontage);
-		}
-	}
+	OwnerPlayer->GetCombatComponent()->RollStart(MovementVector);
 }
 
 void UTA_InputComponent::BasicJump()
 {
-	if (PlayerState == EPlayerState::PS_Roll) return;
+	if (!IsValid(OwnerPlayer->GetCombatComponent())) return;
 
-	if (IsValid(OwnerPlayer))
-	{
-		OwnerPlayer->Jump();
-	}
+	OwnerPlayer->GetCombatComponent()->CombatJump();
 }
 
-void UTA_InputComponent::OnRollMontageEnd(UAnimMontage* Montage, bool bInterrupted)
+void UTA_InputComponent::LeftClick()
 {
-	// 임시 저장된 상태로 상태 변경
-	ChangeState(TempState);
-
-	// 임시 상태가 데쉬 상태인 경우
-	if (TempState == EPlayerState::PS_Dash)
+	switch (PlayerState)
 	{
-		// 체력 감소 설정
-		OwnerPlayer->GetCombatComponent()->SetUseHealth(true);
-	}
-	// 임시 상태가 걷기 상태인 경우
-	else if (TempState == EPlayerState::PS_Walk)
-	{
-		// 체력 회복 설정
-		OwnerPlayer->GetCombatComponent()->SetUseHealth(false);
+	case EPlayerState::PS_Combat:
+		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->Attack();
+		break;
 	}
 }
 
 void UTA_InputComponent::ChangeState(EPlayerState NewState)
 {
 	if (PlayerState == NewState) return;
-
+	
 	// 새로 들어온 상태에 따라 처리
 	switch (NewState)
 	{
-	case EPlayerState::PS_Walk:
-		OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-		break;
-	case EPlayerState::PS_Dash:
-		OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
-		break;
 	case EPlayerState::PS_Combat:
 		break;
-	case EPlayerState::PS_Roll:
-		break;
 	}
-
+	
 	PlayerState = NewState;
 }
-

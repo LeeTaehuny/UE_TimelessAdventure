@@ -11,10 +11,7 @@
 UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
-	PS_Walk,	// 일반(걷기)
-	PS_Dash,	// 달리기
-	PS_Combat,  // 전투
-	PS_Roll,	// 구르기
+	PS_Combat,	// 전투
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -26,7 +23,6 @@ public:
 	UTA_InputComponent();
 
 protected:
-	virtual void InitializeComponent() override;
 	virtual void BeginPlay() override;
 
 public:
@@ -47,6 +43,7 @@ protected:
 	void DashEnd();									// 달리기 종료
 	void BasicRoll();								// 구르기
 	void BasicJump();								// 점프
+	void LeftClick();								// 좌클릭
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -67,16 +64,7 @@ protected:
 	TObjectPtr<class UInputAction> IA_Dash;
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
-	TObjectPtr<class UInputAction> IA_Attack;
-
-// Animations
-protected:
-	// 구르기 AminMontage
-	UPROPERTY(EditAnywhere, Category = "Anims")
-	TObjectPtr<class UAnimMontage> RollMontage;
-
-	// RollMontage가 종료되면 호출되는 함수
-	void OnRollMontageEnd(class UAnimMontage* Montage, bool bInterrupted);
+	TObjectPtr<class UInputAction> IA_LeftClick;
 
 // Member
 private:
@@ -85,20 +73,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	EPlayerState PlayerState;
 
-	// 걷기 속도
-	UPROPERTY(EditAnywhere, Category = "Settings")
-	float WalkSpeed;
-
-	// 달리기 속도
-	UPROPERTY(EditAnywhere, Category = "Settings")
-	float DashSpeed;
-
-	// 임시 상태 저장용 변수
-	EPlayerState TempState;
 	// 임시 이동 입력값 저장용 변수
 	FVector2D MovementVector;
-
-	// 구르기에 사용될 체력 퍼센트
-	UPROPERTY(EditAnywhere, Category = "Settings")
-	float RollHealthPercent;
 };

@@ -2,13 +2,21 @@
 
 
 #include "TA_PlayerComponentBase.h"
+#include "Player/TA_PlayerCharacter.h"
 
 UTA_PlayerComponentBase::UTA_PlayerComponentBase()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
+	bWantsInitializeComponent = true;
 }
 
+
+void UTA_PlayerComponentBase::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	OwnerPlayer = Cast<ATA_PlayerCharacter>(GetOwner());
+}
 
 // Called when the game starts
 void UTA_PlayerComponentBase::BeginPlay()

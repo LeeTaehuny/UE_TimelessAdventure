@@ -16,6 +16,7 @@ public:
 	UTA_PlayerComponentBase();
 
 protected:
+	virtual void InitializeComponent() override;
 	virtual void BeginPlay() override;
 
 public:	
@@ -25,5 +26,4 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class ATA_PlayerCharacter> OwnerPlayer;
-		
 };

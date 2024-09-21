@@ -8,6 +8,15 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnZeroHealthDelegate);
 
+UENUM(BlueprintType)
+enum class ECombatState : uint8
+{
+	CS_Idle,			// 기본
+	CS_Dash,			// 달리기
+	CS_Roll,			// 구르기 (회피)
+	CS_Attack,			// 공격
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TIMELESSADVENTURE_API UTA_CombatComponent : public UTA_PlayerComponentBase
 {
@@ -17,7 +26,6 @@ public:
 	UTA_CombatComponent();
 
 protected:
-	virtual void InitializeComponent() override;
 	virtual void BeginPlay() override;
 
 public:
@@ -27,11 +35,7 @@ public:
 public:
 	// 체력 퍼센트 반환 함수
 	float GetHealthPercent();
-	// 체력 지속 증가/감소 설정 함수 (true : 감소, false : 증가)
-	void SetUseHealth(bool Value);
-	// 체력 즉시 증가/감소 설정 함수 (true : 감소, fasle : 증가 | Percent : 처리할 체력 퍼센트)
-	void UpdateHealth(bool Value, float Percent);
-	
+
 	// 현재 공격 여부 반환 함수
 	FORCEINLINE bool GetIsAttacking() { return bIsAttacking; }
 
@@ -43,6 +47,26 @@ public:
 private:
 	// 게임 시작시 호출되는 초기화 함수 (BeginPlay)
 	void Init();
+
+public:
+	// Walk
+	void Walk(FVector ForwardDir, FVector RightDir, FVector2D MovementVector2D);
+	// Dash Start
+	void DashStart();
+	// Dash End
+	void DashEnd();
+	// Rolling Start
+	void RollStart(FVector2D InMovementVector);
+	// Rolling End
+	void RollEnd(class UAnimMontage* Montage, bool bInterrupted);
+	// Jump
+	void CombatJump();
+
+private:
+	// Roll Montage
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> RollMontage;
+
 
 // Actions
 public:
@@ -93,6 +117,8 @@ private:
 
 // Stat
 private:
+	void UseHealth(float InValue);
+
 	// 체력
 	UPROPERTY(EditAnywhere, Category = "Stat")
 	float MaxStamina;
@@ -113,4 +139,25 @@ private:
 
 	// 지속 체력 증가/감소 판별 (true : 감소, false : 증가)
 	bool bUseHealth;
+
+private:
+	// Change Combat State
+	void ChangeState(ECombatState NewState);
+	// Current Combat State
+	ECombatState CombatState;
+	// Cache - Prev Combat State
+	ECombatState TempState;
+
+private:
+	// Walk Speed
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float WalkSpeed;
+
+	// Dash Speed
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float DashSpeed;
+
+	// 구르기에 사용될 체력 퍼센트
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float RollHealthPercent;
 };
