@@ -29,7 +29,7 @@ public:
 
 	// 콤보 몽타주 섹션 이름
 	UPROPERTY(EditAnywhere, Category = "ComboData")
-	FName SectionBaseName;
+	FString SectionBaseName;
 
 	// 애니메이션 재생 속도
 	UPROPERTY(EditAnywhere, Category = "ComboData")

@@ -46,8 +46,43 @@ private:
 
 // Actions
 public:
-	// 공격 함수
+	// 공격
 	void Attack();
+	// 공격 이동
+	void AttackMove();
+
+// ComboAttack
+private:
+	// 점프 공격
+	void JumpAttack();
+	// 콤보 공격 시작
+	void ComboStart();
+	// 콤보 공격 종료
+	void EndCombo(class UAnimMontage* Montage, bool IsEnded);
+
+	// 콤보 타이머 시작
+	void SetComboTimer();
+	// 콤보 체크
+	void CheckCombo();
+
+	// 콤보 데이터
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TObjectPtr<class UTA_ComboAttackData> ComboAttackData;
+
+	// 콤보 타이머 핸들
+	FTimerHandle ComboTimerHandle;
+
+	// 공격 중 판별 변수
+	bool bIsAttacking;
+
+	// 콤보 입력 판별 변수
+	bool bIsComboInput;
+
+	// 콤보 공격 카운트
+	int32 ComboCount;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float AttackMoveForce;
 
 // Animations
 private:
@@ -78,6 +113,4 @@ private:
 
 	// 지속 체력 증가/감소 판별 (true : 감소, false : 증가)
 	bool bUseHealth;
-
-	bool bIsAttacking;
 };

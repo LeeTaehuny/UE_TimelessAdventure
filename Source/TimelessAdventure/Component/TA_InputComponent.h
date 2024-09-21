@@ -35,6 +35,10 @@ public:
 	// 입력을 전달받기 위한 함수
 	void AddInput(UInputComponent* PlayerInputComponent);
 
+public:
+	// 상태 변경 함수
+	void ChangeState(EPlayerState NewState);
+
 // Input Mapping Context & Input Action
 protected:
 	void BasicMove(const FInputActionValue& Value);	// 플레이어 이동
@@ -76,9 +80,6 @@ protected:
 
 // Member
 private:
-
-	// 상태 변경 함수
-	void ChangeState(EPlayerState NewState);
 
 	// 플레이어의 현재 상태
 	UPROPERTY(VisibleAnywhere, Category = "State")

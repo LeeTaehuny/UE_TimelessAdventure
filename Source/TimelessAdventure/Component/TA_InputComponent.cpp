@@ -82,6 +82,7 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
 {
 	if (!IsValid(OwnerPlayer)) return;
+	if (PlayerState == EPlayerState::PS_Combat) return;
 
 	MovementVector = Value.Get<FVector2D>();
 
@@ -131,6 +132,7 @@ void UTA_InputComponent::DashStart()
 void UTA_InputComponent::DashEnd()
 {
 	if (!IsValid(OwnerPlayer)) return;
+	if (PlayerState == EPlayerState::PS_Combat) return;
 
 	// 플레이어가 구르기 상태인 경우
 	if (PlayerState == EPlayerState::PS_Roll)
