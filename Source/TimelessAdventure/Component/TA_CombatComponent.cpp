@@ -21,7 +21,6 @@ UTA_CombatComponent::UTA_CombatComponent()
 	UseHealthPercent = 0.001f;	
 	bIsAttacking = false;
 	ComboCount = 0;
-	AttackMoveForce = 1000.0f;
 
 	WalkSpeed = 300.0f;
 	DashSpeed = 600.0f;
@@ -116,8 +115,8 @@ void UTA_CombatComponent::Walk(FVector ForwardDir, FVector RightDir, FVector2D M
 void UTA_CombatComponent::DashStart()
 {
 	if (!IsValid(OwnerPlayer)) return;
-	// 플레이어가 구르기 상태인 경우
-	if (CombatState == ECombatState::CS_Roll)
+	// 플레이어가 Roll/Attack 상태인 경우
+	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Attack)
 	{
 		// 데쉬 상태 임시 저장 후 반환
 		TempState = ECombatState::CS_Dash;
@@ -143,8 +142,8 @@ void UTA_CombatComponent::DashEnd()
 		return;
 	}
 
-	// 현재 상태가 Roll인 경우
-	if (CombatState == ECombatState::CS_Roll)
+	// 현재 상태가 Roll/Attack인 경우
+	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Attack)
 	{
 		// 기본 상태 임시 저장 후 반환
 		TempState = ECombatState::CS_Idle;
@@ -223,8 +222,6 @@ void UTA_CombatComponent::Attack()
 	if (!OwnerPlayer) return;
 	// 구르기 상태인 경우 반환
 	if (CombatState == ECombatState::CS_Roll) return;
-	// 임시 상태 초기화
-	TempState = ECombatState::CS_Idle;
 
 	// 공격중이 아닌 경우
 	if (!bIsAttacking)
@@ -253,12 +250,12 @@ void UTA_CombatComponent::Attack()
 	}
 }
 
-void UTA_CombatComponent::AttackMove()
+void UTA_CombatComponent::AttackMove(float InAttackMoveForce)
 {
 	if (!OwnerPlayer) return;
 
 	// 이동할 방향 + 힘 지정
-	FVector Impulse = OwnerPlayer->GetActorForwardVector() * AttackMoveForce;
+	FVector Impulse = OwnerPlayer->GetActorForwardVector() * InAttackMoveForce;
 
 	OwnerPlayer->GetCharacterMovement()->AddImpulse(Impulse, true);
 }
@@ -289,6 +286,12 @@ void UTA_CombatComponent::JumpAttackMontageEnded(UAnimMontage* Montage, bool IsE
 void UTA_CombatComponent::ComboStart()
 {
 	if (!ComboAttackData) return;
+
+	// 임시 상태 저장
+	if (CombatState == ECombatState::CS_Idle || CombatState == ECombatState::CS_Dash)
+	{
+		TempState = CombatState;
+	}
 
 	ChangeState(ECombatState::CS_Attack);
 
@@ -322,7 +325,7 @@ void UTA_CombatComponent::EndCombo(UAnimMontage* Montage, bool IsEnded)
 	ComboCount = 0;
 
 	if (CombatState == ECombatState::CS_Attack)
-		ChangeState(ECombatState::CS_Idle);
+		ChangeState(TempState);
 }
 
 void UTA_CombatComponent::SetComboTimer()

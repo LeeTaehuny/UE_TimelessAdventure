@@ -68,7 +68,6 @@ protected:
 
 // Member
 private:
-
 	// 플레이어의 현재 상태
 	UPROPERTY(VisibleAnywhere, Category = "State")
 	EPlayerState PlayerState;

@@ -11,6 +11,6 @@ void UAnimNotify_BasicAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 
 	if (ICombatComponentInterface* CombatPlayer = Cast<ICombatComponentInterface>(MeshComp->GetOwner()))
 	{
-		CombatPlayer->GetCombatComponent()->AttackMove();
+		CombatPlayer->GetCombatComponent()->AttackMove(AttackMoveForce);
 	}
 }

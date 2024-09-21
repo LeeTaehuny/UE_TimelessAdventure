@@ -16,4 +16,8 @@ class TIMELESSADVENTURE_API UAnimNotify_BasicAttack : public UAnimNotify
 	
 protected:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+private:
+	UPROPERTY(EditAnywhere)
+	float AttackMoveForce;
 };

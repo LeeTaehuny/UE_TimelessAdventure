@@ -73,7 +73,7 @@ public:
 	// 공격
 	void Attack();
 	// 공격 이동
-	void AttackMove();
+	void AttackMove(float InAttackMoveForce);
 
 // ComboAttack
 private:
@@ -104,9 +104,6 @@ private:
 
 	// 콤보 공격 카운트
 	int32 ComboCount;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	float AttackMoveForce;
 
 // Animations
 private:
