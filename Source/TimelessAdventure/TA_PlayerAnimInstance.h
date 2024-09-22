@@ -34,6 +34,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class ACharacter> Player;
 
+public:
+	// Bow Anim을 위한 변수
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bHasBow;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsAimingWithBow;
+	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DistanceMaching", meta = (AllowPrivateAccess = "true"))
 	FVector Acceleration;

@@ -11,10 +11,23 @@
 UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
+	PS_Idle,	// 
 	PS_Walk,	// 일반(걷기)
 	PS_Dash,	// 달리기
 	PS_Combat,  // 전투
 	PS_Roll,	// 구르기
+	PS_Jump,	// 점프
+};
+
+// 무기 Enum
+// 이걸 여기에 두는 게 맞을까? character가 가지고 있어야 하지 않을까?
+UENUM(BlueprintType)
+enum class EWeaponType: uint8
+{
+	WT_Body,		// 맨몸
+	WT_Sword,		// 칼
+	WT_Bow,			// 활
+	WT_Torch,		// 토치
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -62,6 +75,22 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Dash;
 
+	// Attack Combo Input Action (by hr)
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_SwordAttack;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_BowAttack;
+
+	// 공격 바인딩 함수 (by hr)
+	// Sword Attack	
+	void SwordAttack();
+	// BowAttack
+	void BowAttackStart();
+	void BowAttackEnd();
+	// Notify handle
+	UFUNCTION()
+	void HandleOnMontageSwordAttackNotifyBegin(FName notifyName, const FBranchingPointNotifyPayload& branchingpayload);
+
 // Animations
 protected:
 	// 구르기 AminMontage
@@ -71,8 +100,15 @@ protected:
 	// RollMontage가 종료되면 호출되는 함수
 	void OnRollMontageEnd(class UAnimMontage* Montage, bool bInterrupted);
 
+	// Anim Montage (by hr)
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> SwordComboAttackMontage;
+
 // Member
 private:
+	// 플레이어 현재 weapone
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	EWeaponType WeaponType;
 
 	// 상태 변경 함수
 	void ChangeState(EPlayerState NewState);
@@ -97,4 +133,15 @@ private:
 	// 구르기에 사용될 체력 퍼센트
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float RollHealthPercent;
+
+	// combo 공격을 위한 index (by hr)
+	int32 SwordComboIndex = 0;
+	// 자주 사용해서 변수로 만들어둠
+	class UAnimInstance* animInstance;
+
+
+private:
+	// 공격 확인 하는 함수
+	bool IsAttacking();
+	bool isAttack;
 };

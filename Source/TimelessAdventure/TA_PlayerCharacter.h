@@ -8,6 +8,8 @@
 #include "Interface/PlayerComponentInterface.h"
 #include "TA_PlayerCharacter.generated.h"
 
+
+
 UCLASS()
 class TIMELESSADVENTURE_API ATA_PlayerCharacter : public ACharacter, public IAnimUpdateInterface, public IPlayerComponentInterface
 {
@@ -28,7 +30,14 @@ public:
 // Getter
 public:
 	FORCEINLINE virtual class UTA_CombatComponent* GetCombatComponent() override { return TA_CombatComponent; }
-
+	FORCEINLINE void SetHasBow(bool b) { bHasBow = b; };
+	FORCEINLINE bool GetHasBow() const { return bHasBow; };
+	FORCEINLINE void SetAimingBow(bool b) { bAimingBow = b; };
+	FORCEINLINE bool GetAimingBow() const { return bAimingBow; };
+private:
+	bool bHasBow = true;
+	bool bAimingBow;
+	
 // Camera Component
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")

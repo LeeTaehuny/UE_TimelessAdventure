@@ -2,10 +2,14 @@
 
 
 #include "TA_PlayerAnimInstance.h"
+
+#include "TA_PlayerCharacter.h"
 #include "Interface/AnimUpdateInterface.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+
+
 
 void UTA_PlayerAnimInstance::NativeInitializeAnimation()
 {
@@ -17,6 +21,13 @@ void UTA_PlayerAnimInstance::NativeInitializeAnimation()
 		Player = PlayerCharacter;
 		MovementComponent = PlayerCharacter->GetCharacterMovement();
 		CurrentWorldLocation = Player->GetActorLocation();
+	}
+
+	ATA_PlayerCharacter* playerCharacter = Cast<ATA_PlayerCharacter>(Player);
+	if(playerCharacter)
+	{
+		bIsAimingWithBow = playerCharacter->GetAimingBow();
+		bHasBow = playerCharacter->GetAimingBow();
 	}
 }
 
@@ -50,4 +61,13 @@ void UTA_PlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		// 현재 스피드 저장
 		DeltaSpeed = DistanceLastUpdate / DeltaSeconds;
 	}
+
+	// Bow
+	ATA_PlayerCharacter* playerCharacter = Cast<ATA_PlayerCharacter>(Player);
+	if(playerCharacter)
+	{
+		bIsAimingWithBow = playerCharacter->GetAimingBow();
+		bHasBow = playerCharacter->GetHasBow();
+	}
+	
 }

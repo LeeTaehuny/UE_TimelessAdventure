@@ -12,6 +12,8 @@
 #include "InputAction.h"
 #include "Animation/AnimMontage.h"
 #include "Interface/PlayerComponentInterface.h"
+#include "TA_PlayerCharacter.h"
+
 
 UTA_InputComponent::UTA_InputComponent()
 {
@@ -58,6 +60,14 @@ void UTA_InputComponent::BeginPlay()
 	{
 		ComponentInterface->GetCombatComponent()->ZeroHealthDelegate.AddUObject(this, &UTA_InputComponent::DashEnd);
 	}
+
+	// Notify
+	animInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
+	if(animInstance)
+	{
+		animInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UTA_InputComponent::HandleOnMontageSwordAttackNotifyBegin);
+		
+	}
 	
 }
 
@@ -80,12 +90,17 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(IA_Roll, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicRoll);
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &UTA_InputComponent::DashStart);
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Completed, this, &UTA_InputComponent::DashEnd);
+		EnhancedInputComponent->BindAction(IA_SwordAttack, ETriggerEvent::Started, this, &UTA_InputComponent::SwordAttack);
+		EnhancedInputComponent->BindAction(IA_BowAttack, ETriggerEvent::Started, this, &UTA_InputComponent::BowAttackStart);
+		EnhancedInputComponent->BindAction(IA_BowAttack, ETriggerEvent::Completed, this, &UTA_InputComponent::BowAttackEnd);
 	}
 }
 
 void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
 {
 	if (!IsValid(OwnerPlayer)) return;
+	// 공격할때 못 움직임
+	if(IsAttacking() || isAttack) return;
 
 	MovementVector = Value.Get<FVector2D>();
 
@@ -222,6 +237,68 @@ void UTA_InputComponent::BasicJump()
 	}
 }
 
+void UTA_InputComponent::SwordAttack()
+{
+	if (!IsValid(OwnerPlayer)) return;
+	if (OwnerPlayer->GetCharacterMovement()->IsFalling()) return;
+
+	// 활 들고 있을 때는 무시
+	ATA_PlayerCharacter* Character = Cast<ATA_PlayerCharacter>(OwnerPlayer);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), Character->GetHasBow());
+	if(Character->GetHasBow()) return;
+
+	// 구르기 & 점프 중에는 공격 못함
+	// 걷기 & 달리기 중에는 걷기 달리기 멈추고 공격 
+	if(!IsAttacking() && PlayerState != EPlayerState::PS_Roll)
+	{
+		animInstance->Montage_Play(SwordComboAttackMontage);
+	}
+	else
+	{
+		SwordComboIndex = 1;
+	}
+	
+}
+
+void UTA_InputComponent::BowAttackStart()
+{
+	// Bow Attack 중에는 이동 못함
+	// jump & roll 중에는 공격 못함 
+	UE_LOG(LogTemp, Warning, TEXT("BowAttack"));
+	ATA_PlayerCharacter* playerCharacter = Cast<ATA_PlayerCharacter>(OwnerPlayer);
+	if(playerCharacter->GetHasBow())
+	{
+		playerCharacter->SetAimingBow(true);	
+	}
+
+	isAttack = true;
+}
+
+void UTA_InputComponent::BowAttackEnd()
+{
+	ATA_PlayerCharacter* playerCharacter = Cast<ATA_PlayerCharacter>(OwnerPlayer);
+	if(playerCharacter->GetHasBow())
+	{
+		playerCharacter->SetAimingBow(false);	
+	}
+
+	// Animation이 끝났을때 움직일 수 있게
+	isAttack = false;
+}
+
+
+void UTA_InputComponent::HandleOnMontageSwordAttackNotifyBegin(FName notifyName,
+                                                               const FBranchingPointNotifyPayload& branchingpayload)
+{
+	// combo index 감소 + combo index
+	SwordComboIndex--;
+
+	if(SwordComboIndex < 0)
+	{
+		animInstance->Montage_Stop(0.4f, SwordComboAttackMontage);
+	}
+}
+
 void UTA_InputComponent::OnRollMontageEnd(UAnimMontage* Montage, bool bInterrupted)
 {
 	// 임시 저장된 상태로 상태 변경
@@ -258,5 +335,10 @@ void UTA_InputComponent::ChangeState(EPlayerState NewState)
 	}
 
 	PlayerState = NewState;
+}
+
+bool UTA_InputComponent::IsAttacking()
+{
+	return animInstance->Montage_IsPlaying(SwordComboAttackMontage);
 }
 
