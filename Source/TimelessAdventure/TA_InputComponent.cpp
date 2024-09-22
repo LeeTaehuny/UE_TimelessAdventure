@@ -11,6 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "Animation/AnimMontage.h"
+#include "Blueprint/UserWidget.h"
 #include "Interface/PlayerComponentInterface.h"
 
 UTA_InputComponent::UTA_InputComponent()
@@ -80,6 +81,7 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(IA_Roll, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicRoll);
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &UTA_InputComponent::DashStart);
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Completed, this, &UTA_InputComponent::DashEnd);
+		EnhancedInputComponent->BindAction(IA_QuickSlot, ETriggerEvent::Triggered, this, &UTA_InputComponent::QuickSlotWheel);
 	}
 }
 
@@ -260,3 +262,35 @@ void UTA_InputComponent::ChangeState(EPlayerState NewState)
 	PlayerState = NewState;
 }
 
+void UTA_InputComponent::QuickSlotWheel(const FInputActionValue& Value)
+{
+	// UI를 토글하는 코드
+	if(IsQuitSlotVisible())
+	{
+		// UI가 있으면 제거
+		if(QuickSlotInstance)
+		{
+			QuickSlotInstance->RemoveFromParent();
+			QuickSlotInstance=nullptr;
+		}
+	}
+	else
+	{
+		// UI가 없으면 생성하고 추가
+		if(QuickSlotWheelClass)
+		{
+			QuickSlotInstance=CreateWidget<UUserWidget>(GetWorld(), QuickSlotWheelClass);
+			if(QuickSlotInstance)
+			{
+				QuickSlotInstance->AddToViewport();
+			}
+		}
+	}
+}
+
+bool UTA_InputComponent::IsQuitSlotVisible() const
+{
+	if(QuickSlotInstance && QuickSlotInstance->IsInViewport())
+		return true;
+	return false;
+}

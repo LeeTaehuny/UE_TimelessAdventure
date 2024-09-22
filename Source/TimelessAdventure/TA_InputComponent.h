@@ -61,6 +61,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Dash;
+	
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_QuickSlot;
 
 // Animations
 protected:
@@ -97,4 +100,18 @@ private:
 	// 구르기에 사용될 체력 퍼센트
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float RollHealthPercent;
+
+protected:
+	void QuickSlotWheel(const FInputActionValue& Value);
+
+	// UI Widget Class를 UMG 에디터에서 설정할 수 있게 한다.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	TSubclassOf<UUserWidget> QuickSlotWheelClass;
+
+	// 실제 인스턴스화된 위젯
+	UPROPERTY()
+	UUserWidget* QuickSlotInstance;
+
+	// UI가 화면에 떠 있는지 확인하는 함수
+	bool IsQuitSlotVisible() const;
 };
