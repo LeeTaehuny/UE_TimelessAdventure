@@ -3,6 +3,8 @@
 
 #include "TA_CombatComponent.h"
 
+#include "TA_WeaponComponent.h"
+
 UTA_CombatComponent::UTA_CombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -14,7 +16,27 @@ UTA_CombatComponent::UTA_CombatComponent()
 	CurrrentHp = 0.0f;
 	bUseStamina = false;
 	UseStaminaPercent = 0.001f;
+
+
 }
+
+void UTA_CombatComponent::Attack()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Attack();  // 현재 장착된 무기 공격 실행
+	}
+}
+
+void UTA_CombatComponent::EquipWeapon(UTA_WeaponComponent* NewWeapon)
+{
+	if (NewWeapon)
+	{
+		UTA_CombatComponent::CurrentWeapon = NewWeapon;  // 무기 교체
+	}
+}
+
+
 
 void UTA_CombatComponent::BeginPlay()
 {

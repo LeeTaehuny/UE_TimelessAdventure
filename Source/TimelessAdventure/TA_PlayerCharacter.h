@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TA_WeaponComponent_sword.h"
 #include "GameFramework/Character.h"
 #include "Interface/AnimUpdateInterface.h"
 #include "Interface/PlayerComponentInterface.h"
@@ -44,4 +45,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UTA_CombatComponent> TA_CombatComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UTA_WeaponComponent> TA_WeaponComponent;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UTA_WeaponComponent_sword> TA_WeaponComponent_Sword;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UTA_WeaponComponent_bow> TA_WeaponComponent_Bow;
+
+
 };

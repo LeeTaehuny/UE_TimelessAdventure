@@ -3,25 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TA_PlayerComponentBase.h"
 #include "GameFramework/Actor.h"
 #include "TA_WeaponComponent.generated.h"
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 
-class TIMELESSADVENTURE_API ATA_WeaponComponent : public AActor
+class TIMELESSADVENTURE_API UTA_WeaponComponent : public UTA_PlayerComponentBase
+
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATA_WeaponComponent();
+	UTA_WeaponComponent();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
@@ -29,6 +29,26 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void PlayAttackAnimation();
+
+protected:
+	// weapon Damage
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	float Damage;
+
+	// weapon distance
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	float Range;
+
+	// weapon amination
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	UAnimMontage* AttackAnimation;
+
+	// weapon status : Is attacking?
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	bool bIsAttacking;
+
+	// play anim
+	void PlayAnimation(UAnimMontage* Animation);
 };
 
 

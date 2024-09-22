@@ -3,33 +3,57 @@
 
 #include "TA_WeaponComponent.h"
 
+#include "GameFramework/Character.h"
+
 // Sets default values
-ATA_WeaponComponent::ATA_WeaponComponent()
+UTA_WeaponComponent::UTA_WeaponComponent()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = true;
+
 
 }
 
 // Called when the game starts or when spawned
-void ATA_WeaponComponent::BeginPlay()
+void UTA_WeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void ATA_WeaponComponent::Tick(float DeltaTime)
+void UTA_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+
 {
-	Super::Tick(DeltaTime);
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 
 }
 
-void ATA_WeaponComponent::Attack()
+void UTA_WeaponComponent::Attack()
 {
+	PlayAttackAnimation();
+	
 }
 
-void ATA_WeaponComponent::PlayAttackAnimation()
+void UTA_WeaponComponent::PlayAttackAnimation()
 {
+	if(AttackAnimation)
+	{
+		PlayAnimation(AttackAnimation);
+	}
+}
+
+void UTA_WeaponComponent::PlayAnimation(UAnimMontage* Animation)
+{
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (OwnerCharacter && Animation)
+	{
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		if (AnimInstance && AttackAnimation)
+		{
+			AnimInstance->Montage_Play(AttackAnimation);
+		}
+	}
 }
 

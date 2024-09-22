@@ -62,6 +62,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Dash;
 
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Attack;
+	
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_SwitchWeapon;
+	void SwitchWeapon();
+	void Attack();
+
+	
 // Animations
 protected:
 	// roll AminMontage
@@ -97,4 +106,7 @@ private:
 	// Stamina for roll
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float RollStaminaPercent;
+private:
+	FVector2D PreviousMovementVector;
+
 };

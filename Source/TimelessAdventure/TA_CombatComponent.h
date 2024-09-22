@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TA_PlayerComponentBase.h"
+#include "TA_WeaponComponent.h"
 #include "TA_CombatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnZeroHealthDelegate);
@@ -35,10 +36,22 @@ public:
 public:
 	// Stamina Zero
 	FOnZeroHealthDelegate ZeroHealthDelegate;
+	
+	// 장착된 무기
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	UTA_WeaponComponent* CurrentWeapon;  // 정확한 타입으로 선언
+	
+	// 무기 교체 함수
+	void EquipWeapon(UTA_WeaponComponent* NewWeapon);
+
+	// 공격 함수
+	void Attack();
 
 private:
 	// Initialize (BeginPlay)
 	void Init();
+
+	FVector2D PreviousMovementVector;
 
 private:
 	// Stamina

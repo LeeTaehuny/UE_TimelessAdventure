@@ -10,6 +10,9 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
+#include "TA_WeaponComponent.h"
+#include "TA_WeaponComponent_bow.h"
+#include "TA_WeaponComponent_sword.h"
 #include "Animation/AnimMontage.h"
 #include "Interface/PlayerComponentInterface.h"
 
@@ -64,6 +67,7 @@ void UTA_InputComponent::BeginPlay()
 void UTA_InputComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
 }
 
 void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
@@ -80,6 +84,8 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(IA_Roll, ETriggerEvent::Triggered, this, &UTA_InputComponent::BasicRoll);
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &UTA_InputComponent::DashStart);
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Completed, this, &UTA_InputComponent::DashEnd);
+		EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Started, this, &UTA_InputComponent::Attack);
+		EnhancedInputComponent->BindAction(IA_SwitchWeapon, ETriggerEvent::Started, this, &UTA_InputComponent::SwitchWeapon);
 	}
 }
 
@@ -88,6 +94,23 @@ void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
 	if (!IsValid(OwnerPlayer)) return;
 
 	MovementVector = Value.Get<FVector2D>();
+	if(MovementVector != PreviousMovementVector)
+	{
+		// 공격 중에 WASD 입력이 들어오면 공격 취소
+		if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
+		{
+			UTA_CombatComponent* CombatComponent = ComponentInterface->GetCombatComponent();
+			if (CombatComponent && CombatComponent->CurrentWeapon)
+			{
+				if(UTA_WeaponComponent_sword* SwordWeapon = Cast<UTA_WeaponComponent_sword>(CombatComponent->CurrentWeapon))
+				{
+					SwordWeapon->CancelAttackAndMove();
+				
+				}
+			}
+		}
+	}
+	
 
 	// Controller rotation Yaw값 저장
 	const FRotator Rotation = OwnerPlayer->Controller->GetControlRotation();
@@ -99,6 +122,8 @@ void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
 
 	OwnerPlayer->AddMovementInput(ForwardDirection, MovementVector.X);
 	OwnerPlayer->AddMovementInput(RightDirection, MovementVector.Y);
+
+	PreviousMovementVector = MovementVector;
 }
 
 void UTA_InputComponent::BasicLook(const FInputActionValue& Value)
@@ -219,6 +244,66 @@ void UTA_InputComponent::BasicJump()
 	if (IsValid(OwnerPlayer))
 	{
 		OwnerPlayer->Jump();
+	}
+}
+
+void UTA_InputComponent::SwitchWeapon()
+{
+	if (!IsValid(OwnerPlayer)) return;
+
+	// CombatComponent 및 PlayerComponentInterface 참조 확인
+	if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
+	{
+		UTA_CombatComponent* CombatComponent = ComponentInterface->GetCombatComponent();
+
+		// 현재 장착된 무기를 가져와서 무기 교체 로직 실행
+		if (CombatComponent)
+		{
+			UTA_WeaponComponent* CurrentWeapon = CombatComponent->CurrentWeapon;
+
+			// fist->sword->bow
+			//sword->bow
+			if (CurrentWeapon && Cast<UTA_WeaponComponent_sword>(CurrentWeapon))
+			{
+				CombatComponent->EquipWeapon(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent_bow>()));
+				UE_LOG(LogTemp, Warning, TEXT("Switched to bow"));
+			}
+			// bow->fist
+			else if(CurrentWeapon && Cast<UTA_WeaponComponent_bow>(CurrentWeapon))
+			{
+				CombatComponent->EquipWeapon(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent>()));
+				UE_LOG(LogTemp, Warning, TEXT("Switched to fist"));
+			}
+			else
+			{
+				// fist->sword
+				CombatComponent->EquipWeapon(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent_sword>()));
+				UE_LOG(LogTemp, Warning, TEXT("Switched to sword"));
+			}
+		}
+	}
+}
+
+void UTA_InputComponent::Attack()
+{
+	if (!IsValid(OwnerPlayer)) return;
+
+	// CombatComponent 및 PlayerComponentInterface 참조 확인
+	if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
+	{
+		UTA_CombatComponent* CombatComponent = ComponentInterface->GetCombatComponent();
+
+		// 현재 장착된 무기가 있는지 확인
+		if (CombatComponent && CombatComponent->CurrentWeapon)
+		{
+			// 현재 장착된 무기의 Attack 함수 호출
+			CombatComponent->CurrentWeapon->Attack();
+			UE_LOG(LogTemp, Warning, TEXT("Executed Attack!"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No weapon equipped!"));
+		}
 	}
 }
 
