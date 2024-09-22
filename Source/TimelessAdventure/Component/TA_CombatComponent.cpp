@@ -5,6 +5,8 @@
 #include "Player/TA_PlayerCharacter.h"
 #include "Component/TA_InputComponent.h"
 #include "Data/TA_ComboAttackData.h"
+#include "Item/TA_WeaponBase.h"
+#include "Item/TA_Bow.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -25,6 +27,12 @@ UTA_CombatComponent::UTA_CombatComponent()
 	WalkSpeed = 300.0f;
 	DashSpeed = 600.0f;
 	RollHealthPercent = 0.2f;
+
+	bIsHold = false;
+	bCanShoot = false;
+
+	CombatState = ECombatState::CS_Idle;
+	EquippedState = EEquippedState::ES_Idle;
 }
 
 void UTA_CombatComponent::BeginPlay()
@@ -32,12 +40,18 @@ void UTA_CombatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Init();
+
+	// TEST
+	if (WeaponClass)
+	{
+		ATA_WeaponBase* NewWeapon = GetWorld()->SpawnActor<ATA_WeaponBase>(WeaponClass, OwnerPlayer->GetActorTransform());
+		EquipWeapon(NewWeapon);
+	}
 }
 
 void UTA_CombatComponent::Init()
 {
 	// 값 초기화 (체력, HP)
-	CurrentStamina = MaxStamina;
 	CurrrentHp = MaxHp;
 
 	// 이동속도 초기화
@@ -47,9 +61,6 @@ void UTA_CombatComponent::Init()
 void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// 지속 체력 증가/감소 여부에 따라 업데이트
-	//UpdateHealth(bUseHealth, UseHealthPercent);
 
 	// 현재 Dash 상태인 경우
 	if (CombatState == ECombatState::CS_Dash)
@@ -142,7 +153,7 @@ void UTA_CombatComponent::DashEnd()
 		return;
 	}
 
-	// 현재 상태가 Roll/Attack인 경우
+	// 현재 상태가 Roll/Attack 상태인 경우
 	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Attack)
 	{
 		// 기본 상태 임시 저장 후 반환
@@ -154,7 +165,7 @@ void UTA_CombatComponent::DashEnd()
 void UTA_CombatComponent::RollStart(FVector2D InMovementVector)
 {
 	if (!IsValid(OwnerPlayer)) return;
-	if (CombatState == ECombatState::CS_Roll) return;
+	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Special) return;
 	if (OwnerPlayer->GetCharacterMovement()->IsFalling()) return;
 
 	// 현재 체력에서 구르기가 가능한 경우
@@ -212,7 +223,7 @@ void UTA_CombatComponent::RollEnd(UAnimMontage* Montage, bool bInterrupted)
 void UTA_CombatComponent::CombatJump()
 {
 	if (!OwnerPlayer) return;
-	if (CombatState == ECombatState::CS_Roll) return;
+	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Attack || CombatState == ECombatState::CS_Special) return;
 
 	OwnerPlayer->Jump();
 }
@@ -220,8 +231,15 @@ void UTA_CombatComponent::CombatJump()
 void UTA_CombatComponent::Attack()
 {
 	if (!OwnerPlayer) return;
-	// 구르기 상태인 경우 반환
+	// Roll 상태인 경우 반환
 	if (CombatState == ECombatState::CS_Roll) return;
+
+	// Special 상태인 경우
+	if (CombatState == ECombatState::CS_Special)
+	{
+		ShootArrow();
+		return;
+	}
 
 	// 공격중이 아닌 경우
 	if (!bIsAttacking)
@@ -260,8 +278,63 @@ void UTA_CombatComponent::AttackMove(float InAttackMoveForce)
 	OwnerPlayer->GetCharacterMovement()->AddImpulse(Impulse, true);
 }
 
+void UTA_CombatComponent::RightClickStart()
+{
+	if (!OwnerPlayer) return;
+
+	// Idle, Dash 상태가 아니라면 반환
+	if (!(CombatState == ECombatState::CS_Idle) && !(CombatState == ECombatState::CS_Dash)) return;
+
+	switch (EquippedState)
+	{
+	case EEquippedState::ES_Idle:
+		break;
+	case EEquippedState::ES_Sword:
+		break;
+	case EEquippedState::ES_Bow:
+		DrawArrow();
+		break;
+	case EEquippedState::ES_Torch:
+		break;
+	default:
+		break;
+	}
+}
+
+void UTA_CombatComponent::RightClickEnd()
+{
+	if (!OwnerPlayer) return;
+
+	// Special 상태가 아니라면 Return;
+	if (CombatState != ECombatState::CS_Special) return;
+
+	switch (EquippedState)
+	{
+	case EEquippedState::ES_Idle:
+		break;
+	case EEquippedState::ES_Sword:
+		break;
+	case EEquippedState::ES_Bow:
+		bIsHold = false;
+		bCanShoot = false;
+
+		OwnerPlayer->bUseControllerRotationYaw = false;
+		OwnerPlayer->GetCharacterMovement()->bOrientRotationToMovement = true;
+		
+		ResetBow();
+
+		ChangeState(ECombatState::CS_Idle);
+		break;
+	case EEquippedState::ES_Torch:
+		break;
+	default:
+		break;
+	}
+}
+
 void UTA_CombatComponent::JumpAttack()
 {
+	if (!JumpAttackMontages.Find(EquippedState) || !IsValid(JumpAttackMontages[EquippedState])) return;
 	// 애님 인스턴스 받아오기
 	UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
 	if (!AnimInstance) return;
@@ -270,23 +343,23 @@ void UTA_CombatComponent::JumpAttack()
 	bIsAttacking = true;
 
 	// 점프 공격 몽타주 재생
-	AnimInstance->Montage_Play(JumpAttackMontage);
+	AnimInstance->Montage_Play(JumpAttackMontages[EquippedState]);
 
 	FOnMontageEnded MontageEndDelegate;
-	MontageEndDelegate.BindUObject(this, &UTA_CombatComponent::JumpAttackMontageEnded);
+	MontageEndDelegate.BindUObject(this, &UTA_CombatComponent::JumpAttackEnd);
 
-	AnimInstance->Montage_SetEndDelegate(MontageEndDelegate, JumpAttackMontage);
+	AnimInstance->Montage_SetEndDelegate(MontageEndDelegate, JumpAttackMontages[EquippedState]);
 }
 
-void UTA_CombatComponent::JumpAttackMontageEnded(UAnimMontage* Montage, bool IsEnded)
+void UTA_CombatComponent::JumpAttackEnd(UAnimMontage* Montage, bool IsEnded)
 {
 	bIsAttacking = false;
 }
 
 void UTA_CombatComponent::ComboStart()
 {
-	if (!ComboAttackData) return;
-
+	if (!ComboAttackDatas.Find(EquippedState) || !IsValid(ComboAttackDatas[EquippedState])) return;
+	
 	// 임시 상태 저장
 	if (CombatState == ECombatState::CS_Idle || CombatState == ECombatState::CS_Dash)
 	{
@@ -303,13 +376,13 @@ void UTA_CombatComponent::ComboStart()
 	if (!AnimInstance) return;
 
 	// 콤보 몽타주 재생
-	AnimInstance->Montage_Play(ComboAttackData->ComboMontage);
+	AnimInstance->Montage_Play(ComboAttackDatas[EquippedState]->ComboMontage);
 
 	// 몽타주 종료 이벤트 바인딩
 	FOnMontageEnded MontageEndDelegate;
 	MontageEndDelegate.BindUObject(this, &UTA_CombatComponent::EndCombo);
 
-	AnimInstance->Montage_SetEndDelegate(MontageEndDelegate, ComboAttackData->ComboMontage);
+	AnimInstance->Montage_SetEndDelegate(MontageEndDelegate, ComboAttackDatas[EquippedState]->ComboMontage);
 	
 	// 타이머 핸들 초기화
 	ComboTimerHandle.Invalidate();
@@ -337,10 +410,10 @@ void UTA_CombatComponent::SetComboTimer()
 
 	// 콤보 인덱스의 콤보 체크 타이머 설정
 	// * 체크 인덱스가 유효한 경우
-	if (ComboAttackData && ComboAttackData->ComboFrame.IsValidIndex(ComboIndex))
+	if (IsValid(ComboAttackDatas[EquippedState]) && ComboAttackDatas[EquippedState]->ComboFrame.IsValidIndex(ComboIndex))
 	{
 		// 콤보 체크 타이머 설정
-		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UTA_CombatComponent::CheckCombo, ComboAttackData->ComboFrame[ComboIndex], false);
+		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UTA_CombatComponent::CheckCombo, ComboAttackDatas[EquippedState]->ComboFrame[ComboIndex], false);
 	}
 }
 
@@ -356,22 +429,105 @@ void UTA_CombatComponent::CheckCombo()
 		ComboCount++;
 
 		// 콤보 수가 최대 콤보 수를 넘지 않은 경우
-		if (ComboAttackData->MaxCount >= ComboCount)
+		if (ComboAttackDatas[EquippedState]->MaxCount >= ComboCount)
 		{
 			// 애님 인스턴스 받아오기
 			UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
 			if (!AnimInstance) return;
 
 			// 콤보 섹션 이름 저장
-			FName ComboSectionName = *FString::Printf(TEXT("%s%d"), *ComboAttackData->SectionBaseName, ComboCount);
+			FName ComboSectionName = *FString::Printf(TEXT("%s%d"), *ComboAttackDatas[EquippedState]->SectionBaseName, ComboCount);
 			// 몽타주 섹션 이동
-			AnimInstance->Montage_JumpToSection(ComboSectionName, ComboAttackData->ComboMontage);
+			AnimInstance->Montage_JumpToSection(ComboSectionName, ComboAttackDatas[EquippedState]->ComboMontage);
 
 			// 타이머 설정
 			SetComboTimer();
 			// 콤보 입력 초기화
 			bIsComboInput = false;
 		}
+	}
+}
+
+void UTA_CombatComponent::DrawArrow()
+{
+	if (bIsHold) return;
+
+	UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		// 상태 변경
+		ChangeState(ECombatState::CS_Special);
+
+		OwnerPlayer->bUseControllerRotationYaw = true;
+		OwnerPlayer->GetCharacterMovement()->bOrientRotationToMovement = false;
+
+		bIsHold = true;
+
+		// 몽타주 재생
+		AnimInstance->Montage_Play(DrawArrowMontage, 1.0f);
+
+		// 몽타주 재생 종료 바인딩
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindUObject(this, &UTA_CombatComponent::DrawArrowEnd);
+
+		// DrawArrowMontage가 종료되면 EndDelegate에 연동된 DrawArrowEnd함수 호출
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, DrawArrowMontage);
+	}
+}
+
+void UTA_CombatComponent::DrawArrowEnd(UAnimMontage* Montage, bool IsEnded)
+{	
+	if (bIsHold)
+	{
+		bCanShoot = true;
+	}
+	else
+	{
+		bCanShoot = false;
+		ResetBow();
+	}
+}
+
+void UTA_CombatComponent::ShootArrow()
+{
+	if (bCanShoot && bIsHold)
+	{
+		UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			// 플레이어 이동 제한
+			OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+			bCanShoot = false;
+
+			// 몽타주 재생
+			AnimInstance->Montage_Play(ShootArrowMontage, 1.0f);
+
+			// 몽타주 재생 종료 바인딩
+			FOnMontageEnded EndDelegate;
+			EndDelegate.BindUObject(this, &UTA_CombatComponent::ReleaseArrowEnd);
+
+			// ShootArrowMontage가 종료되면 EndDelegate에 연동된 ReleaseArrowEnd함수 호출
+			AnimInstance->Montage_SetEndDelegate(EndDelegate, ShootArrowMontage);
+
+			// TODO : 화살 발사
+		}
+	}
+}
+
+void UTA_CombatComponent::ReleaseArrowEnd(UAnimMontage* Montage, bool IsEnded)
+{
+	// 플레이어 이동 제한 해제
+	OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	RightClickEnd();
+}
+
+void UTA_CombatComponent::ResetBow()
+{
+	ATA_Bow* BowWeapon = Cast<ATA_Bow>(EquippedWeapon);
+	if (BowWeapon)
+	{
+		BowWeapon->SetIsHold(false);
 	}
 }
 
@@ -415,7 +571,35 @@ void UTA_CombatComponent::ChangeState(ECombatState NewState)
 
 	case ECombatState::CS_Attack:
 		break;
+
+	case ECombatState::CS_Special:
+		OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		break;
 	}
 
 	CombatState = NewState;
+}
+
+void UTA_CombatComponent::EquipWeapon(ATA_WeaponBase* Weapon)
+{
+	if (Weapon)
+	{
+		Weapon->EquipWeapon(OwnerPlayer->GetMesh());
+		EquippedWeapon = Weapon;
+
+		switch (Weapon->GetWeaponType())
+		{
+		case EWeaponType::WT_Sword:
+			EquippedState = EEquippedState::ES_Sword;
+			break;
+
+		case EWeaponType::WT_Bow:
+			EquippedState = EEquippedState::ES_Bow;
+			break;
+
+		case EWeaponType::WT_Torch:
+			EquippedState = EEquippedState::ES_Torch;
+			break;
+		}
+	}
 }

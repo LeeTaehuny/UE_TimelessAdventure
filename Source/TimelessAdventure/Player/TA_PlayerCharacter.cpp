@@ -58,11 +58,3 @@ void ATA_PlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 }
-
-bool ATA_PlayerCharacter::GetIsAttacking()
-{
-	if (!TA_CombatComponent) return false;
-
-	return TA_CombatComponent->GetIsAttacking();
-}
-

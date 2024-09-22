@@ -44,6 +44,8 @@ protected:
 	void BasicRoll();								// 구르기
 	void BasicJump();								// 점프
 	void LeftClick();								// 좌클릭
+	void RightClickStart();							// 우클릭 시작
+	void RightClickEnd();							// 우클릭 종료
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -65,6 +67,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_LeftClick;
+
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_RightClick;
 
 // Member
 private:

@@ -9,7 +9,7 @@
 #include "TA_PlayerCharacter.generated.h"
 
 UCLASS()
-class TIMELESSADVENTURE_API ATA_PlayerCharacter : public ACharacter, public IAnimUpdateInterface,
+class TIMELESSADVENTURE_API ATA_PlayerCharacter : public ACharacter,
 	public ICombatComponentInterface
 {
 	GENERATED_BODY()
@@ -30,8 +30,6 @@ public:
 public:
 	FORCEINLINE virtual class UTA_CombatComponent* GetCombatComponent() override { return TA_CombatComponent; }
 	FORCEINLINE class UTA_InputComponent* GetInputComponent() { return TA_InputComponent; }
-
-	virtual bool GetIsAttacking() override;
 
 // Camera Component
 protected:

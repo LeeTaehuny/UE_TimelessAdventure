@@ -15,6 +15,16 @@ enum class ECombatState : uint8
 	CS_Dash,			// 달리기
 	CS_Roll,			// 구르기 (회피)
 	CS_Attack,			// 공격
+	CS_Special,			// 특수 동작
+};
+
+UENUM(BlueprintType)
+enum class EEquippedState : uint8
+{
+	ES_Idle,		// 기본
+	ES_Sword,		// 검
+	ES_Bow,			// 활
+	ES_Torch,		// 횃불
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -36,8 +46,12 @@ public:
 	// 체력 퍼센트 반환 함수
 	float GetHealthPercent();
 
+	// 현재 들고있는 무기 반환 함수
+	FORCEINLINE class ATA_WeaponBase* GetEquippedWeapon() { return EquippedWeapon; }
 	// 현재 공격 여부 반환 함수
 	FORCEINLINE bool GetIsAttacking() { return bIsAttacking; }
+	// 현재 활 Draw 여부 반환 함수
+	FORCEINLINE bool GetIsHolding() { return bIsHold; }
 
 // Delegate
 public:
@@ -61,24 +75,20 @@ public:
 	void RollEnd(class UAnimMontage* Montage, bool bInterrupted);
 	// Jump
 	void CombatJump();
-
-private:
-	// Roll Montage
-	UPROPERTY(EditAnywhere, Category = "Anims")
-	TObjectPtr<class UAnimMontage> RollMontage;
-
-
-// Actions
-public:
-	// 공격
+	// Attack
 	void Attack();
-	// 공격 이동
+	// Attack Move
 	void AttackMove(float InAttackMoveForce);
+	// Right click
+	void RightClickStart();
+	void RightClickEnd();
 
 // ComboAttack
 private:
 	// 점프 공격
 	void JumpAttack();
+	// 점프 공격 종료
+	void JumpAttackEnd(class UAnimMontage* Montage, bool IsEnded);
 	// 콤보 공격 시작
 	void ComboStart();
 	// 콤보 공격 종료
@@ -91,7 +101,7 @@ private:
 
 	// 콤보 데이터
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	TObjectPtr<class UTA_ComboAttackData> ComboAttackData;
+	TMap<EEquippedState, TObjectPtr<class UTA_ComboAttackData>> ComboAttackDatas;
 
 	// 콤보 타이머 핸들
 	FTimerHandle ComboTimerHandle;
@@ -105,12 +115,38 @@ private:
 	// 콤보 공격 카운트
 	int32 ComboCount;
 
+private:
+	// 화살 Draw
+	void DrawArrow();
+	// 화살 Draw End
+	void DrawArrowEnd(class UAnimMontage* Montage, bool IsEnded);
+	// 화살 Shoot
+	void ShootArrow();
+	// 화살 Shoot End
+	void ReleaseArrowEnd(class UAnimMontage* Montage, bool IsEnded);
+
+	// 활 리셋
+	void ResetBow();
+
+	bool bIsHold;
+	bool bCanShoot;
+
 // Animations
 private:
 	UPROPERTY(EditAnywhere, Category = "Animation", meta = (PrivateAllowAccess = "true"))
-	TObjectPtr<class UAnimMontage> JumpAttackMontage;
-	
-	void JumpAttackMontageEnded(class UAnimMontage* Montage, bool IsEnded);
+	TMap<EEquippedState, TObjectPtr<class UAnimMontage>> JumpAttackMontages;
+
+	// Roll Montage
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> RollMontage;
+
+	// Draw Arrow Montage
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> DrawArrowMontage;
+
+	// Shoot Arrow Montage
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> ShootArrowMontage;
 
 // Stat
 private:
@@ -134,9 +170,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Stat")
 	float UseHealthPercent;
 
-	// 지속 체력 증가/감소 판별 (true : 감소, false : 증가)
-	bool bUseHealth;
-
 private:
 	// Change Combat State
 	void ChangeState(ECombatState NewState);
@@ -144,6 +177,9 @@ private:
 	ECombatState CombatState;
 	// Cache - Prev Combat State
 	ECombatState TempState;
+
+	// Current Weapon State
+	EEquippedState EquippedState;
 
 private:
 	// Walk Speed
@@ -157,4 +193,14 @@ private:
 	// 구르기에 사용될 체력 퍼센트
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float RollHealthPercent;
+
+// TEST
+private:
+	void EquipWeapon(class ATA_WeaponBase* Weapon);
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	TSubclassOf<class ATA_WeaponBase> WeaponClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	TObjectPtr<class ATA_WeaponBase> EquippedWeapon; 
 };

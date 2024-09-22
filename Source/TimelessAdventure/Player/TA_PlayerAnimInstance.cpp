@@ -2,7 +2,8 @@
 
 
 #include "TA_PlayerAnimInstance.h"
-#include "Interface/AnimUpdateInterface.h"
+#include "Interface/CombatComponentInterface.h"
+#include "Component/TA_CombatComponent.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -49,10 +50,16 @@ void UTA_PlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		CurrentWorldLocation = Player->GetActorLocation();
 		// 현재 스피드 저장
 		DeltaSpeed = DistanceLastUpdate / DeltaSeconds;
+		// 방향 저장
+		Direction = CalculateDirection(Velocity, Player->GetActorRotation());
 	}
 
-	if (IAnimUpdateInterface* AnimInterface = Cast<IAnimUpdateInterface>(Player))
+	if (ICombatComponentInterface* CombatInterface = Cast<ICombatComponentInterface>(Player))
 	{
-		bIsAttacking = AnimInterface->GetIsAttacking();
+		if (IsValid(CombatInterface->GetCombatComponent()))
+		{
+			bIsAttacking = CombatInterface->GetCombatComponent()->GetIsAttacking();
+			bIsHold = CombatInterface->GetCombatComponent()->GetIsHolding();
+		}
 	}
 }
