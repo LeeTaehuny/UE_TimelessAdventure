@@ -476,10 +476,15 @@ void UTA_CombatComponent::CheckCombo()
 void UTA_CombatComponent::DrawArrow()
 {
 	if (bIsHold) return;
+	if (bCanShoot) return;
+	if (CombatState == ECombatState::CS_Special) return;
 
 	UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
+		// 몽타주 재생중이면 반환
+		if (AnimInstance->Montage_IsPlaying(DrawArrowMontage)) return;
+
 		// 상태 변경
 		ChangeState(ECombatState::CS_Special);
 
@@ -534,8 +539,6 @@ void UTA_CombatComponent::ShootArrow()
 
 			// ShootArrowMontage가 종료되면 EndDelegate에 연동된 ReleaseArrowEnd함수 호출
 			AnimInstance->Montage_SetEndDelegate(EndDelegate, ShootArrowMontage);
-
-			// TODO : 화살 발사
 		}
 	}
 }
@@ -567,6 +570,7 @@ void UTA_CombatComponent::ResetBow()
 	if (BowWeapon)
 	{
 		BowWeapon->SetIsHold(false);
+		BowWeapon->RemoveArrow();
 	}
 }
 

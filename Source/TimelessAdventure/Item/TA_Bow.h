@@ -24,6 +24,14 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
+public:
+	// 화살 생성 함수
+	void SpawnArrow(USkeletalMeshComponent* Mesh);
+	// 화살 발사 함수
+	void ShootArrow();
+	// 화살 삭제 함수
+	void RemoveArrow();
+
 private:
 	// 화살 위치 반환용 함수
 	FVector GetArrowSocketLocation(USkeletalMeshComponent* Mesh);
@@ -40,11 +48,17 @@ private:
 	UPROPERTY(EditAnywhere, Category = "SocketName", meta = (AllowPrivateAccess = "true"))
 	FName QuiverSocketName;
 
-	UPROPERTY(EditAnywhere, Category = "SocketName", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Bow", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> QuiverClass;
 
-	UPROPERTY(VisibleAnywhere, Category = "SocketName", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Bow", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AActor> Quiver;
+
+	UPROPERTY(EditAnywhere, Category = "Bow", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class ATA_Arrow> ArrowClass;
+
+	UPROPERTY(EditAnywhere, Category = "Bow", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class ATA_Arrow> Arrow;
 
 	bool bIsHold;
 
