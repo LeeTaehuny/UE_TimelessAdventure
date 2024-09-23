@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Item/TA_Bow.h"
@@ -17,8 +17,8 @@ void ATA_Bow::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// È­»ì ÁÙÀÇ ·ÎÄÃ À§Ä¡¸¦ ±¸ÇØÁÝ´Ï´Ù.
-	// * GetTransform().InverseTransformPosition(¼ÒÄÏ À§Ä¡) : ¿ùµå »óÀÇ ¼ÒÄÏ À§Ä¡¸¦ ¿ùµåº¯È¯Çà·ÄÀÇ ¿ªÇÔ¼ö¸¦ °öÇØ ·ÎÄÃ À§Ä¡¸¦ ±¸ÇÕ´Ï´Ù.
+	// í™”ì‚´ ì¤„ì˜ ë¡œì»¬ ìœ„ì¹˜ë¥¼ êµ¬í•´ì¤ë‹ˆë‹¤.
+	// * GetTransform().InverseTransformPosition(ì†Œì¼“ ìœ„ì¹˜) : ì›”ë“œ ìƒì˜ ì†Œì¼“ ìœ„ì¹˜ë¥¼ ì›”ë“œë³€í™˜í–‰ë ¬ì˜ ì—­í•¨ìˆ˜ë¥¼ ê³±í•´ ë¡œì»¬ ìœ„ì¹˜ë¥¼ êµ¬í•©ë‹ˆë‹¤.
 	BaseLocation = GetTransform().InverseTransformPosition(WeaponMesh->GetSocketLocation(StringSocketName));
 }
 
@@ -28,21 +28,21 @@ void ATA_Bow::Tick(float DeltaSeconds)
 
 	if (bIsHold)
 	{
-		// È­»ì À§Ä¡¸¦ Àü´Þ¹Þ¾Æ StringLocation¿¡ ÀúÀåÇÕ´Ï´Ù.
+		// í™”ì‚´ ìœ„ì¹˜ë¥¼ ì „ë‹¬ë°›ì•„ StringLocationì— ì €ìž¥í•©ë‹ˆë‹¤.
 		StringLocation = GetArrowSocketLocation(TempMesh);
-		// È­»ì ÁÙ BoneÀÇ À§Ä¡¸¦ ´ç°ÜÁø »óÅÂ·Î ¼³Á¤ÇÕ´Ï´Ù.
+		// í™”ì‚´ ì¤„ Boneì˜ ìœ„ì¹˜ë¥¼ ë‹¹ê²¨ì§„ ìƒíƒœë¡œ ì„¤ì •í•©ë‹ˆë‹¤.
 		WeaponMesh->SetBoneLocationByName(StringSocketName, StringLocation, EBoneSpaces::WorldSpace);
 	}
 	else
 	{
-		// È­»ì ÁÙ BoneÀÇ À§Ä¡¸¦ ±âº» À§Ä¡·Î ¼³Á¤ÇÕ´Ï´Ù.
+		// í™”ì‚´ ì¤„ Boneì˜ ìœ„ì¹˜ë¥¼ ê¸°ë³¸ ìœ„ì¹˜ë¡œ ì„¤ì •í•©ë‹ˆë‹¤.
 		WeaponMesh->SetBoneLocationByName(StringSocketName, BaseLocation, EBoneSpaces::ComponentSpace);
 	}
 }
 
 FVector ATA_Bow::GetArrowSocketLocation(USkeletalMeshComponent* Mesh)
 {
-	// È­»ì ¼ÒÄÏ À§Ä¡¸¦ ¹ÝÈ¯ÇÕ´Ï´Ù.
+	// í™”ì‚´ ì†Œì¼“ ìœ„ì¹˜ë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.
 	return Mesh->GetSocketLocation(ArrowSocketName);
 }
 
@@ -50,7 +50,7 @@ void ATA_Bow::EquipWeapon(USkeletalMeshComponent* Mesh)
 {
 	Super::EquipWeapon(Mesh);
 
-	// È­»ìÅë ½ºÆù
+	// í™”ì‚´í†µ ìŠ¤í°
 	Quiver = GetWorld()->SpawnActor<AActor>(QuiverClass, GetActorTransform());
 	Quiver->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetIncludingScale, QuiverSocketName);
 }

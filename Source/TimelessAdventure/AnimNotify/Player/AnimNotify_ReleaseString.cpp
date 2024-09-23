@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "AnimNotify/Player/AnimNotify_ReleaseString.h"
@@ -12,7 +12,7 @@ void UAnimNotify_ReleaseString::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 
 	if (ICombatComponentInterface* CombatPlayer = Cast<ICombatComponentInterface>(MeshComp->GetOwner()))
 	{
-		// È°·Î Çüº¯È¯
+		// í™œë¡œ í˜•ë³€í™˜
 		if (ATA_Bow* BowWeapon = Cast<ATA_Bow>(CombatPlayer->GetCombatComponent()->GetEquippedWeapon()))
 		{
 			BowWeapon->SetIsHold(false);

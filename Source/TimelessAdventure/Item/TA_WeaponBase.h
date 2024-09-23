@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,9 +9,9 @@
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
-	WT_Sword,	// °Ë
-	WT_Bow,		// È°
-	WT_Torch,	// È¶ºÒ
+	WT_Sword,	// ê²€
+	WT_Bow,		// í™œ
+	WT_Torch,	// íšƒë¶ˆ
 };
 
 /**
@@ -32,17 +32,17 @@ public:
 	virtual void EquipWeapon(class USkeletalMeshComponent* Mesh);
 
 protected:
-	// ºÎÂøÇÒ ¼ÒÄÏ ÀÌ¸§
+	// ë¶€ì°©í•  ì†Œì¼“ ì´ë¦„
 	UPROPERTY(EditAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	FName WeaponSocketName;
 
-	// ¹«±â ¸Ş½¬
+	// ë¬´ê¸° ë©”ì‰¬
 	UPROPERTY(VisibleAnywhere, Category = "Component")
 	TObjectPtr<class UPoseableMeshComponent> WeaponMesh;
 
-	// ¹«±â Å¸ÀÔ
+	// ë¬´ê¸° íƒ€ì…
 	EWeaponType WeaponType;
 
-	// ÀÓ½Ã ½ºÄÌ·¹Åæ ÀúÀå
+	// ì„ì‹œ ìŠ¤ì¼ˆë ˆí†¤ ì €ì¥
 	TObjectPtr<class USkeletalMeshComponent> TempMesh;
 };

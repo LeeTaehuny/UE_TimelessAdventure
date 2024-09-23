@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -15,23 +15,23 @@ class TIMELESSADVENTURE_API UTA_ComboAttackData : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-	// ÄŞº¸¿¡ »ç¿ëµÉ ¸ùÅ¸ÁÖ
+	// ì½¤ë³´ì— ì‚¬ìš©ë  ëª½íƒ€ì£¼
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> ComboMontage;
 
-	// ÃÖ´ë ÄŞº¸ ¼ö
+	// ìµœëŒ€ ì½¤ë³´ ìˆ˜
 	UPROPERTY(EditAnywhere, Category = "ComboData")
 	int32 MaxCount;
 
-	// ÄŞº¸¸¦ ÀÌ¾î°¡±â À§ÇÑ ÃÖ´ë Ã¼Å© ½Ã°£
+	// ì½¤ë³´ë¥¼ ì´ì–´ê°€ê¸° ìœ„í•œ ìµœëŒ€ ì²´í¬ ì‹œê°„
 	UPROPERTY(EditAnywhere, Category = "ComboData")
 	TArray<float> ComboFrame;
 
-	// ÄŞº¸ ¸ùÅ¸ÁÖ ¼½¼Ç ÀÌ¸§
+	// ì½¤ë³´ ëª½íƒ€ì£¼ ì„¹ì…˜ ì´ë¦„
 	UPROPERTY(EditAnywhere, Category = "ComboData")
 	FString SectionBaseName;
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı ¼Óµµ
+	// ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ ì†ë„
 	UPROPERTY(EditAnywhere, Category = "ComboData")
 	float FrameRate;
 };

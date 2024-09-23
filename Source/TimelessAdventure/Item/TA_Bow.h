@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -25,7 +25,7 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 private:
-	// È­»ì À§Ä¡ ¹ÝÈ¯¿ë ÇÔ¼ö
+	// í™”ì‚´ ìœ„ì¹˜ ë°˜í™˜ìš© í•¨ìˆ˜
 	FVector GetArrowSocketLocation(USkeletalMeshComponent* Mesh);
 
 	virtual void EquipWeapon(class USkeletalMeshComponent* Mesh) override;
