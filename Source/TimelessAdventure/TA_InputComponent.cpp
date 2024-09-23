@@ -231,7 +231,7 @@ void UTA_InputComponent::BasicJump()
 {
 	if (PlayerState == EPlayerState::PS_Roll) return;
 
-	if (IsValid(OwnerPlayer))
+	if (IsValid(OwnerPlayer) && !IsAttacking())
 	{
 		OwnerPlayer->Jump();
 	}
