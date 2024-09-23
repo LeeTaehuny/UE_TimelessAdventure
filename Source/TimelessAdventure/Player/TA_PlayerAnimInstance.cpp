@@ -52,6 +52,8 @@ void UTA_PlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		DeltaSpeed = DistanceLastUpdate / DeltaSeconds;
 		// 방향 저장
 		Direction = CalculateDirection(Velocity, Player->GetActorRotation());
+		// 에임 오프셋 저장
+		AimOffset = Player->GetBaseAimRotation().Pitch;
 	}
 
 	if (ICombatComponentInterface* CombatInterface = Cast<ICombatComponentInterface>(Player))
@@ -60,6 +62,7 @@ void UTA_PlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			bIsAttacking = CombatInterface->GetCombatComponent()->GetIsAttacking();
 			bIsHold = CombatInterface->GetCombatComponent()->GetIsHolding();
+			bIsGuard = CombatInterface->GetCombatComponent()->GetIsGuard();
 		}
 	}
 }

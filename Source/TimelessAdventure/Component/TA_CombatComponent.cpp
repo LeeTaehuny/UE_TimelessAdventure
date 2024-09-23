@@ -10,6 +10,7 @@
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 UTA_CombatComponent::UTA_CombatComponent()
 {
@@ -27,6 +28,9 @@ UTA_CombatComponent::UTA_CombatComponent()
 	WalkSpeed = 300.0f;
 	DashSpeed = 600.0f;
 	RollHealthPercent = 0.2f;
+
+	ZoomInDistance = 100.0f;
+	IdleDistance = 500.0f;
 
 	bIsHold = false;
 	bCanShoot = false;
@@ -53,6 +57,7 @@ void UTA_CombatComponent::Init()
 {
 	// 값 초기화 (체력, HP)
 	CurrrentHp = MaxHp;
+	CurrentStamina = MaxStamina;
 
 	// 이동속도 초기화
 	OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
@@ -61,6 +66,8 @@ void UTA_CombatComponent::Init()
 void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (!OwnerPlayer) return;
 
 	// 현재 Dash 상태인 경우
 	if (CombatState == ECombatState::CS_Dash)
@@ -85,6 +92,16 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		}
 	}
 
+	// 현재 Hold 중인 경우
+	if (bIsHold)
+	{
+		OwnerPlayer->GetSpringArmComponent()->TargetArmLength = FMath::FInterpTo(OwnerPlayer->GetSpringArmComponent()->TargetArmLength, ZoomInDistance, DeltaTime, 5.0f);
+	}
+	else
+	{
+		OwnerPlayer->GetSpringArmComponent()->TargetArmLength = FMath::FInterpTo(OwnerPlayer->GetSpringArmComponent()->TargetArmLength, IdleDistance, DeltaTime, 20.0f);
+	}
+	
 	// TEST : 로그
 	{
 		FString Name;
@@ -102,6 +119,9 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 			break;
 		case ECombatState::CS_Attack:
 			Name = TEXT("Attack");
+			break;
+		case ECombatState::CS_Special:
+			Name = TEXT("Special");
 			break;
 		default:
 			break;
@@ -290,6 +310,7 @@ void UTA_CombatComponent::RightClickStart()
 	case EEquippedState::ES_Idle:
 		break;
 	case EEquippedState::ES_Sword:
+		GuardStart();
 		break;
 	case EEquippedState::ES_Bow:
 		DrawArrow();
@@ -313,6 +334,10 @@ void UTA_CombatComponent::RightClickEnd()
 	case EEquippedState::ES_Idle:
 		break;
 	case EEquippedState::ES_Sword:
+		bIsGuard = false;
+		OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+		ChangeState(ECombatState::CS_Idle);
 		break;
 	case EEquippedState::ES_Bow:
 		bIsHold = false;
@@ -520,6 +545,20 @@ void UTA_CombatComponent::ReleaseArrowEnd(UAnimMontage* Montage, bool IsEnded)
 	// 플레이어 이동 제한 해제
 	OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	RightClickEnd();
+}
+
+void UTA_CombatComponent::GuardStart()
+{
+	if (OwnerPlayer->GetCharacterMovement()->IsFalling()) return;
+	if (bIsGuard) return;
+
+	// 플레이어 이동 제한
+	OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	// 상태 변경
+	ChangeState(ECombatState::CS_Special);
+
+	bIsGuard = true;
 }
 
 void UTA_CombatComponent::ResetBow()

@@ -30,6 +30,7 @@ public:
 public:
 	FORCEINLINE virtual class UTA_CombatComponent* GetCombatComponent() override { return TA_CombatComponent; }
 	FORCEINLINE class UTA_InputComponent* GetInputComponent() { return TA_InputComponent; }
+	FORCEINLINE class USpringArmComponent* GetSpringArmComponent() { return SpringArmComp; }
 
 // Camera Component
 protected:

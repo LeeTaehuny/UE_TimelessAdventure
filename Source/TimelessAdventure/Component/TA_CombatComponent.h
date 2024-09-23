@@ -52,6 +52,8 @@ public:
 	FORCEINLINE bool GetIsAttacking() { return bIsAttacking; }
 	// 현재 활 Draw 여부 반환 함수
 	FORCEINLINE bool GetIsHolding() { return bIsHold; }
+	// 현재 방어 여부 반환 함수
+	FORCEINLINE bool GetIsGuard() { return bIsGuard; }
 
 // Delegate
 public:
@@ -115,6 +117,7 @@ private:
 	// 콤보 공격 카운트
 	int32 ComboCount;
 
+// Special Actions
 private:
 	// 화살 Draw
 	void DrawArrow();
@@ -125,11 +128,15 @@ private:
 	// 화살 Shoot End
 	void ReleaseArrowEnd(class UAnimMontage* Montage, bool IsEnded);
 
+	// Guard Start
+	void GuardStart();
+
 	// 활 리셋
 	void ResetBow();
 
 	bool bIsHold;
 	bool bCanShoot;
+	bool bIsGuard;
 
 // Animations
 private:
@@ -193,6 +200,13 @@ private:
 	// 구르기에 사용될 체력 퍼센트
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float RollHealthPercent;
+
+	// Zoom 카메라 거리
+	UPROPERTY(EditAnywhere, Category = "Zoom", meta = (AllowPrivateAccess = "true"))
+	float ZoomInDistance;
+	// 기본 카메라 거리
+	UPROPERTY(EditAnywhere, Category = "Zoom", meta = (AllowPrivateAccess = "true"))
+	float IdleDistance;
 
 // TEST
 private:
