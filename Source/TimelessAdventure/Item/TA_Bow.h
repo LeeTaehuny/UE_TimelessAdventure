@@ -31,6 +31,8 @@ public:
 	void ShootArrow();
 	// 화살 삭제 함수
 	void RemoveArrow();
+	// 무기 삭제 함수
+	virtual void RemoveWeapon() override;
 
 private:
 	// 화살 위치 반환용 함수

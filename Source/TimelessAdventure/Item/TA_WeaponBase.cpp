@@ -21,3 +21,8 @@ void ATA_WeaponBase::EquipWeapon(USkeletalMeshComponent* Mesh)
 		TempMesh = Mesh;
 	}
 }
+
+void ATA_WeaponBase::RemoveWeapon()
+{
+	Destroy();
+}

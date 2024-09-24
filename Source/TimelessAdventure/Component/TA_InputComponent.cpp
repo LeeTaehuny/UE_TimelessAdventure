@@ -58,6 +58,8 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(IA_LeftClick, ETriggerEvent::Started, this, &UTA_InputComponent::LeftClick);
 	EnhancedInputComponent->BindAction(IA_RightClick, ETriggerEvent::Started, this, &UTA_InputComponent::RightClickStart);
 	EnhancedInputComponent->BindAction(IA_RightClick, ETriggerEvent::Completed, this, &UTA_InputComponent::RightClickEnd);
+	EnhancedInputComponent->BindAction(IA_MiddleClick, ETriggerEvent::Started, this, &UTA_InputComponent::MiddleClickStart);
+	EnhancedInputComponent->BindAction(IA_MiddleClick, ETriggerEvent::Completed, this, &UTA_InputComponent::MiddleClickEnd);
 	
 }
 
@@ -142,6 +144,26 @@ void UTA_InputComponent::RightClickEnd()
 	{
 	case EPlayerState::PS_Combat:
 		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->RightClickEnd();
+		break;
+	}
+}
+
+void UTA_InputComponent::MiddleClickStart()
+{
+	switch (PlayerState)
+	{
+	case EPlayerState::PS_Combat:
+		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->MiddleClickStart();
+		break;
+	}
+}
+
+void UTA_InputComponent::MiddleClickEnd()
+{
+	switch (PlayerState)
+	{
+	case EPlayerState::PS_Combat:
+		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->MiddleClickEnd();
 		break;
 	}
 }

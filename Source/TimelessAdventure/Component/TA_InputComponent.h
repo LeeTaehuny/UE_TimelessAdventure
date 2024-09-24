@@ -46,6 +46,8 @@ protected:
 	void LeftClick();								// 좌클릭
 	void RightClickStart();							// 우클릭 시작
 	void RightClickEnd();							// 우클릭 종료
+	void MiddleClickStart();						// 중간 버튼 클릭 시작
+	void MiddleClickEnd();							// 중간 버튼 클릭 종료
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -70,6 +72,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_RightClick;
+
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_MiddleClick;
 
 // Member
 private:

@@ -117,6 +117,21 @@ void ATA_Bow::RemoveArrow()
 	}
 }
 
+void ATA_Bow::RemoveWeapon()
+{
+	if (Arrow)
+	{
+		Arrow->Destroy();
+	}
+
+	if (Quiver)
+	{
+		Quiver->Destroy();
+	}
+
+	Super::RemoveWeapon();
+}
+
 FVector ATA_Bow::GetArrowSocketLocation(USkeletalMeshComponent* Mesh)
 {
 	// 화살 소켓 위치를 반환합니다.

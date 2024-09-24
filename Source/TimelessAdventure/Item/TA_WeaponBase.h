@@ -30,6 +30,7 @@ public:
 
 public:
 	virtual void EquipWeapon(class USkeletalMeshComponent* Mesh);
+	virtual void RemoveWeapon();
 
 protected:
 	// 부착할 소켓 이름

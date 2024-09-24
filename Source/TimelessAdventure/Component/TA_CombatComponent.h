@@ -25,6 +25,7 @@ enum class EEquippedState : uint8
 	ES_Sword,		// 검
 	ES_Bow,			// 활
 	ES_Torch,		// 횃불
+	ES_Cancel,		// 초기화
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -55,6 +56,8 @@ public:
 	// 현재 방어 여부 반환 함수
 	FORCEINLINE bool GetIsGuard() { return bIsGuard; }
 
+	void SetChangeWeaponState(EEquippedState NewState);
+
 // Delegate
 public:
 	// 체력이 0이 되면 사용할 델리게이트
@@ -84,6 +87,9 @@ public:
 	// Right click
 	void RightClickStart();
 	void RightClickEnd();
+	// Middle click
+	void MiddleClickStart();
+	void MiddleClickEnd();
 
 // ComboAttack
 private:
@@ -187,6 +193,8 @@ private:
 
 	// Current Weapon State
 	EEquippedState EquippedState;
+	// Temp Weapon State
+	EEquippedState TempEquippedState;
 
 private:
 	// Walk Speed
@@ -208,12 +216,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Zoom", meta = (AllowPrivateAccess = "true"))
 	float IdleDistance;
 
-// TEST
+// Weapon
 private:
-	void EquipWeapon(class ATA_WeaponBase* Weapon);
+	void ChangeWeapon();
+	void EquipWeapon();
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	TSubclassOf<class ATA_WeaponBase> WeaponClass;
+	TMap<EEquippedState, TSubclassOf<class ATA_WeaponBase>> WeaponClassMap;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<class ATA_WeaponBase> EquippedWeapon; 

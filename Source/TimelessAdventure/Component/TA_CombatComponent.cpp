@@ -7,6 +7,7 @@
 #include "Data/TA_ComboAttackData.h"
 #include "Item/TA_WeaponBase.h"
 #include "Item/TA_Bow.h"
+#include "Player/TA_PlayerController.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -34,9 +35,12 @@ UTA_CombatComponent::UTA_CombatComponent()
 
 	bIsHold = false;
 	bCanShoot = false;
+	bIsGuard = false;
+	bIsComboInput = false;
 
 	CombatState = ECombatState::CS_Idle;
 	EquippedState = EEquippedState::ES_Idle;
+	TempEquippedState = EEquippedState::ES_Idle;
 }
 
 void UTA_CombatComponent::BeginPlay()
@@ -44,12 +48,19 @@ void UTA_CombatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Init();
+}
 
-	// TEST
-	if (WeaponClass)
+void UTA_CombatComponent::SetChangeWeaponState(EEquippedState NewState)
+{
+	// 취소가 선택된 경우
+	if (NewState == EEquippedState::ES_Cancel)
 	{
-		ATA_WeaponBase* NewWeapon = GetWorld()->SpawnActor<ATA_WeaponBase>(WeaponClass, OwnerPlayer->GetActorTransform());
-		EquipWeapon(NewWeapon);
+		TempEquippedState = EquippedState;
+	}
+	// 나머지가 선택된 경우
+	else
+	{
+		TempEquippedState = NewState;
 	}
 }
 
@@ -357,6 +368,38 @@ void UTA_CombatComponent::RightClickEnd()
 	}
 }
 
+void UTA_CombatComponent::MiddleClickStart()
+{
+	if (!OwnerPlayer) return;
+
+	if (CombatState == ECombatState::CS_Idle || CombatState == ECombatState::CS_Dash)
+	{
+		ATA_PlayerController* PC = Cast<ATA_PlayerController>(OwnerPlayer->GetController());
+		if (PC)
+		{
+			// 위젯 보이도록 설정
+			PC->VisibleWeaponSelectWidget(true);
+		}
+	}
+}
+
+void UTA_CombatComponent::MiddleClickEnd()
+{
+	if (!OwnerPlayer) return;
+
+	if (CombatState == ECombatState::CS_Idle || CombatState == ECombatState::CS_Dash)
+	{
+		ATA_PlayerController* PC = Cast<ATA_PlayerController>(OwnerPlayer->GetController());
+		if (PC)
+		{
+			// 위젯 안보이도록 설정
+			PC->VisibleWeaponSelectWidget(false);
+		}
+
+		ChangeWeapon();
+	}
+}
+
 void UTA_CombatComponent::JumpAttack()
 {
 	if (!JumpAttackMontages.Find(EquippedState) || !IsValid(JumpAttackMontages[EquippedState])) return;
@@ -623,26 +666,37 @@ void UTA_CombatComponent::ChangeState(ECombatState NewState)
 	CombatState = NewState;
 }
 
-void UTA_CombatComponent::EquipWeapon(ATA_WeaponBase* Weapon)
+void UTA_CombatComponent::ChangeWeapon()
 {
-	if (Weapon)
+	// 임시 타입에 따라 현재 타입 변환
+	EquippedState = TempEquippedState;
+
+	// 기존 무기가 존재하는 경우
+	if (IsValid(EquippedWeapon))
 	{
-		Weapon->EquipWeapon(OwnerPlayer->GetMesh());
-		EquippedWeapon = Weapon;
+		// 해당 무기 삭제
+		EquippedWeapon->RemoveWeapon();
+		EquippedWeapon = nullptr;
+	}
 
-		switch (Weapon->GetWeaponType())
+	// 무기 장착
+	EquipWeapon();
+}
+
+void UTA_CombatComponent::EquipWeapon()
+{
+	// 현재 타입에 따른 무기가 존재하는 경우
+	if (WeaponClassMap[EquippedState])
+	{
+		// 무기 스폰 & 장착
+		if (WeaponClassMap[TempEquippedState])
 		{
-		case EWeaponType::WT_Sword:
-			EquippedState = EEquippedState::ES_Sword;
-			break;
-
-		case EWeaponType::WT_Bow:
-			EquippedState = EEquippedState::ES_Bow;
-			break;
-
-		case EWeaponType::WT_Torch:
-			EquippedState = EEquippedState::ES_Torch;
-			break;
+			ATA_WeaponBase* NewWeapon = GetWorld()->SpawnActor<ATA_WeaponBase>(WeaponClassMap[TempEquippedState], OwnerPlayer->GetActorTransform());
+			if (NewWeapon)
+			{
+				NewWeapon->EquipWeapon(OwnerPlayer->GetMesh());
+				EquippedWeapon = NewWeapon;
+			}
 		}
 	}
 }
