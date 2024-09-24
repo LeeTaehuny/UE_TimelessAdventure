@@ -536,6 +536,14 @@ void UTA_CombatComponent::DrawArrow()
 
 		bIsHold = true;
 
+		// 에임 추가
+		ATA_PlayerController* PC = Cast<ATA_PlayerController>(OwnerPlayer->GetController());
+		if (PC)
+		{
+			// 위젯 보이도록 설정
+			PC->VisibleAimWidget(true);
+		}
+
 		// 몽타주 재생
 		AnimInstance->Montage_Play(DrawArrowMontage, 1.0f);
 
@@ -614,6 +622,13 @@ void UTA_CombatComponent::ResetBow()
 	{
 		BowWeapon->SetIsHold(false);
 		BowWeapon->RemoveArrow();
+	}
+
+	ATA_PlayerController* PC = Cast<ATA_PlayerController>(OwnerPlayer->GetController());
+	if (PC)
+	{
+		// 위젯 안보이도록 설정
+		PC->VisibleAimWidget(false);
 	}
 }
 

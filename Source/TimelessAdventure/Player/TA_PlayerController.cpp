@@ -3,6 +3,7 @@
 
 #include "Player/TA_PlayerController.h"
 #include "UI/TA_ChangeWeapon.h"
+#include "UI/TA_HUD.h"
 
 ATA_PlayerController::ATA_PlayerController()
 {
@@ -18,6 +19,17 @@ void ATA_PlayerController::BeginPlay()
 		if (WeaponSelectWidget)
 		{
 			WeaponSelectWidget->SetOwnerPlayer(GetPawn());
+		}
+	}
+
+	if (HUDWidgetClass)
+	{
+		HUDWidget = CreateWidget<UTA_HUD>(GetWorld(), HUDWidgetClass);
+		if (HUDWidget)
+		{
+			HUDWidget->SetOwnerPlayer(GetPawn());
+			HUDWidget->SetAimVisibility(false);
+			HUDWidget->AddToViewport();
 		}
 	}
 }
@@ -62,5 +74,13 @@ void ATA_PlayerController::VisibleWeaponSelectWidget(bool Value)
 			// 마우스 커서 보이도록 설정
 			bShowMouseCursor = false;
 		}
+	}
+}
+
+void ATA_PlayerController::VisibleAimWidget(bool Value)
+{
+	if (HUDWidget)
+	{
+		HUDWidget->SetAimVisibility(Value);
 	}
 }

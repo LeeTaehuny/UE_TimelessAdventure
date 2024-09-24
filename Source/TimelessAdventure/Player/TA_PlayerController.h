@@ -22,6 +22,7 @@ protected:
 
 public:
 	void VisibleWeaponSelectWidget(bool Value);
+	void VisibleAimWidget(bool Value);
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Widget")
@@ -29,4 +30,10 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UTA_ChangeWeapon> WeaponSelectWidget;
+
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	TSubclassOf<class UUserWidget> HUDWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<class UTA_HUD> HUDWidget;
 };

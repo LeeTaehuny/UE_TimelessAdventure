@@ -94,7 +94,7 @@ void ATA_Bow::ShootArrow()
 
 			if (bIsSuccess)
 			{
-				DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10, 12, FColor::Red, true);
+				//DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10, 12, FColor::Red, true);
 
 				Arrow->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 				Arrow->FireArrow(HitResult.ImpactPoint);
