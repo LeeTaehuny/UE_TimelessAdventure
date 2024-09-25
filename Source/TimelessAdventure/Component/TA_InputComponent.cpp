@@ -275,7 +275,7 @@ void UTA_InputComponent::AimBowStart()
 	{
 		playerCharacter->SetAimingBow(true);	
 	}*/
-	isAttack = true;
+	//isAttack = true;
 }
 
 void UTA_InputComponent::AimBowEnd()
@@ -292,7 +292,7 @@ void UTA_InputComponent::AimBowEnd()
 	}*/
 
 	// Animation이 끝났을때 움직일 수 있게
-	isAttack = false;
+	//isAttack = false;
 }
 
 
