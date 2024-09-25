@@ -26,7 +26,8 @@ public:
 // Components
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	class USkeletalMesh* SkeletalMesh;
-	
+	class USkeletalMeshComponent* SkeletalMeshComp;
+
+
 	
 };

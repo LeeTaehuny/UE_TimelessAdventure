@@ -3,6 +3,9 @@
 
 #include "TA_CombatComponent.h"
 
+#include "../Player/TA_PlayerCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 UTA_CombatComponent::UTA_CombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -16,12 +19,16 @@ UTA_CombatComponent::UTA_CombatComponent()
 	UseHealthPercent = 0.001f;
 }
 
+
+
 void UTA_CombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	Init();
 }
+
+
 
 void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -37,8 +44,12 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 float UTA_CombatComponent::GetHealthPercent()
 {
-	if (MaxHealth == 0.0f) return MaxHealth;
-
+	if (MaxHealth == 0.0f)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,  1.0f, FColor::Green, FString::Printf(TEXT("Null")));
+		return MaxHealth;
+	}
+		
 	// 체력 퍼센트 반환
 	return CurrentHealth / MaxHealth;
 }
@@ -53,6 +64,45 @@ void UTA_CombatComponent::Init()
 	// 값 초기화 (체력, HP)
 	CurrentHealth = MaxHealth;
 	CurrrentHp = MaxHp;
+
+	// 
+	OwnerPlayer = Cast<ATA_PlayerCharacter>(GetOwner());
+
+}
+
+// Bow Aim 기능
+void UTA_CombatComponent::AimingBowStart()
+{
+	// 나중에 GetHasBow 대신 Enum  or WeaponBase로 확인
+	// 1) bisAiming 변셩
+	// 2) bIsZooming 변경
+	// 3) Camera 고정
+	if(OwnerPlayer->GetHasBow())
+	{
+		if(OwnerPlayer)
+		{
+			OwnerPlayer->SetAimingBow(true);
+			OwnerPlayer->SetZooming(true);
+			OwnerPlayer->GetCharacterMovement()->bOrientRotationToMovement = false;
+			OwnerPlayer->GetCharacterMovement()->bUseControllerDesiredRotation = true;
+			// + characterMovement::RotationRate 조정
+		}
+	}
+}
+void UTA_CombatComponent::AimingBowEnd()
+{
+	
+	if(OwnerPlayer->GetHasBow())
+	{
+		if(OwnerPlayer)
+		{
+			OwnerPlayer->SetAimingBow(false);
+			OwnerPlayer->SetZooming(false);
+			OwnerPlayer->GetCharacterMovement()->bOrientRotationToMovement = true;
+			OwnerPlayer->GetCharacterMovement()->bUseControllerDesiredRotation = false;
+			// + characterMovement::RotationRate 조정 
+		}
+	}
 }
 
 void UTA_CombatComponent::UpdateHealth(bool Value, float Percent)

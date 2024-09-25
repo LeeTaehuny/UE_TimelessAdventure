@@ -6,6 +6,15 @@
 #include "TA_PlayerComponentBase.h"
 #include "TA_CombatComponent.generated.h"
 
+UENUM(BlueprintType)
+enum class EEquipedWeapon : uint8
+{
+	None,		// none
+	Sword,		//
+	Bow,		//
+	Torch,		// 
+};
+
 DECLARE_MULTICAST_DELEGATE(FOnZeroHealthDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -61,4 +70,17 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Stat")
 	// 지속 체력 증가/감소량 
 	float UseHealthPercent;
+
+// Weapon
+public:
+	// 나중에 Map이나 Array로 저장 고려 
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	TSubclassOf<class AHR_Bow> Weapon_Bow;
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	FName BowSocketName;
+
+public:
+	void AimingBowStart();
+	void AimingBowEnd();
+	
 };

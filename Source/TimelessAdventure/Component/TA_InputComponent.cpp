@@ -29,7 +29,7 @@ void UTA_InputComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	OwnerPlayer = Cast<ACharacter>(GetOwner());
+	OwnerPlayer = Cast<ATA_PlayerCharacter>(GetOwner());
 }
 
 void UTA_InputComponent::BeginPlay()
@@ -91,8 +91,8 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &UTA_InputComponent::DashStart);
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Completed, this, &UTA_InputComponent::DashEnd);
 		EnhancedInputComponent->BindAction(IA_SwordAttack, ETriggerEvent::Started, this, &UTA_InputComponent::SwordAttack);
-		EnhancedInputComponent->BindAction(IA_BowAttack, ETriggerEvent::Started, this, &UTA_InputComponent::BowAttackStart);
-		EnhancedInputComponent->BindAction(IA_BowAttack, ETriggerEvent::Completed, this, &UTA_InputComponent::BowAttackEnd);
+		EnhancedInputComponent->BindAction(IA_AimBow, ETriggerEvent::Started, this, &UTA_InputComponent::AimBowStart);
+		EnhancedInputComponent->BindAction(IA_AimBow, ETriggerEvent::Completed, this, &UTA_InputComponent::AimBowEnd);
 	}
 }
 
@@ -260,27 +260,36 @@ void UTA_InputComponent::SwordAttack()
 	
 }
 
-void UTA_InputComponent::BowAttackStart()
+void UTA_InputComponent::AimBowStart()
 {
+
+	OwnerPlayer->GetCombatComponent()->AimingBowStart();
+	
+	// bisAimingbow 체크
+	//if(OwnerPlayer) OwnerPlayer->SetAimingBow(true);
+	
 	// Bow Attack 중에는 이동 못함
 	// jump & roll 중에는 공격 못함 
-	UE_LOG(LogTemp, Warning, TEXT("BowAttack"));
-	ATA_PlayerCharacter* playerCharacter = Cast<ATA_PlayerCharacter>(OwnerPlayer);
+	/*ATA_PlayerCharacter* playerCharacter = Cast<ATA_PlayerCharacter>(OwnerPlayer);
 	if(playerCharacter->GetHasBow())
 	{
 		playerCharacter->SetAimingBow(true);	
-	}
-
+	}*/
 	isAttack = true;
 }
 
-void UTA_InputComponent::BowAttackEnd()
+void UTA_InputComponent::AimBowEnd()
 {
-	ATA_PlayerCharacter* playerCharacter = Cast<ATA_PlayerCharacter>(OwnerPlayer);
+	OwnerPlayer->GetCombatComponent()->AimingBowEnd();
+	
+	// bisAimingbow 체크
+	//if(OwnerPlayer) OwnerPlayer->SetAimingBow(false);
+	
+	/*ATA_PlayerCharacter* playerCharacter = Cast<ATA_PlayerCharacter>(OwnerPlayer);
 	if(playerCharacter->GetHasBow())
 	{
 		playerCharacter->SetAimingBow(false);	
-	}
+	}*/
 
 	// Animation이 끝났을때 움직일 수 있게
 	isAttack = false;

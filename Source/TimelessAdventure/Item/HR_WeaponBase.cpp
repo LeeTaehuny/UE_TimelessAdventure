@@ -24,3 +24,8 @@ void AHR_WeaponBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AHR_WeaponBase::Equip(FName socketName, USkeletalMeshComponent* skeletalMeshComp)
+{
+	AttachToComponent(skeletalMeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+}
+

@@ -22,11 +22,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	FORCEINLINE void SetOwnerPlayer(ACharacter* InPlayer) { OwnerPlayer = InPlayer; }
+	FORCEINLINE void SetOwnerPlayer(class ATA_PlayerCharacter* InPlayer) { OwnerPlayer = InPlayer; }
 
 // Owner Player
 protected:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class ACharacter> OwnerPlayer;
+	TObjectPtr<class ATA_PlayerCharacter> OwnerPlayer;
 		
 };

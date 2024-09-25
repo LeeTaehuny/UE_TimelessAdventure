@@ -9,6 +9,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "TimelessAdventure/Item/HR_Bow.h"
+
 ATA_PlayerCharacter::ATA_PlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -38,13 +40,40 @@ ATA_PlayerCharacter::ATA_PlayerCharacter()
 void ATA_PlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Bow 임시 부착
+	// 나중에 Combat Component에서 무기 교환할때 사용 
+	AHR_Bow* spawnWeapon = GetWorld()->SpawnActor<AHR_Bow>(Weapon_Bow);
+	spawnWeapon->Equip(FName("bow_socket_l"), GetMesh());
+
+	// Zoom 변수들 초기화
+	InitialSO = SpringArmComp->SocketOffset;
+	InitialFOV = CameraComp->FieldOfView;
+	
 }
 
 void ATA_PlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
+	// bisZooming 변수를 combatComp에서 변경
+	if(bisZooming)
+	{
+		// Camera의 Fiel of view
+		CameraComp->FieldOfView = FMath::FInterpTo(CameraComp->FieldOfView, AimFOV, DeltaTime, 5.0f);
+		//CameraComp->SetFieldOfView(AimFOV);
+		SpringArmComp->SocketOffset.X = FMath::FInterpTo(SpringArmComp->SocketOffset.X, AimSO.X, DeltaTime, 5.0f);
+		SpringArmComp->SocketOffset.Y = FMath::FInterpTo(SpringArmComp->SocketOffset.Y, AimSO.Y, DeltaTime, 5.0f);
+		SpringArmComp->SocketOffset.Z = FMath::FInterpTo(SpringArmComp->SocketOffset.Z, AimSO.Z, DeltaTime, 5.0f);
+		
+	}
+	else
+	{
+		CameraComp->FieldOfView = FMath::FInterpTo(CameraComp->FieldOfView, InitialFOV, DeltaTime, 10.0f);
+		SpringArmComp->SocketOffset.X = FMath::FInterpTo(SpringArmComp->SocketOffset.X, InitialSO.X, DeltaTime, 10.0f);
+		SpringArmComp->SocketOffset.Y = FMath::FInterpTo(SpringArmComp->SocketOffset.Y, InitialSO.Y, DeltaTime, 10.0f);
+		SpringArmComp->SocketOffset.Z = FMath::FInterpTo(SpringArmComp->SocketOffset.Z, InitialSO.Z, DeltaTime, 10.0f);
+	}
 }
 
 void ATA_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -58,4 +87,6 @@ void ATA_PlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 }
+
+
 

@@ -34,6 +34,14 @@ public:
 
 // member
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "WeaponType")
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	EWeaponType WeaponType;
+	
+	UPROPERTY(EditAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	FName WeaponSocketName;
+
+// Weapon Equip
+public:
+	void Equip(FName socketName, USkeletalMeshComponent* skeletalMeshComp);
+	
 };

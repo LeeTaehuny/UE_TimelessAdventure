@@ -69,14 +69,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_SwordAttack;
 	UPROPERTY(EditAnywhere, Category = "InputAction")
-	TObjectPtr<class UInputAction> IA_BowAttack;
+	TObjectPtr<class UInputAction> IA_AimBow;
 
 	// 공격 바인딩 함수 (by hr)
 	// Sword Attack	
 	void SwordAttack();
 	// BowAttack
-	void BowAttackStart();
-	void BowAttackEnd();
+	void AimBowStart();
+	void AimBowEnd();
 	// Notify handle
 	UFUNCTION()
 	void HandleOnMontageSwordAttackNotifyBegin(FName notifyName, const FBranchingPointNotifyPayload& branchingpayload);

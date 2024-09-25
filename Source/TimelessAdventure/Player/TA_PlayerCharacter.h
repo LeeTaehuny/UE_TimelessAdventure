@@ -29,14 +29,41 @@ public:
 
 // Getter
 public:
+	// 이건 왜 virtual ??
 	FORCEINLINE virtual class UTA_CombatComponent* GetCombatComponent() override { return TA_CombatComponent; }
+	FORCEINLINE class UTA_InputComponent* GetInputComponent() { return TA_InputComponent; }
+
 	FORCEINLINE void SetHasBow(bool b) { bHasBow = b; };
 	FORCEINLINE bool GetHasBow() const { return bHasBow; };
-	FORCEINLINE void SetAimingBow(bool b) { bAimingBow = b; };
-	FORCEINLINE bool GetAimingBow() const { return bAimingBow; };
+	FORCEINLINE void SetAimingBow(bool b) { bisAimingBow = b; };
+	FORCEINLINE bool GetAimingBow() const { return bisAimingBow; };
+	FORCEINLINE void SetZooming(bool b) { bisZooming = b; };
+	FORCEINLINE bool GetZooming() const { return bisZooming; };
+	
+// Bow
 private:
 	bool bHasBow = true;
-	bool bAimingBow;
+	bool bisAimingBow;
+	bool bisZooming = false;
+
+// Zoom
+public:
+	UPROPERTY(EditAnywhere, Category = "Zoom")
+	float InitialFOV;
+	UPROPERTY(EditAnywhere, Category = "Zoom")
+	float AimFOV = 60.0f;
+	UPROPERTY(EditAnywhere, Category = "Zoom")
+	FVector InitialSO;
+	UPROPERTY(EditAnywhere, Category = "Zoom")
+	FVector AimSO = FVector(60, 60, 45);
+	
+
+// Weapon BP
+protected:
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	TSubclassOf<class AHR_Bow> Weapon_Bow;
+
+
 	
 // Camera Component
 protected:
