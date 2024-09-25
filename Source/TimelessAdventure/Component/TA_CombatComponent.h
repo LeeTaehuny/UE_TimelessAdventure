@@ -71,16 +71,26 @@ private:
 	// 지속 체력 증가/감소량 
 	float UseHealthPercent;
 
+protected:
+	EEquipedWeapon EquipedWeapon = EEquipedWeapon::Bow;
+
 // Weapon
 public:
 	// 나중에 Map이나 Array로 저장 고려 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	TSubclassOf<class AHR_Bow> Weapon_Bow;
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	FName BowSocketName;
+	FName BowSocketName = FName("bow_socket_l");
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	TObjectPtr<class AHR_Bow> BowObject;
 
+// Bow 기능 
 public:
 	void AimingBowStart();
 	void AimingBowEnd();
+
+// Weapon eauip
+public:
+	void EquipWeapon();
 	
 };

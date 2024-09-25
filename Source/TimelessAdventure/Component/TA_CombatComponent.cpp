@@ -5,6 +5,7 @@
 
 #include "../Player/TA_PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "../Item/HR_Bow.h"
 
 UTA_CombatComponent::UTA_CombatComponent()
 {
@@ -77,6 +78,8 @@ void UTA_CombatComponent::AimingBowStart()
 	// 1) bisAiming 변셩
 	// 2) bIsZooming 변경
 	// 3) Camera 고정
+	// 4) Bow 상태 변경
+	// 5) Arrow Spawn
 	if(OwnerPlayer->GetHasBow())
 	{
 		if(OwnerPlayer)
@@ -87,6 +90,11 @@ void UTA_CombatComponent::AimingBowStart()
 			OwnerPlayer->GetCharacterMovement()->bUseControllerDesiredRotation = true;
 			// + characterMovement::RotationRate 조정
 		}
+	}
+	if(BowObject)
+	{
+		BowObject->ChangeBowState(EBowState::BS_Aim);
+		BowObject->SpawnArrow(OwnerPlayer->GetMesh());
 	}
 }
 void UTA_CombatComponent::AimingBowEnd()
@@ -103,6 +111,23 @@ void UTA_CombatComponent::AimingBowEnd()
 			// + characterMovement::RotationRate 조정 
 		}
 	}
+	if(BowObject)
+	{
+		BowObject->ChangeBowState(EBowState::BS_Idle);
+	}
+}
+
+// 무기 생성 부착(Equip)
+void UTA_CombatComponent::EquipWeapon()
+{
+	// 
+	if(EquipedWeapon == EEquipedWeapon::Bow)
+	{
+		AHR_Bow* spawnWeapon = GetWorld()->SpawnActor<AHR_Bow>(Weapon_Bow);
+		BowObject = spawnWeapon;
+        BowObject->Equip(BowSocketName, OwnerPlayer->GetMesh());
+	}
+	
 }
 
 void UTA_CombatComponent::UpdateHealth(bool Value, float Percent)

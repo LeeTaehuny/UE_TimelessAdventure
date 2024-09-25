@@ -42,9 +42,10 @@ void ATA_PlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// Bow 임시 부착
-	// 나중에 Combat Component에서 무기 교환할때 사용 
-	AHR_Bow* spawnWeapon = GetWorld()->SpawnActor<AHR_Bow>(Weapon_Bow);
-	spawnWeapon->Equip(FName("bow_socket_l"), GetMesh());
+	// 나중에 Combat Component에서 무기 교환할때 사용
+	TA_CombatComponent->EquipWeapon();
+	
+	
 
 	// Zoom 변수들 초기화
 	InitialSO = SpringArmComp->SocketOffset;

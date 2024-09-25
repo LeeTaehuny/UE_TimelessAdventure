@@ -6,6 +6,15 @@
 #include "HR_WeaponBase.h"
 #include "HR_Bow.generated.h"
 
+// Bow 상태
+UENUM(BlueprintType)
+enum class EBowState : uint8
+{
+	BS_Idle,
+	BS_Aim,
+	BS_Draw
+};
+
 UCLASS()
 class TIMELESSADVENTURE_API AHR_Bow : public AHR_WeaponBase
 {
@@ -28,6 +37,26 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	class USkeletalMeshComponent* SkeletalMeshComp;
 
+// Bow 상태
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Bow")
+	EBowState BowState;
 
+
+// Bow state
+public:
+	UFUNCTION(BlueprintCallable)
+	void ChangeBowState(EBowState newBowState);
+	
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE EBowState GetBowState() const { return BowState; }
+
+public:
+	void SpawnArrow(USkeletalMeshComponent* Mesh);
+
+	
+public:
+	UPROPERTY(EditAnywhere, Category = "Arrow")
+	TSubclassOf<class AHR_Arrow> ArrowClass;
 	
 };

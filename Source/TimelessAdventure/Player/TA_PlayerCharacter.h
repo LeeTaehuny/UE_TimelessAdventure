@@ -60,6 +60,7 @@ public:
 
 // Weapon BP
 protected:
+	// 일단 필요 없을 것 같은데
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	TSubclassOf<class AHR_Bow> Weapon_Bow;
 

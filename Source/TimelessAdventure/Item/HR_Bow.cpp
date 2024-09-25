@@ -3,6 +3,8 @@
 
 #include "HR_Bow.h"
 
+#include "HR_Arrow.h"
+
 
 // Sets default values
 AHR_Bow::AHR_Bow()
@@ -28,6 +30,23 @@ void AHR_Bow::BeginPlay()
 void AHR_Bow::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AHR_Bow::ChangeBowState(EBowState newBowState)
+{
+	BowState = newBowState;
+}
+
+void AHR_Bow::SpawnArrow(USkeletalMeshComponent* Mesh)
+{
+	if (ArrowClass)
+	{
+		AHR_Arrow* Arrow = GetWorld()->SpawnActor<AHR_Arrow>(ArrowClass);
+		if (Arrow)
+		{
+			Arrow->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetIncludingScale, FName("arrow_socket_r"));
+		}
+	}
 }
 
 
