@@ -44,6 +44,10 @@ void ATA_PlayerController::BeginPlay()
 			InventoryInterface->GetInventory()->OnChangeInventory.AddUObject(HUDWidget, &UTA_HUD::UpdateInventory);
 		}
 	}
+
+	// Test
+	bShowMouseCursor = true;
+	SetInputMode(FInputModeGameAndUI());
 }
 
 void ATA_PlayerController::VisibleWeaponSelectWidget(bool Value)

@@ -19,8 +19,12 @@ void UTA_InventoryComponent::BeginPlay()
 
 	int32 num = 60;
 	int32 num2 = 70;
+	int32 n1 = 1;
+	int32 n2 = 1;
 	AddItem(TEXT("HPPotion"), num);
-	AddItem(TEXT("HPPotion"), num2);
+	AddItem(TEXT("STPotion"), num2);
+	AddItem(TEXT("B_Crystal"), n1);
+	AddItem(TEXT("G_Crystal"), n2);
 
 	for (FInvItem Item : Inventory_C)
 	{
@@ -163,5 +167,30 @@ void UTA_InventoryComponent::RemoveItem(ESlotType Type, int32 Index)
 
 void UTA_InventoryComponent::SwapItem(ESlotType Type1, int32 Index1, ESlotType Type2, int32 Index2)
 {
+	if (Type1 == Type2)
+	{
+		FInvItem Temp;
 
+		switch (Type1)
+		{
+		case ESlotType::ST_Inventory_C:
+			Temp = Inventory_C[Index1];
+			Inventory_C[Index1] = Inventory_C[Index2];
+			Inventory_C[Index2] = Temp;
+			break;
+		case ESlotType::ST_Inventory_M:
+			Temp = Inventory_M[Index1];
+			Inventory_M[Index1] = Inventory_M[Index2];
+			Inventory_M[Index2] = Temp;
+			break;
+		case ESlotType::ST_QuickSlot:
+			break;
+		}
+	}
+
+	OnChangeInventory.Broadcast();
+	for (FInvItem Item : Inventory_C)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s, %d"), *Item.Data.ItemName.ToString(), Item.Quantity);
+	}
 }

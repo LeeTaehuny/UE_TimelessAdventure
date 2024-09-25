@@ -20,6 +20,7 @@ class TIMELESSADVENTURE_API UTA_Inventory : public UTA_CustomWidget
 	
 protected:
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
 	void InitInventory();
@@ -31,6 +32,12 @@ private:
 
 	UFUNCTION()
 	void ChangeInventoryType_M();
+
+	UFUNCTION()
+	void PressMoveBTN();
+
+	UFUNCTION()
+	void ReleaseMoveBTN();
 
 
 private:
@@ -46,9 +53,16 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> TXT_Gold;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UBorder> B_Main;
+
 	UPROPERTY()
 	TArray<TObjectPtr<class UTA_Slot>> Slots;
 
 private:
 	EInventoryType InventoryType;
+	bool bIsDragging;
+
+	FVector2D InitialOffset;
+	FVector2D InitialPos;
 };

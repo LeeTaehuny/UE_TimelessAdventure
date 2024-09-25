@@ -23,8 +23,10 @@ protected:
 	bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 public:
+	FORCEINLINE void SetNum(int32 Num) { SlotNum = Num; }
 	void Init(ESlotType Type);
 	void UpdateSlot();
+
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -40,4 +42,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Slot", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UTexture2D> NoneTexture;
+
+	UPROPERTY(EditAnywhere, Category = "Slot")
+	TSubclassOf<UTA_Slot> DragSlotClass;
 };

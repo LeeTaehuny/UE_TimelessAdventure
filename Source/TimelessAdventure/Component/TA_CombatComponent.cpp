@@ -313,6 +313,9 @@ void UTA_CombatComponent::RightClickStart()
 {
 	if (!OwnerPlayer) return;
 
+	// 공격 중이면 return
+	if (bIsAttacking) return;
+
 	// Idle, Dash 상태가 아니라면 반환
 	if (!(CombatState == ECombatState::CS_Idle) && !(CombatState == ECombatState::CS_Dash)) return;
 
@@ -324,6 +327,7 @@ void UTA_CombatComponent::RightClickStart()
 		GuardStart();
 		break;
 	case EEquippedState::ES_Bow:
+		ResetBow();
 		DrawArrow();
 		break;
 	case EEquippedState::ES_Torch:
@@ -579,7 +583,7 @@ void UTA_CombatComponent::ShootArrow()
 			// 플레이어 이동 제한
 			OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
-			bCanShoot = false;
+			bIsAttacking = true;
 
 			// 몽타주 재생
 			AnimInstance->Montage_Play(ShootArrowMontage, 1.0f);
@@ -597,8 +601,9 @@ void UTA_CombatComponent::ShootArrow()
 void UTA_CombatComponent::ReleaseArrowEnd(UAnimMontage* Montage, bool IsEnded)
 {
 	// 플레이어 이동 제한 해제
-	OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	RightClickEnd();
+	OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	bIsAttacking = false;
 }
 
 void UTA_CombatComponent::GuardStart()

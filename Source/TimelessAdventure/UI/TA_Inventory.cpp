@@ -7,6 +7,9 @@
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/Button.h"
+#include "Components/Border.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/CanvasPanelSlot.h"
 
 void UTA_Inventory::NativeConstruct()
 {
@@ -14,6 +17,8 @@ void UTA_Inventory::NativeConstruct()
 
 	if (BTN_ChangeC) BTN_ChangeC->OnClicked.AddDynamic(this, &UTA_Inventory::ChangeInventoryType_C);
 	if (BTN_ChangeM) BTN_ChangeM->OnClicked.AddDynamic(this, &UTA_Inventory::ChangeInventoryType_M);
+	if (BTN_Frame) BTN_Frame->OnPressed.AddDynamic(this, &UTA_Inventory::PressMoveBTN);
+	if (BTN_Frame) BTN_Frame->OnReleased.AddDynamic(this, &UTA_Inventory::ReleaseMoveBTN);
 
 	TArray<UWidget*> TempWidgets;
 	WidgetTree->GetAllWidgets(TempWidgets);
@@ -34,6 +39,30 @@ void UTA_Inventory::NativeConstruct()
 	InventoryType = EInventoryType::IT_Consum;
 }
 
+void UTA_Inventory::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (bIsDragging)
+	{
+		FVector2D MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
+
+		float DeltaX = InitialOffset.X - MousePos.X;
+		float DeltaY = InitialOffset.Y - MousePos.Y;
+
+		InitialPos.X += -DeltaX;
+		InitialPos.Y += -DeltaY;
+
+		InitialOffset = MousePos;
+
+		UCanvasPanelSlot* slot = UWidgetLayoutLibrary::SlotAsCanvasSlot(B_Main);
+		if (slot)
+		{
+			slot->SetPosition(InitialPos);
+		}
+	}
+}
+
 void UTA_Inventory::InitInventory()
 {
 	// 슬롯 초기화
@@ -52,6 +81,27 @@ void UTA_Inventory::ChangeInventoryType_M()
 	UE_LOG(LogTemp, Warning, TEXT("M"));
 	InventoryType = EInventoryType::IT_Misc;
 	UpdateInvenSlot();
+}
+
+void UTA_Inventory::PressMoveBTN()
+{
+	bIsDragging = true;
+
+	FVector2D WidgetPos;
+
+	UCanvasPanelSlot* slot = UWidgetLayoutLibrary::SlotAsCanvasSlot(B_Main);
+	if (slot)
+	{
+		WidgetPos = slot->GetPosition();
+	}
+
+	InitialOffset = UWidgetLayoutLibrary::GetMousePositionOnViewport(this);
+	InitialPos = WidgetPos;
+}
+
+void UTA_Inventory::ReleaseMoveBTN()
+{
+	bIsDragging = false;
 }
 
 void UTA_Inventory::UpdateInvenSlot()
