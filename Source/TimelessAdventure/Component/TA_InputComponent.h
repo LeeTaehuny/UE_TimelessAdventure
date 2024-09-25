@@ -19,16 +19,6 @@ enum class EPlayerState : uint8
 	PS_Jump,	// 점프
 };
 
-// 무기 Enum
-// 이걸 여기에 두는 게 맞을까? character가 가지고 있어야 하지 않을까?
-UENUM(BlueprintType)
-enum class EWeaponType: uint8
-{
-	WT_Body,		// 맨몸
-	WT_Sword,		// 칼
-	WT_Bow,			// 활
-	WT_Torch,		// 토치
-};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TIMELESSADVENTURE_API UTA_InputComponent : public UTA_PlayerComponentBase
@@ -106,9 +96,6 @@ protected:
 
 // Member
 private:
-	// 플레이어 현재 weapone
-	UPROPERTY(EditAnywhere, Category = "Settings")
-	EWeaponType WeaponType;
 
 	// 상태 변경 함수
 	void ChangeState(EPlayerState NewState);

@@ -4,7 +4,7 @@
 #include "TA_PlayerAnimInstance.h"
 
 #include "TA_PlayerCharacter.h"
-#include "Interface/AnimUpdateInterface.h"
+#include "../Interface/AnimUpdateInterface.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"

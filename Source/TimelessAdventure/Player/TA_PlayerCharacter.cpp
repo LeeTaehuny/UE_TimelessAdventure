@@ -2,8 +2,8 @@
 
 
 #include "TA_PlayerCharacter.h"
-#include "TA_InputComponent.h"
-#include "TA_CombatComponent.h"
+#include "../Component/TA_InputComponent.h"
+#include "../Component/TA_CombatComponent.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"

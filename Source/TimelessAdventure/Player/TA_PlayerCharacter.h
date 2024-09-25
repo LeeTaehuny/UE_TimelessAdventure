@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Interface/AnimUpdateInterface.h"
-#include "Interface/PlayerComponentInterface.h"
+#include "../Interface/AnimUpdateInterface.h"
+#include "../Interface/PlayerComponentInterface.h"
 #include "TA_PlayerCharacter.generated.h"
 
 

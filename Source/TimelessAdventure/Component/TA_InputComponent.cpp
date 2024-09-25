@@ -11,8 +11,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "Animation/AnimMontage.h"
-#include "Interface/PlayerComponentInterface.h"
-#include "TA_PlayerCharacter.h"
+#include "../Interface/PlayerComponentInterface.h"
+#include "../Player/TA_PlayerCharacter.h"
 
 
 UTA_InputComponent::UTA_InputComponent()

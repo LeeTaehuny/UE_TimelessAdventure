@@ -3,24 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Item.generated.h"
+#include "HR_WeaponBase.h"
+#include "HR_Bow.generated.h"
 
 UCLASS()
-class TIMELESSADVENTURE_API AItem : public AActor
+class TIMELESSADVENTURE_API AHR_Bow : public AHR_WeaponBase
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
-	AItem();
+	AHR_Bow();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+// Components
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class USkeletalMesh* SkeletalMesh;
+	
+	
 };
