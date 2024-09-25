@@ -26,8 +26,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	// 입력을 전달받기 위한 함수
 	void AddInput(UInputComponent* PlayerInputComponent);
 
@@ -48,6 +46,7 @@ protected:
 	void RightClickEnd();							// 우클릭 종료
 	void MiddleClickStart();						// 중간 버튼 클릭 시작
 	void MiddleClickEnd();							// 중간 버튼 클릭 종료
+	void ConvertInventory();						// 인벤토리 On/Off
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -75,6 +74,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_MiddleClick;
+
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_ConvertInventory;
 
 // Member
 private:

@@ -6,11 +6,12 @@
 #include "GameFramework/Character.h"
 #include "Interface/AnimUpdateInterface.h"
 #include "Interface/CombatComponentInterface.h"
+#include "Interface/InventoryInterface.h"
 #include "TA_PlayerCharacter.generated.h"
 
 UCLASS()
 class TIMELESSADVENTURE_API ATA_PlayerCharacter : public ACharacter,
-	public ICombatComponentInterface
+	public ICombatComponentInterface, public IInventoryInterface
 {
 	GENERATED_BODY()
 
@@ -29,7 +30,10 @@ public:
 // Getter
 public:
 	FORCEINLINE virtual class UTA_CombatComponent* GetCombatComponent() override { return TA_CombatComponent; }
+	FORCEINLINE virtual class UTA_InventoryComponent* GetInventory() override { return TA_InventoryComponent; }
+	
 	FORCEINLINE class UTA_InputComponent* GetInputComponent() { return TA_InputComponent; }
+	FORCEINLINE class UTA_InventoryComponent* GetInventoryComponent() { return TA_InventoryComponent; }
 	FORCEINLINE class USpringArmComponent* GetSpringArmComponent() { return SpringArmComp; }
 
 // Camera Component
@@ -47,4 +51,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UTA_CombatComponent> TA_CombatComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UTA_InventoryComponent> TA_InventoryComponent;
 };

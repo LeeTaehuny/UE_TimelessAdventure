@@ -29,6 +29,8 @@ void UTA_ChangeWeapon::OpenWidget()
 	{
 		slot->SetPosition(MousePos);
 	}
+
+	PlayAnimation(ChangeWidgetOpen);
 }
 
 void UTA_ChangeWeapon::OnHoverFist()

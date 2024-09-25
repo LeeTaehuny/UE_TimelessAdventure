@@ -4,6 +4,7 @@
 #include "TA_PlayerCharacter.h"
 #include "Component/TA_InputComponent.h"
 #include "Component/TA_CombatComponent.h"
+#include "Component/TA_InventoryComponent.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -33,6 +34,7 @@ ATA_PlayerCharacter::ATA_PlayerCharacter()
 
 	TA_InputComponent = CreateDefaultSubobject<UTA_InputComponent>(TEXT("InputComponent"));
 	TA_CombatComponent = CreateDefaultSubobject<UTA_CombatComponent>(TEXT("TA_CombatComponent"));
+	TA_InventoryComponent = CreateDefaultSubobject<UTA_InventoryComponent>(TEXT("TA_InventoryComponent"));
 }
 
 void ATA_PlayerCharacter::BeginPlay()

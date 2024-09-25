@@ -19,8 +19,13 @@ protected:
 
 public:
 	void SetAimVisibility(bool Value);
+	void Init();
+	void UpdateInventory();
 
 private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> IMG_Aim;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTA_Inventory> InventoryWidget;
 };

@@ -4,6 +4,9 @@
 #include "Player/TA_PlayerController.h"
 #include "UI/TA_ChangeWeapon.h"
 #include "UI/TA_HUD.h"
+#include "Interface/InventoryInterface.h"
+#include "Component/TA_InventoryComponent.h"
+
 
 ATA_PlayerController::ATA_PlayerController()
 {
@@ -19,6 +22,8 @@ void ATA_PlayerController::BeginPlay()
 		if (WeaponSelectWidget)
 		{
 			WeaponSelectWidget->SetOwnerPlayer(GetPawn());
+			WeaponSelectWidget->AddToViewport();
+			VisibleWeaponSelectWidget(false);
 		}
 	}
 
@@ -29,7 +34,14 @@ void ATA_PlayerController::BeginPlay()
 		{
 			HUDWidget->SetOwnerPlayer(GetPawn());
 			HUDWidget->SetAimVisibility(false);
+			HUDWidget->Init();
 			HUDWidget->AddToViewport();
+		
+
+			IInventoryInterface* InventoryInterface = Cast<IInventoryInterface>(GetPawn());
+			if (!InventoryInterface) return;
+
+			InventoryInterface->GetInventory()->OnChangeInventory.AddUObject(HUDWidget, &UTA_HUD::UpdateInventory);
 		}
 	}
 }
@@ -50,7 +62,7 @@ void ATA_PlayerController::VisibleWeaponSelectWidget(bool Value)
 
 			// 위젯 활성화
 			WeaponSelectWidget->OpenWidget();
-			WeaponSelectWidget->AddToViewport();
+			WeaponSelectWidget->SetVisibility(ESlateVisibility::Visible);
 
 			// 입력 모드 설정
 			FInputModeGameAndUI InputMode;
@@ -65,7 +77,7 @@ void ATA_PlayerController::VisibleWeaponSelectWidget(bool Value)
 		if (WeaponSelectWidget)
 		{
 			// 위젯 비활성화
-			WeaponSelectWidget->RemoveFromParent();
+			WeaponSelectWidget->SetVisibility(ESlateVisibility::Hidden);
 
 			// 입력 모드 설정
 			FInputModeGameOnly InputMode;

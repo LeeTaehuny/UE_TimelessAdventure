@@ -3,6 +3,7 @@
 
 #include "TA_InputComponent.h"
 #include "TA_CombatComponent.h"
+#include "TA_InventoryComponent.h"
 #include "Player/TA_PlayerCharacter.h"
 
 #include "EnhancedInputSubsystems.h"
@@ -12,7 +13,7 @@
 
 UTA_InputComponent::UTA_InputComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	PlayerState = EPlayerState::PS_Combat;
 }
@@ -38,11 +39,6 @@ void UTA_InputComponent::BeginPlay()
 	}
 }
 
-void UTA_InputComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
 void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 {
 	if (!IsValid(OwnerPlayer)) return;
@@ -60,7 +56,7 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(IA_RightClick, ETriggerEvent::Completed, this, &UTA_InputComponent::RightClickEnd);
 	EnhancedInputComponent->BindAction(IA_MiddleClick, ETriggerEvent::Started, this, &UTA_InputComponent::MiddleClickStart);
 	EnhancedInputComponent->BindAction(IA_MiddleClick, ETriggerEvent::Completed, this, &UTA_InputComponent::MiddleClickEnd);
-	
+	EnhancedInputComponent->BindAction(IA_ConvertInventory, ETriggerEvent::Started, this, &UTA_InputComponent::ConvertInventory);
 }
 
 void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
@@ -164,6 +160,16 @@ void UTA_InputComponent::MiddleClickEnd()
 	{
 	case EPlayerState::PS_Combat:
 		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->MiddleClickEnd();
+		break;
+	}
+}
+
+void UTA_InputComponent::ConvertInventory()
+{
+	switch (PlayerState)
+	{
+	case EPlayerState::PS_Combat:
+		if (IsValid(OwnerPlayer->GetInventoryComponent())) OwnerPlayer->GetInventoryComponent()->ConvertInventory();
 		break;
 	}
 }
