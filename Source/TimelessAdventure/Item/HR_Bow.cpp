@@ -13,7 +13,8 @@ AHR_Bow::AHR_Bow()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Component 생성
-	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon SkeletalMesh");
+	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon Bow SkeletalMesh");
+	SetRootComponent(SkeletalMeshComp);
 	
 	
 }

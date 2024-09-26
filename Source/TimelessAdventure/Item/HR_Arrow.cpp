@@ -5,6 +5,7 @@
 
 #include "NaniteSceneProxy.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 
 // Sets default values
@@ -14,7 +15,8 @@ AHR_Arrow::AHR_Arrow()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Components 생성
-	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Arrow Weapon StaticMesh"));
+	RootComponent = WeaponMesh;
 }
 
 // Called when the game starts or when spawned
@@ -34,13 +36,19 @@ void AHR_Arrow::Fire(FVector Direction)
 {
 	// Projectile Movement 이용해서 발사
 	// Projectil Movement 동적으로 생성
-	ProjectilMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	// Actor Comp 등록
-	ProjectilMovementComp->RegisterComponent();
-	ProjectilMovementComp->UpdatedComponent = StaticMeshComp;
-	// 변수 설정 
-	ProjectilMovementComp->bRotationFollowsVelocity = true;
-	ProjectilMovementComp->ProjectileGravityScale = 0.5f;
+	// ?) 생성자가 아닌 곳에서 CreateDefaultofObject<T> 호출하면 안되나?
+	ProjectilMovementComp = NewObject<UProjectileMovementComponent>(this, UProjectileMovementComponent::StaticClass());
+	if(ProjectilMovementComp)
+	{
+		// Actor Comp 등록
+		ProjectilMovementComp->RegisterComponent();
+		// 변수 설정
+		
+		ProjectilMovementComp->UpdatedComponent = WeaponMesh;
+		ProjectilMovementComp->bRotationFollowsVelocity = true;
+		ProjectilMovementComp->ProjectileGravityScale = 0.5f;
+	}
+	
 
 }
 

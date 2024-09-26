@@ -34,7 +34,7 @@ public:
 
 // Components
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
 	class USkeletalMeshComponent* SkeletalMeshComp;
 
 // Bow 상태

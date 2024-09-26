@@ -30,7 +30,7 @@ protected:
 	class UProjectileMovementComponent* ProjectilMovementComp;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	class UStaticMeshComponent* StaticMeshComp;
+	class UStaticMeshComponent* WeaponMesh;
 
 
 //
