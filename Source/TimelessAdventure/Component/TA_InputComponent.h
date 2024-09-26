@@ -46,6 +46,12 @@ protected:
 	void DashEnd();									// 달리기 종료
 	void BasicRoll();								// 구르기
 	void BasicJump();								// 점프
+	// Sword
+	void SwordAttack();								// 검 콤보 공격
+	// Bow aim, attack
+	void AimBowStart();
+	void AimBowEnd();
+	void FireBow();
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -68,15 +74,12 @@ protected:
 	// Attack Combo Input Action (by hr)
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_SwordAttack;
+	// Bow
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_FireBow;
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_AimBow;
-
-	// 공격 바인딩 함수 (by hr)
-	// Sword Attack	
-	void SwordAttack();
-	// BowAttack
-	void AimBowStart();
-	void AimBowEnd();
+	
 	// Notify handle
 	UFUNCTION()
 	void HandleOnMontageSwordAttackNotifyBegin(FName notifyName, const FBranchingPointNotifyPayload& branchingpayload);

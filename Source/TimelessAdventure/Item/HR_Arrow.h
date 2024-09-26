@@ -25,6 +25,16 @@ public:
 
 // Components
 protected:
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class UProjectileMovementComponent* ProjectilMovementComp;
 	
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class UStaticMeshComponent* StaticMeshComp;
+
+
+//
+public:
+	void Fire(FVector Direction);
 	
 };

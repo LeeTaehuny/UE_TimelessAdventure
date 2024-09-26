@@ -4,6 +4,7 @@
 #include "TA_PlayerCharacter.h"
 #include "../Component/TA_InputComponent.h"
 #include "../Component/TA_CombatComponent.h"
+#include "Blueprint/UserWidget.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -44,12 +45,21 @@ void ATA_PlayerCharacter::BeginPlay()
 	// Bow 임시 부착
 	// 나중에 Combat Component에서 무기 교환할때 사용
 	TA_CombatComponent->EquipWeapon();
-	
-	
 
 	// Zoom 변수들 초기화
 	InitialSO = SpringArmComp->SocketOffset;
 	InitialFOV = CameraComp->FieldOfView;
+
+	// PlyaerHUB 띄우기
+	if(PlayerHUBClass)
+	{
+		PlayerHUBIns = CreateWidget<UUserWidget>(GetWorld(), PlayerHUBClass);
+		if(PlayerHUBIns)
+		{
+			PlayerHUBIns->AddToViewport();
+		}
+	}
+	
 	
 }
 
@@ -87,6 +97,24 @@ void ATA_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 void ATA_PlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+}
+
+void ATA_PlayerCharacter::ShowPlayerHUB()
+{
+	// Widget visibility true
+	if(PlayerHUBIns)
+	{
+		PlayerHUBIns->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void ATA_PlayerCharacter::HidePlayerHUB()
+{
+	// Widget visibility true
+	if(PlayerHUBClass)
+	{
+		PlayerHUBIns->SetVisibility(ESlateVisibility::Hidden);	
+	}
 }
 
 

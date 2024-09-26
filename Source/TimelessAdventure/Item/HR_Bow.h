@@ -51,12 +51,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE EBowState GetBowState() const { return BowState; }
 
+// Arrow spawn, destroy
 public:
-	void SpawnArrow(USkeletalMeshComponent* Mesh);
-
+	void SpawnArrow(USkeletalMeshComponent* Mesh, FName SocketName);
+	void DestroyArrow();
+	void FireArrow();
 	
 public:
 	UPROPERTY(EditAnywhere, Category = "Arrow")
 	TSubclassOf<class AHR_Arrow> ArrowClass;
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Arrow")
+	TObjectPtr<class AHR_Arrow> ArrowIns;
 	
 };

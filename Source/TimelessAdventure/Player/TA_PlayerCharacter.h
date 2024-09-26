@@ -64,15 +64,26 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	TSubclassOf<class AHR_Bow> Weapon_Bow;
 
+// Player HUB Widget
+protected:
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<UUserWidget> PlayerHUBClass;
+private:
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	TObjectPtr<UUserWidget> PlayerHUBIns;
+// Plyaer HUB Visible 변경 
+public:
+	void ShowPlayerHUB();
+	void HidePlayerHUB();
 
 	
 // Camera Component
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<class USpringArmComponent> SpringArmComp;
-
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<class UCameraComponent> CameraComp;
+
 
 // Components
 protected:

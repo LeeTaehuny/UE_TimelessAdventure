@@ -93,6 +93,7 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(IA_SwordAttack, ETriggerEvent::Started, this, &UTA_InputComponent::SwordAttack);
 		EnhancedInputComponent->BindAction(IA_AimBow, ETriggerEvent::Started, this, &UTA_InputComponent::AimBowStart);
 		EnhancedInputComponent->BindAction(IA_AimBow, ETriggerEvent::Completed, this, &UTA_InputComponent::AimBowEnd);
+		EnhancedInputComponent->BindAction(IA_FireBow, ETriggerEvent::Started, this, &UTA_InputComponent::FireBow);
 	}
 }
 
@@ -293,6 +294,14 @@ void UTA_InputComponent::AimBowEnd()
 
 	// Animation이 끝났을때 움직일 수 있게
 	//isAttack = false;
+}
+
+void UTA_InputComponent::FireBow()
+{
+	if(OwnerPlayer)
+	{
+		OwnerPlayer->GetCombatComponent()->FireBow();
+	}
 }
 
 

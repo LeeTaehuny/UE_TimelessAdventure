@@ -74,20 +74,26 @@ private:
 protected:
 	EEquipedWeapon EquipedWeapon = EEquipedWeapon::Bow;
 
+// Weapon이 부착될 socket
+public:
+	UPROPERTY(EditAnywhere, Category = "Socket")
+	FName BowSocketName = FName("bow_socket_l");
+	UPROPERTY(EditAnywhere, Category = "Socket")
+	FName ArrowSocketName = FName("arrow_socket_r");;
+	
 // Weapon
 public:
 	// 나중에 Map이나 Array로 저장 고려 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	TSubclassOf<class AHR_Bow> Weapon_Bow;
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	FName BowSocketName = FName("bow_socket_l");
-	UPROPERTY(EditAnywhere, Category = "Weapon")
-	TObjectPtr<class AHR_Bow> BowObject;
+	TObjectPtr<class AHR_Bow> BowIns;
 
 // Bow 기능 
 public:
 	void AimingBowStart();
 	void AimingBowEnd();
+	void FireBow();
 
 // Weapon eauip
 public:

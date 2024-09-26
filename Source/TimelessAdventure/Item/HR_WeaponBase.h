@@ -37,8 +37,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	EWeaponType WeaponType;
 	
-	UPROPERTY(EditAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	FName WeaponSocketName;
 
 // Weapon Equip
 public:

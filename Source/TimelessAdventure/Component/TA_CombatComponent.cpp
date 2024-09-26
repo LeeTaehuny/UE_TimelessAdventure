@@ -80,7 +80,8 @@ void UTA_CombatComponent::AimingBowStart()
 	// 3) Camera 고정
 	// 4) Bow 상태 변경
 	// 5) Arrow Spawn
-	if(OwnerPlayer->GetHasBow())
+	// 6) player HUB 켜기
+	if(EquipedWeapon == EEquipedWeapon::Bow)
 	{
 		if(OwnerPlayer)
 		{
@@ -88,19 +89,20 @@ void UTA_CombatComponent::AimingBowStart()
 			OwnerPlayer->SetZooming(true);
 			OwnerPlayer->GetCharacterMovement()->bOrientRotationToMovement = false;
 			OwnerPlayer->GetCharacterMovement()->bUseControllerDesiredRotation = true;
+			OwnerPlayer->ShowPlayerHUB();
 			// + characterMovement::RotationRate 조정
 		}
 	}
-	if(BowObject)
+	if(BowIns)
 	{
-		BowObject->ChangeBowState(EBowState::BS_Aim);
-		BowObject->SpawnArrow(OwnerPlayer->GetMesh());
+		BowIns->ChangeBowState(EBowState::BS_Aim);
+		BowIns->SpawnArrow(OwnerPlayer->GetMesh(), ArrowSocketName);
 	}
 }
 void UTA_CombatComponent::AimingBowEnd()
 {
 	
-	if(OwnerPlayer->GetHasBow())
+	if(EquipedWeapon == EEquipedWeapon::Bow)
 	{
 		if(OwnerPlayer)
 		{
@@ -108,12 +110,27 @@ void UTA_CombatComponent::AimingBowEnd()
 			OwnerPlayer->SetZooming(false);
 			OwnerPlayer->GetCharacterMovement()->bOrientRotationToMovement = true;
 			OwnerPlayer->GetCharacterMovement()->bUseControllerDesiredRotation = false;
+			OwnerPlayer->HidePlayerHUB();
 			// + characterMovement::RotationRate 조정 
 		}
 	}
-	if(BowObject)
+	if(BowIns)
 	{
-		BowObject->ChangeBowState(EBowState::BS_Idle);
+		// Aim 종료되면 Destroy
+		BowIns->ChangeBowState(EBowState::BS_Idle);
+		BowIns->DestroyArrow();
+	}
+}
+
+void UTA_CombatComponent::FireBow()
+{
+	if(EquipedWeapon == EEquipedWeapon::Bow)
+	{
+		// Arrow Dispatch
+		if(BowIns)
+		{
+			BowIns->FireArrow();
+		}
 	}
 }
 
@@ -124,8 +141,8 @@ void UTA_CombatComponent::EquipWeapon()
 	if(EquipedWeapon == EEquipedWeapon::Bow)
 	{
 		AHR_Bow* spawnWeapon = GetWorld()->SpawnActor<AHR_Bow>(Weapon_Bow);
-		BowObject = spawnWeapon;
-        BowObject->Equip(BowSocketName, OwnerPlayer->GetMesh());
+		BowIns = spawnWeapon;
+        BowIns->Equip(BowSocketName, OwnerPlayer->GetMesh());
 	}
 	
 }

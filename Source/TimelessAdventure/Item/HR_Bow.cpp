@@ -37,15 +37,42 @@ void AHR_Bow::ChangeBowState(EBowState newBowState)
 	BowState = newBowState;
 }
 
-void AHR_Bow::SpawnArrow(USkeletalMeshComponent* Mesh)
+void AHR_Bow::SpawnArrow(USkeletalMeshComponent* Mesh, FName SocketName)
 {
 	if (ArrowClass)
 	{
-		AHR_Arrow* Arrow = GetWorld()->SpawnActor<AHR_Arrow>(ArrowClass);
-		if (Arrow)
+		AHR_Arrow* SpawnArrow = GetWorld()->SpawnActor<AHR_Arrow>(ArrowClass);
+		ArrowIns = SpawnArrow;
+		if (ArrowIns)
 		{
-			Arrow->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetIncludingScale, FName("arrow_socket_r"));
+			ArrowIns->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
 		}
+	}
+}
+
+void AHR_Bow::DestroyArrow()
+{
+	if(ArrowIns)
+	{
+		ArrowIns->Destroy();
+	}
+}
+
+void AHR_Bow::FireArrow()
+{
+	// Aim 하는 중이면 발사
+	if(BowState == EBowState::BS_Aim)
+	{
+		// Arrow Dispatch
+		if(ArrowIns)
+		{
+			ArrowIns->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+			//ArrowIns->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		}
+		// 날라가고자 하는 방향으로 발사
+		// 
+		FVector Direction = FVector(0, 0, 0); 
+		ArrowIns->Fire(Direction);
 	}
 }
 
