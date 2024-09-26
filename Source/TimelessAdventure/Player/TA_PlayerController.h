@@ -22,6 +22,7 @@ protected:
 
 public:
 	void VisibleWeaponSelectWidget(bool Value);
+	void ConvertInventoryWidget();
 	void VisibleAimWidget(bool Value);
 
 private:

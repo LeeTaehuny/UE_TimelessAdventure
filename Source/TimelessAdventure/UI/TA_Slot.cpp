@@ -119,6 +119,16 @@ bool UTA_Slot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& I
 				InvInterface->GetInventory()->SwapItem(DragSlot->SlotType, DragSlot->PrevSlotIndex, SlotType, SlotNum);
 			}
 		}
+		// 이전 슬롯이 소비 슬롯이고, 현재 슬롯이 퀵슬롯인 경우
+		else if (DragSlot->SlotType == ESlotType::ST_Inventory_C && SlotType == ESlotType::ST_QuickSlot)
+		{
+			// 아이템 등록
+			IInventoryInterface* InvInterface = Cast<IInventoryInterface>(OwnerActor);
+			if (InvInterface)
+			{
+				InvInterface->GetInventory()->AddQuickSlot(DragSlot->SlotType, DragSlot->PrevSlotIndex, SlotNum);
+			}
+		}
 	}
 
 	return false;
@@ -172,6 +182,34 @@ void UTA_Slot::UpdateSlot()
 			}
 			break;
 		case ESlotType::ST_QuickSlot:
+			// 해당 슬롯의 인덱스가 유효한 경우
+			if (InvInterface->GetInventory()->GetQuickSlot().IsValidIndex(SlotNum) && !(InvInterface->GetInventory()->GetQuickSlot()[SlotNum] == -1))
+			{
+				int32 Index = InvInterface->GetInventory()->GetQuickSlot()[SlotNum];
+
+				// 해당 슬롯의 정보가 유효한 경우
+				if (InvInterface->GetInventory()->GetCInventory().IsValidIndex(SlotNum) && !InvInterface->GetInventory()->GetCInventory()[Index].bIsEmpty)
+				{
+					// 해당 텍스처 설정
+					IMG_ItemIcon->SetBrushFromTexture(InvInterface->GetInventory()->GetCInventory()[Index].Data.ItemThumbnail);
+					// 수량 설정
+					TXT_Quantity->SetText(FText::FromString(FString::FromInt(InvInterface->GetInventory()->GetCInventory()[Index].Quantity)));
+				}
+				else
+				{
+					// 빈 텍스처 설정
+					IMG_ItemIcon->SetBrushFromTexture(NoneTexture);
+					// 수량 설정
+					TXT_Quantity->SetText(FText::FromString(TEXT("")));
+				}
+			}
+			else
+			{
+				// 빈 텍스처 설정
+				IMG_ItemIcon->SetBrushFromTexture(NoneTexture);
+				// 수량 설정
+				TXT_Quantity->SetText(FText::FromString(TEXT("")));
+			}
 			break;
 		default:
 			break;

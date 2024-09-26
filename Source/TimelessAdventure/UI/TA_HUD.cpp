@@ -2,18 +2,33 @@
 
 
 #include "UI/TA_HUD.h"
+#include "UI/TA_Inventory.h"
+#include "UI/TA_QuickSlot.h"
 
 #include "Components/Image.h"
-#include "UI/TA_Inventory.h"
 
 void UTA_HUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 }
 
+bool UTA_HUD::GetInventoryVisibility()
+{
+	if (InventoryWidget)
+	{
+		return InventoryWidget->IsVisible();
+	}
+	return false;
+}
+
 void UTA_HUD::SetAimVisibility(bool Value)
 {
 	IMG_Aim->SetVisibility(Value ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
+void UTA_HUD::SetInventoryVisibility(bool Value)
+{
+	InventoryWidget->SetVisibility(Value ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 void UTA_HUD::Init()
@@ -22,6 +37,13 @@ void UTA_HUD::Init()
 	{
 		InventoryWidget->SetOwnerPlayer(OwnerActor);
 		InventoryWidget->InitInventory();
+		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (QuickSlotWidget)
+	{
+		QuickSlotWidget->SetOwnerPlayer(OwnerActor);
+		QuickSlotWidget->InitQuickSlot();
 	}
 }
 
@@ -30,5 +52,10 @@ void UTA_HUD::UpdateInventory()
 	if (InventoryWidget)
 	{
 		InventoryWidget->UpdateInvenSlot();
+	}
+
+	if (QuickSlotWidget)
+	{
+		QuickSlotWidget->UpdateQuickSlot();
 	}
 }

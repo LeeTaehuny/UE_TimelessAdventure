@@ -57,6 +57,8 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(IA_MiddleClick, ETriggerEvent::Started, this, &UTA_InputComponent::MiddleClickStart);
 	EnhancedInputComponent->BindAction(IA_MiddleClick, ETriggerEvent::Completed, this, &UTA_InputComponent::MiddleClickEnd);
 	EnhancedInputComponent->BindAction(IA_ConvertInventory, ETriggerEvent::Started, this, &UTA_InputComponent::ConvertInventory);
+	EnhancedInputComponent->BindAction(IA_Num1, ETriggerEvent::Started, this, &UTA_InputComponent::NumClick, 1);
+	EnhancedInputComponent->BindAction(IA_Num2, ETriggerEvent::Started, this, &UTA_InputComponent::NumClick, 2);
 }
 
 void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
@@ -170,6 +172,16 @@ void UTA_InputComponent::ConvertInventory()
 	{
 	case EPlayerState::PS_Combat:
 		if (IsValid(OwnerPlayer->GetInventoryComponent())) OwnerPlayer->GetInventoryComponent()->ConvertInventory();
+		break;
+	}
+}
+
+void UTA_InputComponent::NumClick(int32 ClickNum)
+{
+	switch (PlayerState)
+	{
+	case EPlayerState::PS_Combat:
+		if (IsValid(OwnerPlayer->GetInventoryComponent())) OwnerPlayer->GetInventoryComponent()->UseQuickSlot(ClickNum);
 		break;
 	}
 }

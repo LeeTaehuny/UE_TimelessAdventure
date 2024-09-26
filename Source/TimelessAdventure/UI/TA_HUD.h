@@ -18,7 +18,9 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
+	bool GetInventoryVisibility();
 	void SetAimVisibility(bool Value);
+	void SetInventoryVisibility(bool Value);
 	void Init();
 	void UpdateInventory();
 
@@ -28,4 +30,7 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTA_Inventory> InventoryWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTA_QuickSlot> QuickSlotWidget;
 };

@@ -56,6 +56,8 @@ public:
 	// 현재 방어 여부 반환 함수
 	FORCEINLINE bool GetIsGuard() { return bIsGuard; }
 
+public:
+	void HealStat(float HpPercent, float StaminaPercent);
 	void SetChangeWeaponState(EEquippedState NewState);
 
 // Delegate
@@ -177,7 +179,7 @@ private:
 	float MaxHp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Stat")
-	float CurrrentHp;
+	float CurrentHp;
 	
 	// 지속 체력 증가/감소량 
 	UPROPERTY(EditAnywhere, Category = "Stat")

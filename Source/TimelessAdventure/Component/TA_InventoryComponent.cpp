@@ -2,6 +2,10 @@
 
 
 #include "Component/TA_InventoryComponent.h"
+#include "Component/TA_CombatComponent.h"
+#include "Player/TA_PlayerController.h"
+#include "Player/TA_PlayerCharacter.h"
+#include "Interface/CombatComponentInterface.h"
 
 #include "Game/TA_GameInstance.h"
 
@@ -11,6 +15,7 @@ UTA_InventoryComponent::UTA_InventoryComponent()
 
 	Inventory_C.Init(FInvItem(), 8);
 	Inventory_M.Init(FInvItem(), 8);
+	QuickSlot.Init(-1, 2);
 }
 
 void UTA_InventoryComponent::BeginPlay()
@@ -35,6 +40,11 @@ void UTA_InventoryComponent::BeginPlay()
 void UTA_InventoryComponent::ConvertInventory()
 {
 	// 인벤토리 열기 / 닫기
+	ATA_PlayerController* PC = Cast<ATA_PlayerController>(OwnerPlayer->GetController());
+	if (PC)
+	{
+		PC->ConvertInventoryWidget();
+	}
 }
 
 bool UTA_InventoryComponent::AddItem(FName ItemName, int32& Quantity)
@@ -155,14 +165,99 @@ bool UTA_InventoryComponent::AddItem(FName ItemName, int32& Quantity)
 	return false;
 }
 
+void UTA_InventoryComponent::UseQuickSlot(int32 Num)
+{
+	int32 Idx = Num - 1;
+
+	// 해당 슬롯에 아이템이 존재하는 경우
+	if (QuickSlot[Idx] != -1 && !Inventory_C[QuickSlot[Idx]].bIsEmpty)
+	{
+		// 아이템 사용
+		UseItem(ESlotType::ST_Inventory_C, QuickSlot[Idx]);
+	}
+}
+
 void UTA_InventoryComponent::UseItem(ESlotType Type, int32 Index)
 {
+	switch (Type)
+	{
+	case ESlotType::ST_Inventory_C:
+		// 해당 아이템이 유효한지 체크
+		if (Inventory_C.IsValidIndex(Index) && !Inventory_C[Index].bIsEmpty)
+		{
+			// 아이템 사용
+			ICombatComponentInterface* CombatInterface = Cast<ICombatComponentInterface>(OwnerPlayer);
+			if (CombatInterface)
+			{
+				CombatInterface->GetCombatComponent()->HealStat(Inventory_C[Index].Data.AddHPAmount, Inventory_C[Index].Data.AddStaminaAmount);
+			}
+
+			// 아이템 수량 감소
+			Inventory_C[Index].Quantity--;
+		
+			OnChangeInventory.Broadcast();
+
+			// 수량이 0인 경우
+			if (Inventory_C[Index].Quantity <= 0)
+			{
+				// 아이템 제거
+				RemoveItem(Type, Index);
+			}
+		}
+		break;
+	case ESlotType::ST_Inventory_M:
+		// 해당 아이템이 유효한지 체크
+		if (Inventory_M.IsValidIndex(Index) && !Inventory_M[Index].bIsEmpty)
+		{
+			// 아이템 수량 감소
+			Inventory_M[Index].Quantity--;
+
+			OnChangeInventory.Broadcast();
+
+			// 수량이 0인 경우
+			if (Inventory_M[Index].Quantity <= 0)
+			{
+				// 아이템 제거
+				RemoveItem(Type, Index);
+			}
+		}
+		break;
+	}
 
 }
 
 void UTA_InventoryComponent::RemoveItem(ESlotType Type, int32 Index)
 {
+	switch (Type)
+	{
+	case ESlotType::ST_Inventory_C:
+		if (Inventory_C.IsValidIndex(Index))
+		{
+			// 아이템 초기화
+			Inventory_C[Index] = FInvItem();
 
+			// 퀵 슬롯 확인 후 초기화
+			for (int32 i = 0; i < QuickSlot.Num(); i++)
+			{
+				// 해당 인덱스를 가진 경우
+				if (QuickSlot[i] == Index)
+				{
+					// 초기화
+					QuickSlot[i] = -1;
+				}
+			}
+		}
+		break;
+	case ESlotType::ST_Inventory_M:
+		if (Inventory_M.IsValidIndex(Index))
+		{
+			// 아이템 초기화
+			Inventory_M[Index] = FInvItem();
+		}
+		break;
+	}
+
+	OnChangeInventory.Broadcast();
 }
 
 void UTA_InventoryComponent::SwapItem(ESlotType Type1, int32 Index1, ESlotType Type2, int32 Index2)
@@ -174,6 +269,21 @@ void UTA_InventoryComponent::SwapItem(ESlotType Type1, int32 Index1, ESlotType T
 		switch (Type1)
 		{
 		case ESlotType::ST_Inventory_C:
+			if (QuickSlot[0] == Index1 && QuickSlot[1] == Index2 || QuickSlot[0] == Index2 && QuickSlot[1] == Index1)
+			{
+				QuickSlot.Swap(0, 1);
+			}
+			else
+			{
+				for (int32 i = 0; i < QuickSlot.Num(); i++)
+				{
+					if (QuickSlot[i] == Index1)
+					{
+						QuickSlot[i] = Index2;
+					}
+				}
+			}
+
 			Temp = Inventory_C[Index1];
 			Inventory_C[Index1] = Inventory_C[Index2];
 			Inventory_C[Index2] = Temp;
@@ -193,4 +303,16 @@ void UTA_InventoryComponent::SwapItem(ESlotType Type1, int32 Index1, ESlotType T
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s, %d"), *Item.Data.ItemName.ToString(), Item.Quantity);
 	}
+}
+
+void UTA_InventoryComponent::AddQuickSlot(ESlotType Type, int32 Index1, int32 Index2)
+{
+	// 슬롯 타입이 소비 슬롯인 경우
+	if (Type == ESlotType::ST_Inventory_C)
+	{
+		// 소비 슬롯의 해당 칸의 인덱스를 복제합니다.
+		QuickSlot[Index2] = Index1;
+	}
+
+	OnChangeInventory.Broadcast();
 }

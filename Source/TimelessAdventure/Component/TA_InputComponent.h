@@ -47,6 +47,7 @@ protected:
 	void MiddleClickStart();						// 중간 버튼 클릭 시작
 	void MiddleClickEnd();							// 중간 버튼 클릭 종료
 	void ConvertInventory();						// 인벤토리 On/Off
+	void NumClick(int32 ClickNum);					// 숫자 키보드 입력
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -77,6 +78,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_ConvertInventory;
+
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Num1;
+
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Num2;
 
 // Member
 private:

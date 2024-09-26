@@ -20,9 +20,9 @@ UTA_CombatComponent::UTA_CombatComponent()
 	// 멤버 변수 초기화
 	MaxStamina = 10.0f;
 	CurrentStamina = 0.0f;
-	MaxHp = 10.0f;
-	CurrrentHp = 0.0f;
-	UseHealthPercent = 0.001f;	
+	MaxHp = 100.0f;
+	CurrentHp = 0.0f;
+	UseHealthPercent = 0.5f;	
 	bIsAttacking = false;
 	ComboCount = 0;
 
@@ -48,6 +48,8 @@ void UTA_CombatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Init();
+
+	CurrentHp /= 2;
 }
 
 void UTA_CombatComponent::SetChangeWeaponState(EEquippedState NewState)
@@ -67,7 +69,7 @@ void UTA_CombatComponent::SetChangeWeaponState(EEquippedState NewState)
 void UTA_CombatComponent::Init()
 {
 	// 값 초기화 (체력, HP)
-	CurrrentHp = MaxHp;
+	CurrentHp = MaxHp;
 	CurrentStamina = MaxStamina;
 
 	// 이동속도 초기화
@@ -96,7 +98,7 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	else if (CombatState == ECombatState::CS_Idle)
 	{
 		// 지속 스테미너 회복
-		CurrentStamina += DeltaTime;
+		CurrentStamina += DeltaTime * UseHealthPercent;
 		if (CurrentStamina >= MaxStamina)
 		{
 			CurrentStamina = MaxStamina;
@@ -139,6 +141,7 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		}
 
 		GEngine->AddOnScreenDebugMessage(3, 1.0f, FColor::Green, FString::Printf(TEXT("CurState : %s"), *Name));
+		GEngine->AddOnScreenDebugMessage(3, 1.0f, FColor::Green, FString::Printf(TEXT("CurHP : %.1f, MaxHP : %.1f"), CurrentHp, MaxHp));
 		GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Green, FString::Printf(TEXT("CurHealth : %.1f"), CurrentStamina));
 		GEngine->AddOnScreenDebugMessage(2, 1.0f, FColor::Green, FString::Printf(TEXT("Rate      : %.1f"), CurrentStamina / MaxStamina));
 	}
@@ -655,6 +658,21 @@ void UTA_CombatComponent::UseHealth(float InValue)
 		CurrentStamina = 0.0f;
 		// Idle 상태로 변경
 		ChangeState(ECombatState::CS_Idle);
+	}
+}
+
+void UTA_CombatComponent::HealStat(float HpPercent, float StaminaPercent)
+{
+	CurrentStamina += (MaxStamina * StaminaPercent);
+	if (CurrentStamina >= MaxStamina)
+	{
+		CurrentStamina = MaxStamina;
+	}
+
+	CurrentHp += (MaxHp * HpPercent);
+	if (CurrentHp >= MaxHp)
+	{
+		CurrentHp = MaxHp;
 	}
 }
 
