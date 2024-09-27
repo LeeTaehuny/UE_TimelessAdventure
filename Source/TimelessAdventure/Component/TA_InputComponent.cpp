@@ -300,6 +300,8 @@ void UTA_InputComponent::FireBow()
 {
 	if(OwnerPlayer)
 	{
+		FVector Direction;
+		// 카메라가 바라보는 방향으로 쏴줌
 		OwnerPlayer->GetCombatComponent()->FireBow();
 	}
 }

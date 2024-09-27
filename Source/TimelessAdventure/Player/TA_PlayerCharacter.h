@@ -48,9 +48,9 @@ private:
 
 // Zoom
 public:
-	UPROPERTY(EditAnywhere, Category = "Zoom")
+	UPROPERTY(VisibleAnywhere, Category = "Zoom")
 	float InitialFOV;
-	UPROPERTY(EditAnywhere, Category = "Zoom")
+	UPROPERTY(VisibleAnywhere, Category = "Zoom")
 	float AimFOV = 60.0f;
 	UPROPERTY(EditAnywhere, Category = "Zoom")
 	FVector InitialSO;

@@ -59,7 +59,7 @@ void AHR_Bow::DestroyArrow()
 	}
 }
 
-void AHR_Bow::FireArrow()
+void AHR_Bow::FireArrow(FVector Direction)
 {
 	// Aim 하는 중이면 발사
 	if(BowState == EBowState::BS_Aim)
@@ -67,13 +67,14 @@ void AHR_Bow::FireArrow()
 		// Arrow Dispatch
 		if(ArrowIns)
 		{
-			ArrowIns->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-			//ArrowIns->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			// FDetachmentTransformRules :: Detach 했을 때의 좌표를 어떻게 할지에 대한 설정인듯
+			// KeepRelativeTransform -> 원래 좌표가 (0,0,0)이었을 때, 이 좌표를 (0, 0, 0) 유지 => 기존에는 상대 좌표였으므로 좌표 위치가 변함
+			// KeepWorldTransform -> 기존 좌표에 맞춰서 월드 좌표로 변환 => 좌표 값은 변경, 위치는 변경 X
+			ArrowIns->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+			// 날라가고자 하는 방향으로 발사
+			ArrowIns->Fire(Direction);
 		}
-		// 날라가고자 하는 방향으로 발사
-		// 
-		FVector Direction = FVector(0, 0, 0); 
-		ArrowIns->Fire(Direction);
 	}
 }
 

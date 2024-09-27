@@ -6,6 +6,7 @@
 #include "../Player/TA_PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../Item/HR_Bow.h"
+#include "Camera/CameraComponent.h"
 
 UTA_CombatComponent::UTA_CombatComponent()
 {
@@ -129,7 +130,10 @@ void UTA_CombatComponent::FireBow()
 		// Arrow Dispatch
 		if(BowIns)
 		{
-			BowIns->FireArrow();
+			FVector Direction;
+			UCameraComponent* cameraComp = OwnerPlayer->GetComponentByClass<UCameraComponent>();
+			Direction = cameraComp->GetForwardVector();
+			BowIns->FireArrow(Direction);
 		}
 	}
 }

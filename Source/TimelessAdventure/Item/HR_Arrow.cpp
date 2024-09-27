@@ -43,10 +43,12 @@ void AHR_Arrow::Fire(FVector Direction)
 		// Actor Comp 등록
 		ProjectilMovementComp->RegisterComponent();
 		// 변수 설정
-		
 		ProjectilMovementComp->UpdatedComponent = WeaponMesh;
 		ProjectilMovementComp->bRotationFollowsVelocity = true;
 		ProjectilMovementComp->ProjectileGravityScale = 0.5f;
+
+		// 속도 설정
+		ProjectilMovementComp->Velocity = Direction * 1000;
 	}
 	
 

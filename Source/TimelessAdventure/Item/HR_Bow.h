@@ -55,7 +55,7 @@ public:
 public:
 	void SpawnArrow(USkeletalMeshComponent* Mesh, FName SocketName);
 	void DestroyArrow();
-	void FireArrow();
+	void FireArrow(FVector Direction);
 	
 public:
 	UPROPERTY(EditAnywhere, Category = "Arrow")
