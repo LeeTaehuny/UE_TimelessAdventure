@@ -139,3 +139,19 @@ void ATA_PlayerController::VisibleAimWidget(bool Value)
 		HUDWidget->SetAimVisibility(Value);
 	}
 }
+
+void ATA_PlayerController::VisibleInteractionWidget(bool Value)
+{
+	if (HUDWidget)
+	{
+		HUDWidget->SetInteractionVisibility(Value);
+	}
+}
+
+void ATA_PlayerController::SetInteractionText(FText NewText)
+{
+	if (HUDWidget)
+	{
+		HUDWidget->SetInteractionText(NewText);
+	}
+}

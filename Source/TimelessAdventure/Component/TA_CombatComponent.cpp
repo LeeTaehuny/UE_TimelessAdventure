@@ -8,6 +8,7 @@
 #include "Item/TA_WeaponBase.h"
 #include "Item/TA_Bow.h"
 #include "Player/TA_PlayerController.h"
+#include "Interface/InteractionInterface.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -658,6 +659,32 @@ void UTA_CombatComponent::UseHealth(float InValue)
 		CurrentStamina = 0.0f;
 		// Idle 상태로 변경
 		ChangeState(ECombatState::CS_Idle);
+	}
+}
+
+void UTA_CombatComponent::Interaction()
+{
+	// Idle / Dash 상태가 아닌경우 리턴
+	if (!(CombatState == ECombatState::CS_Idle) && !(CombatState == ECombatState::CS_Dash)) return;
+
+	FHitResult HitResult;
+
+	bool bIsHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		OwnerPlayer->GetActorLocation(),
+		OwnerPlayer->GetActorLocation(),
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel4,
+		FCollisionShape::MakeSphere(40.0f)
+	);
+
+	if (bIsHit)
+	{
+		IInteractionInterface* InteractionInterface = Cast<IInteractionInterface>(HitResult.GetActor());
+		if (InteractionInterface)
+		{
+			InteractionInterface->Interaction(OwnerPlayer);
+		}
 	}
 }
 

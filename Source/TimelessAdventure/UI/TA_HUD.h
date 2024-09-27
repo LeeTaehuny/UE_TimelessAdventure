@@ -21,6 +21,8 @@ public:
 	bool GetInventoryVisibility();
 	void SetAimVisibility(bool Value);
 	void SetInventoryVisibility(bool Value);
+	void SetInteractionVisibility(bool Value);
+	void SetInteractionText(FText NewText);
 	void Init();
 	void UpdateInventory();
 
@@ -33,4 +35,7 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTA_QuickSlot> QuickSlotWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTA_Interaction> InteractionWidget;
 };

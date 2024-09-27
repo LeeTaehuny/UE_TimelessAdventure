@@ -24,6 +24,8 @@ public:
 	void VisibleWeaponSelectWidget(bool Value);
 	void ConvertInventoryWidget();
 	void VisibleAimWidget(bool Value);
+	void VisibleInteractionWidget(bool Value);
+	void SetInteractionText(FText NewText);
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Widget")

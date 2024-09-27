@@ -4,6 +4,7 @@
 #include "UI/TA_HUD.h"
 #include "UI/TA_Inventory.h"
 #include "UI/TA_QuickSlot.h"
+#include "UI/TA_Interaction.h"
 
 #include "Components/Image.h"
 
@@ -31,6 +32,16 @@ void UTA_HUD::SetInventoryVisibility(bool Value)
 	InventoryWidget->SetVisibility(Value ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
+void UTA_HUD::SetInteractionVisibility(bool Value)
+{
+	InteractionWidget->SetVisibility(Value ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
+void UTA_HUD::SetInteractionText(FText NewText)
+{
+	InteractionWidget->UpdateHelpText(NewText);
+}
+
 void UTA_HUD::Init()
 {
 	if (InventoryWidget)
@@ -44,6 +55,12 @@ void UTA_HUD::Init()
 	{
 		QuickSlotWidget->SetOwnerPlayer(OwnerActor);
 		QuickSlotWidget->InitQuickSlot();
+	}
+
+	if (InteractionWidget)
+	{
+		InteractionWidget->SetOwnerPlayer(OwnerActor);
+		InteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

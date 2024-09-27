@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Item/TA_ItemBase.h"
+#include "GameFramework/Actor.h"
 #include "TA_WeaponBase.generated.h"
 
 UENUM(BlueprintType)
@@ -18,7 +18,7 @@ enum class EWeaponType : uint8
  * 
  */
 UCLASS()
-class TIMELESSADVENTURE_API ATA_WeaponBase : public ATA_ItemBase
+class TIMELESSADVENTURE_API ATA_WeaponBase : public AActor
 {
 	GENERATED_BODY()
 	

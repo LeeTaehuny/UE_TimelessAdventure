@@ -56,7 +56,11 @@ public:
 	// 현재 방어 여부 반환 함수
 	FORCEINLINE bool GetIsGuard() { return bIsGuard; }
 
+	// 줍기 몽타주 반환 함수
+	FORCEINLINE class UAnimMontage* GetPickupMontage() { return PickupMontage; }
+
 public:
+	void Interaction();
 	void HealStat(float HpPercent, float StaminaPercent);
 	void SetChangeWeaponState(EEquippedState NewState);
 
@@ -162,6 +166,10 @@ private:
 	// Shoot Arrow Montage
 	UPROPERTY(EditAnywhere, Category = "Anims")
 	TObjectPtr<class UAnimMontage> ShootArrowMontage;
+
+	// Pickup Montage
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> PickupMontage;
 
 // Stat
 private:
