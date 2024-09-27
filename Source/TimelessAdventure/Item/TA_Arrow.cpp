@@ -9,15 +9,20 @@
 ATA_Arrow::ATA_Arrow()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
-	BaseMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMeshComp"));
-	SetRootComponent(BaseMeshComp);
+
+	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
+	RootComponent = BaseMesh;
+
+	ShaftMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShaftMesh"));
+	ShaftMesh->SetupAttachment(BaseMesh);
+
+	IronMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("IronMesh"));
+	IronMesh->SetupAttachment(ShaftMesh);
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetupAttachment(RootComponent);
+	SphereComp->SetupAttachment(IronMesh);
 
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
-	ProjectileMovementComp->SetUpdatedComponent(BaseMeshComp);
 	ProjectileMovementComp->InitialSpeed = 3000.0f;
 	ProjectileMovementComp->MaxSpeed = 5000.0f;
 	ProjectileMovementComp->ProjectileGravityScale = 0.0f;

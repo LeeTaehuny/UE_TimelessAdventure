@@ -51,7 +51,7 @@ void ATA_Bow::SpawnArrow(USkeletalMeshComponent* Mesh)
 		Arrow = GetWorld()->SpawnActor<ATA_Arrow>(ArrowClass);
 		if (Arrow)
 		{
-			Arrow->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ArrowSocketName);
+			Arrow->AttachToComponent(Mesh, FAttachmentTransformRules::KeepRelativeTransform, ArrowSocketName);
 		}
 	}
 }

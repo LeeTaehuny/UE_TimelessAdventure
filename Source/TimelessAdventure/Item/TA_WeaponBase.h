@@ -33,6 +33,8 @@ public:
 	virtual void RemoveWeapon();
 
 protected:
+	virtual void Tick(float DeltaTime) override;
+
 	// 부착할 소켓 이름
 	UPROPERTY(EditAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	FName WeaponSocketName;

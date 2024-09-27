@@ -23,8 +23,14 @@ public:
 	void FireArrow(FVector Pos);
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Component")
-	TObjectPtr<class UStaticMeshComponent> BaseMeshComp;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UStaticMeshComponent> BaseMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UStaticMeshComponent> ShaftMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UStaticMeshComponent> IronMesh;
 
 	UPROPERTY(VisibleAnywhere, Category = "Component")
 	TObjectPtr<class USphereComponent> SphereComp;

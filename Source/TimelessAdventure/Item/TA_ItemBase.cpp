@@ -16,7 +16,7 @@
 // Sets default values
 ATA_ItemBase::ATA_ItemBase()
 {
- 	PrimaryActorTick.bCanEverTick = true;
+ 	PrimaryActorTick.bCanEverTick = false;
 
 	InteractionCollider = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionCollider"));
 	SetRootComponent(InteractionCollider);
