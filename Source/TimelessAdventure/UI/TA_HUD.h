@@ -25,13 +25,14 @@ public:
 	void SetInteractionText(FText NewText);
 	void Init();
 	void UpdateInventory();
+	void UpdateGold();
 
 private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> IMG_Aim;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTA_Inventory> InventoryWidget;
+	TObjectPtr<class UTA_Inventory> InventoryWidget	;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTA_QuickSlot> QuickSlotWidget;

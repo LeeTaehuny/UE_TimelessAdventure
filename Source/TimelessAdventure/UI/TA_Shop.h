@@ -16,10 +16,19 @@ class TIMELESSADVENTURE_API UTA_Shop : public UTA_CustomWidget
 	
 protected:
 	virtual void NativeConstruct() override;
+	virtual bool Initialize() override;
 
 public:
 	void Init();
 	void UpdateGold();
+
+private:
+	void InitItemDesc();
+	
+	UFUNCTION()
+	void PurchaseItem1();
+	UFUNCTION()
+	void PurchaseItem2();
 
 private:
 	UPROPERTY(meta = (BindWidget))

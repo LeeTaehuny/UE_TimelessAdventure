@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interface/InteractionInterface.h"
+#include "Data/TA_ItemData.h"
 #include "TA_Stone.generated.h"
 
 UCLASS()
@@ -23,12 +24,18 @@ protected:
 protected:
 	virtual void Interaction(ACharacter* Target) override;
 
+public:
+	FORCEINLINE const TArray<FItemData>& GetShopItemData() { return ShopItemData; }
+	FORCEINLINE const TArray<FName>& GetShopItemName() { return ShopItems; }
+
 public:	
 	UFUNCTION()
 	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void SetVisibilityStoneMenu(bool Value);
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
@@ -42,4 +49,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Item")
 	TArray<FName> ShopItems;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	TArray<FItemData> ShopItemData; 
+
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	TSubclassOf<class UTA_StoneMenu> StoneWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<class UTA_StoneMenu> StoneWidget;
 };

@@ -25,6 +25,7 @@ protected:
 public:
 	void InitInventory();
 	void UpdateInvenSlot();
+	void UpdateGold();
 
 private:
 	UFUNCTION()

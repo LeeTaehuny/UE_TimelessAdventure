@@ -76,3 +76,8 @@ void UTA_HUD::UpdateInventory()
 		QuickSlotWidget->UpdateQuickSlot();
 	}
 }
+
+void UTA_HUD::UpdateGold()
+{
+	InventoryWidget->UpdateGold();
+}

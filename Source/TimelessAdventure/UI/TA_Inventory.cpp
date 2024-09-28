@@ -4,10 +4,13 @@
 #include "UI/TA_Inventory.h"
 #include "Data/TA_SlotType.h"
 #include "UI/TA_Slot.h"
+#include "Interface/InventoryInterface.h"
+#include "Component/TA_InventoryComponent.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/Button.h"
 #include "Components/Border.h"
+#include "Components/TextBlock.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
 
@@ -67,6 +70,8 @@ void UTA_Inventory::InitInventory()
 {
 	// 슬롯 초기화
 	UpdateInvenSlot();
+	// 골드 초기화
+	UpdateGold();
 }
 
 void UTA_Inventory::ChangeInventoryType_C()
@@ -120,5 +125,14 @@ void UTA_Inventory::UpdateInvenSlot()
 		default:
 			break;
 		}
+	}
+}
+
+void UTA_Inventory::UpdateGold()
+{
+	IInventoryInterface* InvInterface = Cast<IInventoryInterface>(OwnerActor);
+	if (InvInterface)
+	{
+		TXT_Gold->SetText(FText::FromString(FString::FromInt(InvInterface->GetInventory()->GetGold())));
 	}
 }

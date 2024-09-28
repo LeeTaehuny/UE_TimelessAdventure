@@ -5,6 +5,7 @@
 #include "Interface/InventoryInterface.h"
 #include "Component/TA_InventoryComponent.h"
 #include "UI/TA_DragSlot.h"
+#include "Gimmick/TA_Stone.h"
 
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -215,6 +216,24 @@ void UTA_Slot::UpdateSlot()
 			break;
 		default:
 			break;
+		}
+	}
+	else
+	{
+		if (SlotType == ESlotType::ST_Shop)
+		{
+			if (ATA_Stone* Stone = Cast<ATA_Stone>(OwnerActor))
+			{
+				if (Stone->GetShopItemData().IsValidIndex(SlotNum))
+				{
+					// 텍스처 설정
+					IMG_ItemIcon->SetBrushFromTexture(Stone->GetShopItemData()[SlotNum].ItemThumbnail);
+				}
+				else
+				{
+					IMG_ItemIcon->SetBrushFromTexture(NoneTexture);
+				}
+			}
 		}
 	}
 	

@@ -31,10 +31,8 @@ void UTA_InventoryComponent::BeginPlay()
 	AddItem(TEXT("B_Crystal"), n1);
 	AddItem(TEXT("G_Crystal"), n2);
 
-	for (FInvItem Item : Inventory_C)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s, %d"), *Item.Data.ItemName.ToString(), Item.Quantity);
-	}
+	// TEST
+	AddGold(7);
 }
 
 void UTA_InventoryComponent::ConvertInventory()
@@ -315,4 +313,30 @@ void UTA_InventoryComponent::AddQuickSlot(ESlotType Type, int32 Index1, int32 In
 	}
 
 	OnChangeInventory.Broadcast();
+}
+
+void UTA_InventoryComponent::AddGold(int32 InGold)
+{
+	Gold += InGold;
+
+	OnChangeGold.Broadcast();
+}
+
+bool UTA_InventoryComponent::PurchaseItem(FName ItemName, int32 Price)
+{
+	if (Gold >= Price)
+	{
+		int32 TempNum = 1;
+		// 아이템 추가에 성공했다면?
+		if (AddItem(ItemName, TempNum))
+		{
+			// 소지 골드 수정
+			Gold -= Price;
+
+			OnChangeGold.Broadcast();
+			return true;
+		}
+	}
+
+	return false;
 }

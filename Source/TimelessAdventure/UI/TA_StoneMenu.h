@@ -20,6 +20,7 @@ protected:
 
 public:
 	void Init();
+	void UpdateWidget();
 
 private:
 	UFUNCTION()

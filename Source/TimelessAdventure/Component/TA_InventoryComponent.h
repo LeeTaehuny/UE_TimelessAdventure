@@ -9,6 +9,7 @@
 #include "TA_InventoryComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnChangeInventory);
+DECLARE_MULTICAST_DELEGATE(FOnChangeGold);
 
 USTRUCT(BlueprintType)
 struct FInvItem
@@ -37,6 +38,7 @@ protected:
 
 public:
 	FOnChangeInventory OnChangeInventory;
+	FOnChangeGold OnChangeGold;
 
 	FORCEINLINE const TArray<FInvItem>& GetCInventory() { return Inventory_C; }
 	FORCEINLINE const TArray<FInvItem>& GetMInventory() { return Inventory_M; }
@@ -53,6 +55,9 @@ public:
 	void SwapItem(ESlotType Type1, int32 Index1, ESlotType Type2, int32 Index2);
 
 	void AddQuickSlot(ESlotType Type, int32 Index1, int32 Index2);
+	void AddGold(int32 InGold);
+
+	bool PurchaseItem(FName ItemName, int32 Price);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")

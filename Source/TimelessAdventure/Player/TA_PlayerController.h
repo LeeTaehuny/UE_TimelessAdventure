@@ -26,6 +26,7 @@ public:
 	void VisibleAimWidget(bool Value);
 	void VisibleInteractionWidget(bool Value);
 	void SetInteractionText(FText NewText);
+	bool GetInventoryVisible();
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Widget")

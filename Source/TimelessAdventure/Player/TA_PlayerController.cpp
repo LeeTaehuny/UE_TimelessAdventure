@@ -42,6 +42,7 @@ void ATA_PlayerController::BeginPlay()
 			if (!InventoryInterface) return;
 
 			InventoryInterface->GetInventory()->OnChangeInventory.AddUObject(HUDWidget, &UTA_HUD::UpdateInventory);
+			InventoryInterface->GetInventory()->OnChangeGold.AddUObject(HUDWidget, &UTA_HUD::UpdateGold);
 		}
 	}
 }
@@ -154,4 +155,9 @@ void ATA_PlayerController::SetInteractionText(FText NewText)
 	{
 		HUDWidget->SetInteractionText(NewText);
 	}
+}
+
+bool ATA_PlayerController::GetInventoryVisible()
+{
+	return HUDWidget->GetInventoryVisibility();
 }
