@@ -39,4 +39,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Item")
 	FText InteractionText;
+
+	UPROPERTY(EditAnywhere, Category = "Item")
+	TArray<FName> ShopItems;
 };

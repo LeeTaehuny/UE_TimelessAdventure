@@ -120,7 +120,5 @@ void UTA_Inventory::UpdateInvenSlot()
 		default:
 			break;
 		}
-		
-		InvSlot->UpdateSlot();
 	}
 }

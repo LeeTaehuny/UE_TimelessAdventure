@@ -137,6 +137,8 @@ bool UTA_Slot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& I
 void UTA_Slot::Init(ESlotType Type)
 {
 	SlotType = Type;
+
+	UpdateSlot();
 }
 
 void UTA_Slot::UpdateSlot()

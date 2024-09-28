@@ -41,6 +41,7 @@ public:
 	FORCEINLINE const TArray<FInvItem>& GetCInventory() { return Inventory_C; }
 	FORCEINLINE const TArray<FInvItem>& GetMInventory() { return Inventory_M; }
 	FORCEINLINE const TArray<int32>& GetQuickSlot() { return QuickSlot; }
+	FORCEINLINE const int32 GetGold() { return Gold; }
 
 public:
 	void ConvertInventory();
@@ -62,4 +63,7 @@ private:
 
 	UPROPERTY()
 	TArray<int32> QuickSlot;
+
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+	int32 Gold;
 };
