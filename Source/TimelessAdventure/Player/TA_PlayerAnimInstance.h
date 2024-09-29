@@ -42,6 +42,9 @@ public:
 	bool bHasBow;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsAimingWithBow;
+	// Aim offset
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float BowPitch;
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DistanceMaching", meta = (AllowPrivateAccess = "true"))

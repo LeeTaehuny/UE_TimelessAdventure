@@ -50,12 +50,12 @@ private:
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Zoom")
 	float InitialFOV;
-	UPROPERTY(VisibleAnywhere, Category = "Zoom")
-	float AimFOV = 60.0f;
 	UPROPERTY(EditAnywhere, Category = "Zoom")
+	float AimFOV = 60.0f;
+	UPROPERTY(VisibleAnywhere, Category = "Zoom")
 	FVector InitialSO;
 	UPROPERTY(EditAnywhere, Category = "Zoom")
-	FVector AimSO = FVector(60, 60, 45);
+	FVector AimSO = FVector(100, 75, 45);
 	
 
 // Weapon BP

@@ -48,7 +48,7 @@ void AHR_Arrow::Fire(FVector Direction)
 		ProjectilMovementComp->ProjectileGravityScale = 0.5f;
 
 		// 속도 설정
-		ProjectilMovementComp->Velocity = Direction * 1000;
+		ProjectilMovementComp->Velocity = Direction * 2500;
 	}
 	
 

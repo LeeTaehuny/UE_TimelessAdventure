@@ -69,6 +69,10 @@ void UTA_PlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsAimingWithBow = playerCharacter->GetAimingBow();
 		bHasBow = playerCharacter->GetHasBow();
 		Direction = CalculateDirection(Velocity, Player->GetActorRotation());
+
+		FRotator delta = playerCharacter->GetBaseAimRotation() - playerCharacter->GetActorRotation();
+		delta.Normalize();
+		BowPitch = delta.Pitch;
 	}
 	
 }

@@ -93,12 +93,13 @@ void UTA_CombatComponent::AimingBowStart()
 			OwnerPlayer->ShowPlayerHUB();
 			// + characterMovement::RotationRate 조정
 		}
+		if(BowIns)
+		{
+			BowIns->ChangeBowState(EBowState::BS_Aim);
+			BowIns->SpawnArrow(OwnerPlayer->GetMesh(), ArrowSocketName);
+		}
 	}
-	if(BowIns)
-	{
-		BowIns->ChangeBowState(EBowState::BS_Aim);
-		BowIns->SpawnArrow(OwnerPlayer->GetMesh(), ArrowSocketName);
-	}
+	
 }
 void UTA_CombatComponent::AimingBowEnd()
 {
@@ -125,15 +126,12 @@ void UTA_CombatComponent::AimingBowEnd()
 
 void UTA_CombatComponent::FireBow()
 {
+	// Direction 계산
 	if(EquipedWeapon == EEquipedWeapon::Bow)
 	{
-		// Arrow Dispatch
 		if(BowIns)
 		{
-			FVector Direction;
-			UCameraComponent* cameraComp = OwnerPlayer->GetComponentByClass<UCameraComponent>();
-			Direction = cameraComp->GetForwardVector();
-			BowIns->FireArrow(Direction);
+			BowIns->FireArrow(CalculateArrowDirection());
 		}
 	}
 }
@@ -149,6 +147,37 @@ void UTA_CombatComponent::EquipWeapon()
         BowIns->Equip(BowSocketName, OwnerPlayer->GetMesh());
 	}
 	
+}
+
+FVector UTA_CombatComponent::CalculateArrowDirection()
+{
+	FVector Direction;
+	UCameraComponent* cameraComp = OwnerPlayer->GetComponentByClass<UCameraComponent>();
+	Direction = cameraComp->GetForwardVector();
+
+
+	// LineTrace
+	FVector _Start = cameraComp->K2_GetComponentLocation();
+	FVector _End = cameraComp->GetForwardVector() * 10000;
+	FHitResult _HitOut;
+	FCollisionQueryParams _TraceParams;
+	bool success = GetWorld()->LineTraceSingleByChannel(_HitOut, _Start, _End, ECC_Visibility, _TraceParams);
+
+	DrawDebugLine(GetWorld(), _Start, _End, FColor::Red, true, 1.0f);
+
+	FVector _From;
+	FVector _To;
+	if(success)
+	{
+		_To = _HitOut.Location;
+	}
+	else _To = _HitOut.TraceEnd;
+	_From = BowIns->GetActorLocation();
+
+	Direction = _To;
+	
+	
+	return Direction;
 }
 
 void UTA_CombatComponent::UpdateHealth(bool Value, float Percent)

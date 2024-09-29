@@ -72,8 +72,11 @@ void AHR_Bow::FireArrow(FVector Direction)
 			// KeepWorldTransform -> 기존 좌표에 맞춰서 월드 좌표로 변환 => 좌표 값은 변경, 위치는 변경 X
 			ArrowIns->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
+			FVector Dir = Direction - ArrowIns->GetActorLocation();
+			Dir.Normalize();
+			
 			// 날라가고자 하는 방향으로 발사
-			ArrowIns->Fire(Direction);
+			ArrowIns->Fire(Dir);
 		}
 	}
 }

@@ -98,5 +98,9 @@ public:
 // Weapon eauip
 public:
 	void EquipWeapon();
+
+// Arrow Direction calculate
+private:
+	FVector CalculateArrowDirection();
 	
 };
