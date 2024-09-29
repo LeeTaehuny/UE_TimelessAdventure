@@ -23,7 +23,7 @@ UTA_CombatComponent::UTA_CombatComponent()
 	CurrentStamina = 0.0f;
 	MaxHp = 100.0f;
 	CurrentHp = 0.0f;
-	UseHealthPercent = 0.5f;	
+	UseStaminaPercent = 0.5f;	
 	bIsAttacking = false;
 	ComboCount = 0;
 
@@ -99,7 +99,7 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	else if (CombatState == ECombatState::CS_Idle)
 	{
 		// 지속 스테미너 회복
-		CurrentStamina += DeltaTime * UseHealthPercent;
+		CurrentStamina += DeltaTime * UseStaminaPercent;
 		if (CurrentStamina >= MaxStamina)
 		{
 			CurrentStamina = MaxStamina;
@@ -207,7 +207,7 @@ void UTA_CombatComponent::RollStart(FVector2D InMovementVector)
 	if (GetHealthPercent() > RollHealthPercent)
 	{
 		// 체력 사용
-		UseHealth(RollHealthPercent);
+		UseStamina(RollHealthPercent);
 
 		// 임시 상태 저장
 		if (CombatState == ECombatState::CS_Idle || CombatState == ECombatState::CS_Dash)
@@ -649,7 +649,7 @@ float UTA_CombatComponent::GetHealthPercent()
 	return CurrentStamina / MaxStamina;
 }
 
-void UTA_CombatComponent::UseHealth(float InValue)
+void UTA_CombatComponent::UseStamina(float InValue)
 {
 	// 스테미너 감소
 	CurrentStamina -= (InValue * MaxStamina);

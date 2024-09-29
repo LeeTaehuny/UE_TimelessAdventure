@@ -173,7 +173,7 @@ private:
 
 // Stat
 private:
-	void UseHealth(float InValue);
+	void UseStamina(float InValue);
 
 	// 체력
 	UPROPERTY(EditAnywhere, Category = "Stat")
@@ -191,7 +191,7 @@ private:
 	
 	// 지속 체력 증가/감소량 
 	UPROPERTY(EditAnywhere, Category = "Stat")
-	float UseHealthPercent;
+	float UseStaminaPercent;
 
 private:
 	// Change Combat State
