@@ -244,19 +244,18 @@ void UTA_InputComponent::SwordAttack()
 	if (OwnerPlayer->GetCharacterMovement()->IsFalling()) return;
 
 	// 활 들고 있을 때는 무시
-	ATA_PlayerCharacter* Character = Cast<ATA_PlayerCharacter>(OwnerPlayer);
-	UE_LOG(LogTemp, Warning, TEXT("%d"), Character->GetHasBow());
-	if(Character->GetHasBow()) return;
-
-	// 구르기 & 점프 중에는 공격 못함
-	// 걷기 & 달리기 중에는 걷기 달리기 멈추고 공격 
-	if(!IsAttacking() && PlayerState != EPlayerState::PS_Roll)
+	if(OwnerPlayer->GetCombatComponent()->GetEqipedWeapon() == EEquipedWeapon::Sword)
 	{
-		animInstance->Montage_Play(SwordComboAttackMontage);
-	}
-	else
-	{
-		SwordComboIndex = 1;
+		// 구르기 & 점프 중에는 공격 못함
+		// 걷기 & 달리기 중에는 걷기 달리기 멈추고 공격 
+		if(!IsAttacking() && PlayerState != EPlayerState::PS_Roll)
+		{
+			animInstance->Montage_Play(SwordComboAttackMontage);
+		}
+		else
+		{
+			SwordComboIndex = 1;
+		}
 	}
 	
 }

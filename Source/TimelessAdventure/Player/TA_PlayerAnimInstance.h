@@ -9,6 +9,17 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EEquiped : uint8
+{
+	E_None,
+	E_Sword,
+	E_Bow,
+	E_Torch
+};
+
+
 UCLASS()
 class TIMELESSADVENTURE_API UTA_PlayerAnimInstance : public UAnimInstance
 {
@@ -36,6 +47,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class ACharacter> Player;
 
+// Weapon
 public:
 	// Bow Anim을 위한 변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -45,6 +57,9 @@ public:
 	// Aim offset
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float BowPitch;
+	//
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	EEquiped Eqiped;
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DistanceMaching", meta = (AllowPrivateAccess = "true"))

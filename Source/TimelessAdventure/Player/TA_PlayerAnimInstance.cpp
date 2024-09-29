@@ -8,7 +8,7 @@
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "TimelessAdventure/Component/TA_CombatComponent.h"
 
 
 void UTA_PlayerAnimInstance::NativeInitializeAnimation()
@@ -35,6 +35,8 @@ void UTA_PlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
+	
+
 	if (MovementComponent)
 	{
 		// 현재 속도 저장
@@ -60,12 +62,15 @@ void UTA_PlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		CurrentWorldLocation = Player->GetActorLocation();
 		// 현재 스피드 저장
 		DeltaSpeed = DistanceLastUpdate / DeltaSeconds;
+
+
 	}
 
-	// Bow
+	// Weapon
 	ATA_PlayerCharacter* playerCharacter = Cast<ATA_PlayerCharacter>(Player);
 	if(playerCharacter)
 	{
+		// Bow
 		bIsAimingWithBow = playerCharacter->GetAimingBow();
 		bHasBow = playerCharacter->GetHasBow();
 		Direction = CalculateDirection(Velocity, Player->GetActorRotation());
@@ -73,6 +78,26 @@ void UTA_PlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		FRotator delta = playerCharacter->GetBaseAimRotation() - playerCharacter->GetActorRotation();
 		delta.Normalize();
 		BowPitch = delta.Pitch;
+
+		// Equiped weapon
+		switch (playerCharacter->GetCombatComponent()->GetEqipedWeapon())
+		{
+		case EEquipedWeapon::None:
+			Eqiped = EEquiped::E_None;
+			break;
+		case EEquipedWeapon::Sword:
+			Eqiped = EEquiped::E_Sword;
+			break;
+		case EEquipedWeapon::Bow:
+			Eqiped = EEquiped::E_Bow;
+			break;
+		case EEquipedWeapon::Torch:
+			Eqiped = EEquiped::E_Torch;
+			break;
+		default:
+			break;
+		}
+
 	}
 	
 }

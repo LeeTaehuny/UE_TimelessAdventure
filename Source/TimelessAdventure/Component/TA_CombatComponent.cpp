@@ -7,6 +7,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../Item/HR_Bow.h"
 #include "Camera/CameraComponent.h"
+#include "TimelessAdventure/Item/HR_Sword.h"
+#include "TimelessAdventure/Item/HR_Torch.h"
 
 UTA_CombatComponent::UTA_CombatComponent()
 {
@@ -139,14 +141,25 @@ void UTA_CombatComponent::FireBow()
 // 무기 생성 부착(Equip)
 void UTA_CombatComponent::EquipWeapon()
 {
-	// 
-	if(EquipedWeapon == EEquipedWeapon::Bow)
+	//
+	switch (EquipedWeapon)
 	{
-		AHR_Bow* spawnWeapon = GetWorld()->SpawnActor<AHR_Bow>(Weapon_Bow);
-		BowIns = spawnWeapon;
-        BowIns->Equip(BowSocketName, OwnerPlayer->GetMesh());
+	case EEquipedWeapon::Bow:
+		BowIns = GetWorld()->SpawnActor<AHR_Bow>(Weapon_Bow);
+		BowIns->Equip(BowSocketName, OwnerPlayer->GetMesh());
+		break;
+	case EEquipedWeapon::Sword:
+		SwordIns = GetWorld()->SpawnActor<AHR_Sword>(Weapon_Sword);
+		SwordIns->Equip(SwordSocketName, OwnerPlayer->GetMesh());
+		break;
+	case EEquipedWeapon::Torch:
+		TorchIns = GetWorld()->SpawnActor<AHR_Torch>(Weapon_Torch);
+		TorchIns->Equip(TorchSocketName, OwnerPlayer->GetMesh());
+		break;
+	default:
+		break;
 	}
-	
+
 }
 
 FVector UTA_CombatComponent::CalculateArrowDirection()

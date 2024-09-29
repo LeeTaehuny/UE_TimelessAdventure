@@ -9,7 +9,7 @@
 UENUM(BlueprintType)
 enum class EEquipedWeapon : uint8
 {
-	None,		// none
+	None,		//
 	Sword,		//
 	Bow,		//
 	Torch,		// 
@@ -39,6 +39,7 @@ public:
 	void SetUseHealth(bool Value);
 	// 체력 즉시 증가/감소 설정 함수 (true : 감소, fasle : 증가 | Percent : 처리할 체력 퍼센트)
 	void UpdateHealth(bool Value, float Percent);
+	FORCEINLINE EEquipedWeapon GetEqipedWeapon(){ return EquipedWeapon; };
 
 // Delegate
 public:
@@ -72,22 +73,46 @@ private:
 	float UseHealthPercent;
 
 protected:
-	EEquipedWeapon EquipedWeapon = EEquipedWeapon::Bow;
+	UPROPERTY(EditAnywhere, Category = "Eqiped")
+	EEquipedWeapon EquipedWeapon = EEquipedWeapon::None;
 
 // Weapon이 부착될 socket
 public:
+	// Bow
 	UPROPERTY(EditAnywhere, Category = "Socket")
 	FName BowSocketName = FName("bow_socket_l");
 	UPROPERTY(EditAnywhere, Category = "Socket")
-	FName ArrowSocketName = FName("arrow_socket_r");;
-	
+	FName ArrowSocketName = FName("arrow_socket_r");
+	// Sword
+	UPROPERTY(EditAnywhere, Category = "Socket")
+	FName SwordSocketName = FName("sword_socket_r");
+	// Torch
+	UPROPERTY(EditAnywhere, Category = "Socket")
+	FName TorchSocketName = FName("torch_socket_l");;
 // Weapon
 public:
-	// 나중에 Map이나 Array로 저장 고려 
+	// 나중에 Map이나 Array로 저장 고려 ]
+	// Bow
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	TSubclassOf<class AHR_Bow> Weapon_Bow;
+	// Sword
 	UPROPERTY(EditAnywhere, Category = "Weapon")
+	TSubclassOf<class AHR_Sword> Weapon_Sword;
+	// Torch
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	TSubclassOf<class AHR_Torch> Weapon_Torch;
+
+// Weapon Ins
+private:
+	// Bow
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<class AHR_Bow> BowIns;
+	// Sowrd
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	TObjectPtr<class AHR_Sword> SwordIns;
+	// Torch
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	TObjectPtr<class AHR_Torch> TorchIns;
 
 // Bow 기능 
 public:
