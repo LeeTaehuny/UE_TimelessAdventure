@@ -10,11 +10,17 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
+#include "TA_EquipmentWidget.h"
+#include "TA_InteractionComponent.h"
+#include "TA_PlayerCharacter.h"
 #include "TA_WeaponComponent.h"
 #include "TA_WeaponComponent_bow.h"
 #include "TA_WeaponComponent_sword.h"
+#include "TA_WeaponComponent_torch.h"
 #include "Animation/AnimMontage.h"
+#include "Blueprint/UserWidget.h"
 #include "Interface/PlayerComponentInterface.h"
+#include "Inventory/TA_InventoryComponent.h"
 
 UTA_InputComponent::UTA_InputComponent()
 {
@@ -39,6 +45,15 @@ void UTA_InputComponent::BeginPlay()
 	
 	if (!IsValid(OwnerPlayer)) return;
 
+	if(WeaponSelectionWidgetClass)
+	{
+		WeaponSelectionWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), WeaponSelectionWidgetClass);
+		WeaponSelectionWidgetInstance->AddToViewport();
+		WeaponSelectionWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
+
+	}
+
+	
 	// Set InputMappingContext
 	APlayerController* PlayerController = Cast<APlayerController>(OwnerPlayer->GetController());
 	if (PlayerController && IMC_Player)
@@ -85,7 +100,11 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Started, this, &UTA_InputComponent::DashStart);
 		EnhancedInputComponent->BindAction(IA_Dash, ETriggerEvent::Completed, this, &UTA_InputComponent::DashEnd);
 		EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Started, this, &UTA_InputComponent::Attack);
-		EnhancedInputComponent->BindAction(IA_SwitchWeapon, ETriggerEvent::Started, this, &UTA_InputComponent::SwitchWeapon);
+		EnhancedInputComponent->BindAction(IA_SwitchWeapon, ETriggerEvent::Started, this, &UTA_InputComponent::OpenWeaponSelection);
+		EnhancedInputComponent->BindAction(IA_SwitchWeapon, ETriggerEvent::Completed, this, &UTA_InputComponent::CloseWeaponSelection);
+		EnhancedInputComponent->BindAction(IA_Interaction, ETriggerEvent::Started, this, &UTA_InputComponent::InteractionPositive);
+		EnhancedInputComponent->BindAction(IA_Inventory, ETriggerEvent::Started, this, &UTA_InputComponent::ToggleInventory);
+
 	}
 }
 
@@ -105,6 +124,16 @@ void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
 				if(UTA_WeaponComponent_sword* SwordWeapon = Cast<UTA_WeaponComponent_sword>(CombatComponent->CurrentWeapon))
 				{
 					SwordWeapon->CancelAttackAndMove();
+				
+				}
+				if(UTA_WeaponComponent_torch* TorchWeapon = Cast<UTA_WeaponComponent_torch>(CombatComponent->CurrentWeapon))
+				{
+					TorchWeapon->CancelAttackAndMove();
+				
+				}
+				if(UTA_WeaponComponent* Weapon = Cast<UTA_WeaponComponent>(CombatComponent->CurrentWeapon))
+				{
+					Weapon->CancelAttackAndMove();
 				
 				}
 			}
@@ -247,7 +276,47 @@ void UTA_InputComponent::BasicJump()
 	}
 }
 
-void UTA_InputComponent::SwitchWeapon()
+void UTA_InputComponent::OpenWeaponSelection()
+{
+	if (!IsValid(OwnerPlayer) || !WeaponSelectionWidgetInstance) return	;
+	//WeaponSelectionWidgetInstance->AddToViewport();
+	
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+	WeaponSelectionWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+
+	//OwnerPlayer->GetCharacterMovement()->DisableMovement();
+}
+void UTA_InputComponent::CloseWeaponSelection()
+{
+
+	if (!IsValid(OwnerPlayer) || !WeaponSelectionWidgetInstance) return;
+
+	UTA_EquipmentWidget* EquipmentWidget = Cast<UTA_EquipmentWidget>(WeaponSelectionWidgetInstance);
+	int32 HoveredWeapon = EquipmentWidget->CurrentHoveredWeapon;
+//	WeaponSelectionWidgetInstance->RemoveFromViewport();
+	WeaponSelectionWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
+
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+
+	SwitchWeapon(HoveredWeapon);
+
+}
+
+
+void UTA_InputComponent::ToggleInventory()
+{
+	ATA_PlayerCharacter* PlayerCharacter = Cast<ATA_PlayerCharacter>(GetOwner());
+	UTA_InventoryComponent* InventoryComponent = OwnerPlayer->FindComponentByClass<UTA_InventoryComponent>();
+
+	if(PlayerCharacter && InventoryComponent)
+	{
+		InventoryComponent->ToggleInventory();
+	}
+}
+
+void UTA_InputComponent::SwitchWeapon(int32 equipweapon)
 {
 	if (!IsValid(OwnerPlayer)) return;
 
@@ -255,32 +324,19 @@ void UTA_InputComponent::SwitchWeapon()
 	if (IPlayerComponentInterface* ComponentInterface = Cast<IPlayerComponentInterface>(OwnerPlayer))
 	{
 		UTA_CombatComponent* CombatComponent = ComponentInterface->GetCombatComponent();
+		TArray<UTA_WeaponComponent*> WeaponList;
+		WeaponList.Add(nullptr);
+		WeaponList.Add(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent_sword>()));
+		WeaponList.Add(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent_bow>()));
+		WeaponList.Add(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent_torch>()));
+		WeaponList.Add(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent>())); // Fist
+		
+		// 현재 무기 가져오기
+		//UTA_WeaponComponent* CurrentWeapon = CombatComponent->CurrentWeapon;
+		//int32 CurrentIndex = WeaponList.IndexOfByKey(CurrentWeapon);
 
-		// 현재 장착된 무기를 가져와서 무기 교체 로직 실행
-		if (CombatComponent)
-		{
-			UTA_WeaponComponent* CurrentWeapon = CombatComponent->CurrentWeapon;
-
-			// fist->sword->bow
-			//sword->bow
-			if (CurrentWeapon && Cast<UTA_WeaponComponent_sword>(CurrentWeapon))
-			{
-				CombatComponent->EquipWeapon(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent_bow>()));
-				UE_LOG(LogTemp, Warning, TEXT("Switched to bow"));
-			}
-			// bow->fist
-			else if(CurrentWeapon && Cast<UTA_WeaponComponent_bow>(CurrentWeapon))
-			{
-				CombatComponent->EquipWeapon(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent>()));
-				UE_LOG(LogTemp, Warning, TEXT("Switched to fist"));
-			}
-			else
-			{
-				// fist->sword
-				CombatComponent->EquipWeapon(Cast<UTA_WeaponComponent>(OwnerPlayer->FindComponentByClass<UTA_WeaponComponent_sword>()));
-				UE_LOG(LogTemp, Warning, TEXT("Switched to sword"));
-			}
-		}
+		UTA_WeaponComponent* NextWeapon = WeaponList[equipweapon];
+		CombatComponent->EquipWeapon(NextWeapon);
 	}
 }
 
@@ -305,6 +361,17 @@ void UTA_InputComponent::Attack()
 			UE_LOG(LogTemp, Warning, TEXT("No weapon equipped!"));
 		}
 	}
+}
+
+void UTA_InputComponent::InteractionPositive()
+{
+	UTA_InteractionComponent* InteractionComponent = OwnerPlayer->FindComponentByClass<UTA_InteractionComponent>();
+	if(InteractionComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InteractionComponent is null!"));
+		return;
+	}
+	InteractionComponent->InteractionPositive();
 }
 
 void UTA_InputComponent::OnRollMontageEnd(UAnimMontage* Montage, bool bInterrupted)

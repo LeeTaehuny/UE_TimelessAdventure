@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TA_InputComponent.h"
 #include "TA_PlayerComponentBase.h"
 #include "TA_WeaponComponent.h"
 #include "TA_CombatComponent.generated.h"
@@ -31,8 +32,10 @@ public:
 	void SetUseStamina(bool Value);
 	// Stamina instant increase/decrease function (true : Decrese, fasle : Increase | Percent : Stamina Percent)
 	void UpdateStamina(bool Value, float Percent);
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	void ChangeToIdleState();
 
-// Delegate
+	// Delegate
 public:
 	// Stamina Zero
 	FOnZeroHealthDelegate ZeroHealthDelegate;
@@ -40,19 +43,30 @@ public:
 	// 장착된 무기
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	UTA_WeaponComponent* CurrentWeapon;  // 정확한 타입으로 선언
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<class ATA_Sword> SwordClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<class ATA_Torch> TorchClass;
+
 	
 	// 무기 교체 함수
 	void EquipWeapon(UTA_WeaponComponent* NewWeapon);
+	UPROPERTY()
+	AActor* SpawnedWeaponActor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	UAnimMontage* EquipSwordMontage;
 
+	
 	// 공격 함수
 	void Attack();
+	void OnNotifyReceived(UAnimNotify* Notify);
 
 private:
 	// Initialize (BeginPlay)
 	void Init();
 
 	FVector2D PreviousMovementVector;
-
 private:
 	// Stamina
 	UPROPERTY(EditAnywhere, Category = "Stat")

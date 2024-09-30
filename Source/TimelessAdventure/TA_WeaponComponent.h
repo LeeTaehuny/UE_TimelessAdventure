@@ -26,10 +26,11 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void Attack();
+	virtual void StartAttackSequence(UAnimInstance* AnimInstance, ACharacter* OwnerCharacter);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void PlayAttackAnimation();
-
+	virtual void CancelAttackAndMove();
 protected:
 	// weapon Damage
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
@@ -49,6 +50,7 @@ protected:
 
 	// play anim
 	void PlayAnimation(UAnimMontage* Animation);
+
 };
 
 

@@ -4,7 +4,6 @@
 
 #include "TA_WeaponComponent_sword.h"
 
-#include "IPersonaPreviewScene.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -95,7 +94,12 @@ void UTA_WeaponComponent_sword::StartAttackSequence(UAnimInstance* AnimInstance,
 		}
 	});
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, AttackAnimation);
+
+	
 }
+
+
+
 void UTA_WeaponComponent_sword::ResetCombo()
 {
 	CurrentComboIndex = -1;

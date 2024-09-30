@@ -3,7 +3,15 @@
 
 #include "TA_CombatComponent.h"
 
+#include "MovieSceneTracksComponentTypes.h"
+#include "TA_InputComponent.h"
+#include "TA_Sword.h"
+#include "TA_Torch.h"
 #include "TA_WeaponComponent.h"
+#include "TA_WeaponComponent_bow.h"
+#include "TA_WeaponComponent_sword.h"
+#include "TA_WeaponComponent_torch.h"
+#include "GameFramework/Character.h"
 
 UTA_CombatComponent::UTA_CombatComponent()
 {
@@ -28,12 +36,143 @@ void UTA_CombatComponent::Attack()
 	}
 }
 
+
+void UTA_CombatComponent::OnNotifyReceived(UAnimNotify* Notify)
+{
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (OwnerCharacter)
+	{
+		USkeletalMeshComponent* CharacterMesh = OwnerCharacter->GetMesh();
+		if (CharacterMesh)
+		{
+			UWorld* World = GetWorld();
+			if (World)
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = OwnerCharacter;
+
+				UTA_WeaponComponent_sword* SwordWeapon = Cast<UTA_WeaponComponent_sword>(CurrentWeapon);
+				UTA_WeaponComponent_torch* TorchWeapon = Cast<UTA_WeaponComponent_torch>(CurrentWeapon);
+				if(SpawnedWeaponActor)
+				{
+					// 기존 무기를 소켓에서 분리하고 파괴
+					SpawnedWeaponActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+					SpawnedWeaponActor->Destroy();
+					SpawnedWeaponActor = nullptr;  // 무기 파괴 후 초기화	
+				}
+					
+				if(SwordWeapon)
+				{
+					
+					// 무기를 생성하고 소켓에 부착
+					ATA_Sword* SpawnedSword = World->SpawnActor<ATA_Sword>(SwordClass, OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+					if (SpawnedSword)
+					{
+						FName SocketName = FName("SwordSocket");
+						SpawnedSword->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
+						UE_LOG(LogTemp, Warning, TEXT("Sword equipped to socket: %s"), *SocketName.ToString());
+
+						// 현재 무기로 설정
+						SpawnedWeaponActor = SpawnedSword;
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Failed to spawn sword"));
+					}
+				}
+				else if(TorchWeapon)
+				{
+					
+					ATA_Torch* SpawnedTorch = World->SpawnActor<ATA_Torch>(TorchClass, OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+					if (SpawnedTorch)
+					{
+						FName SocketName = FName("TorchSocket"); // 토치 소켓 이름 사용
+						SpawnedTorch->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
+						UE_LOG(LogTemp, Warning, TEXT("Torch equipped to socket: %s"), *SocketName.ToString());
+
+						// 현재 무기로 설정
+						SpawnedWeaponActor = SpawnedTorch;
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Failed to spawn torch"));
+					}
+				}
+				
+			}
+		}
+	}
+}
+
+
 void UTA_CombatComponent::EquipWeapon(UTA_WeaponComponent* NewWeapon)
 {
-	if (NewWeapon)
+	// 기존에 장착된 무기를 소켓에서 분리하고 파괴
+	if (SpawnedWeaponActor)
+	{
+		
+
+		if (NewWeapon)
+		{
+			UTA_CombatComponent::CurrentWeapon = NewWeapon;  // 무기 교체
+
+			// 무기가 sword일 경우에만 손 소켓에 장착
+			UTA_WeaponComponent_sword* SwordWeapon = Cast<UTA_WeaponComponent_sword>(NewWeapon);
+			UTA_WeaponComponent_torch* TorchWeapon = Cast<UTA_WeaponComponent_torch>(NewWeapon);
+			UTA_WeaponComponent* Weapon = Cast<UTA_WeaponComponent>(NewWeapon);
+			UTA_WeaponComponent_bow* BowWeapon = Cast<UTA_WeaponComponent_bow>(NewWeapon);
+
+
+			ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+			if (OwnerCharacter && EquipSwordMontage)
+			{
+				UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+				if (AnimInstance && !AnimInstance->Montage_IsPlaying(EquipSwordMontage))
+				{
+					// 장착 애니메이션 실행
+					AnimInstance->Montage_Play(EquipSwordMontage);
+				
+						
+				}
+			}
+		}
+		
+	}
+	else if (NewWeapon)
 	{
 		UTA_CombatComponent::CurrentWeapon = NewWeapon;  // 무기 교체
+
+		// 무기가 sword일 경우에만 손 소켓에 장착
+		UTA_WeaponComponent_sword* SwordWeapon = Cast<UTA_WeaponComponent_sword>(NewWeapon);
+		UTA_WeaponComponent_torch* TorchWeapon = Cast<UTA_WeaponComponent_torch>(NewWeapon);
+		UTA_WeaponComponent_bow* BowWeapon = Cast<UTA_WeaponComponent_bow>(NewWeapon);
+
+
+		if (!SwordWeapon && !TorchWeapon && !BowWeapon)
+		{
+			return;
+		}
+		else
+		{
+			
+			ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+			if (OwnerCharacter && EquipSwordMontage)
+			{
+				UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+				if (AnimInstance && !AnimInstance->Montage_IsPlaying(EquipSwordMontage))
+				{
+					// 장착 애니메이션 실행
+					AnimInstance->Montage_Play(EquipSwordMontage);
+					
+							
+				}
+			}
+		}
 	}
+	
+
+
+	
 }
 
 
@@ -108,4 +247,13 @@ void UTA_CombatComponent::UpdateStamina(bool Value, float Percent)
 		}
 	}
 }
-
+void UTA_CombatComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (OwnerCharacter && Montage == EquipSwordMontage && !bInterrupted)
+	{
+		// Montage가 끝난 후 Locomotion 상태로 자연스럽게 전환
+		OwnerCharacter->GetMesh()->GetAnimInstance()->Montage_Stop(0.5f); // 0.5초 블렌드 아웃으로 전환
+		UE_LOG(LogTemp, Warning, TEXT("Montage ended, returning to Locomotion"));
+	}
+}

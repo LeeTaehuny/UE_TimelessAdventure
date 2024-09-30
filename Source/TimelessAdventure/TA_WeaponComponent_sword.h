@@ -29,4 +29,6 @@ private:
 	void StartAttackSequence(UAnimInstance* AnimInstance, ACharacter* OwnerCharacter);
 	void ResetCombo();
 	void UpdateCombo();
+
+	
 };

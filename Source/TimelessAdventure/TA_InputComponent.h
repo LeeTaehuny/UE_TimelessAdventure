@@ -34,7 +34,10 @@ public:
 
 	// function for input
 	void AddInput(UInputComponent* PlayerInputComponent);
+	// change state function
+	void ChangeState(EPlayerState NewState);
 
+	
 // Input Mapping Context & Input Action
 protected:
 	void BasicMove(const FInputActionValue& Value);	// player move
@@ -43,6 +46,8 @@ protected:
 	void DashEnd();									// sprint end
 	void BasicRoll();								// roll
 	void BasicJump();								// jumping
+	void OpenWeaponSelection();
+	void CloseWeaponSelection();
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -67,9 +72,14 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_SwitchWeapon;
-	void SwitchWeapon();
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Interaction;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Inventory;
+	void ToggleInventory();
+	void SwitchWeapon(int32 equipweapon);
 	void Attack();
-
+	void InteractionPositive();
 	
 // Animations
 protected:
@@ -80,11 +90,12 @@ protected:
 	// called function when finished playing RollMontage
 	void OnRollMontageEnd(class UAnimMontage* Montage, bool bInterrupted);
 
+	
+
+
 // Member
 private:
 
-	// change state function
-	void ChangeState(EPlayerState NewState);
 
 	// player status
 	UPROPERTY(VisibleAnywhere, Category = "State")
@@ -109,4 +120,8 @@ private:
 private:
 	FVector2D PreviousMovementVector;
 
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	TSubclassOf<UUserWidget> WeaponSelectionWidgetClass;
+
+	UUserWidget* WeaponSelectionWidgetInstance;
 };

@@ -52,6 +52,11 @@ protected:
 	TObjectPtr<class UTA_WeaponComponent_sword> TA_WeaponComponent_Sword;
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UTA_WeaponComponent_bow> TA_WeaponComponent_Bow;
-
-
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UTA_WeaponComponent_torch> TA_WeaponComponent_Torch;
+	UPROPERTY(VisibleAnywhere, Category = "Interaction")
+	TObjectPtr<class UTA_InteractionComponent> TA_InteractionComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	class UTA_InventoryComponent* DefaultInventory;
+	
 };
