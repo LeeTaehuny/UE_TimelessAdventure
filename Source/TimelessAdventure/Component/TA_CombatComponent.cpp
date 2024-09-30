@@ -13,6 +13,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 UTA_CombatComponent::UTA_CombatComponent()
 {
@@ -42,6 +43,8 @@ UTA_CombatComponent::UTA_CombatComponent()
 	CombatState = ECombatState::CS_Idle;
 	EquippedState = EEquippedState::ES_Idle;
 	TempEquippedState = EEquippedState::ES_Idle;
+
+	AttackDistance = 300.0f;
 }
 
 void UTA_CombatComponent::BeginPlay()
@@ -311,6 +314,36 @@ void UTA_CombatComponent::AttackMove(float InAttackMoveForce)
 	FVector Impulse = OwnerPlayer->GetActorForwardVector() * InAttackMoveForce;
 
 	OwnerPlayer->GetCharacterMovement()->AddImpulse(Impulse, true);
+
+	// 공격 판정 체크
+	TArray<FHitResult> HirResults;
+
+	FVector Start = OwnerPlayer->GetActorLocation();
+	FVector End = Start + OwnerPlayer->GetActorForwardVector() * AttackDistance;
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(OwnerPlayer);
+
+	GetWorld()->SweepMultiByChannel(
+		HirResults,
+		Start,
+		End,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel5,
+		FCollisionShape::MakeSphere(50.0f),
+		Params
+	);
+
+	if (HirResults.Num() > 0)
+	{
+		for (FHitResult Target : HirResults)
+		{
+			// 데미지 전달
+			UGameplayStatics::ApplyDamage(Target.GetActor(), AttackDamage, OwnerPlayer->GetController(), OwnerPlayer, UDamageType::StaticClass());
+		}
+
+		DrawDebugSphere(GetWorld(), End, 50.0f, 12, FColor::Red, false, 2.0f);
+	}
 }
 
 void UTA_CombatComponent::RightClickStart()
@@ -764,4 +797,23 @@ void UTA_CombatComponent::EquipWeapon()
 			}
 		}
 	}
+}
+
+void UTA_CombatComponent::TakeDamage(float DamageAmount, AActor* DamageCauser)
+{
+	GEngine->AddOnScreenDebugMessage(99, 2.0f, FColor::Red, FString::Printf(TEXT("TakeDamage %f"), DamageAmount));
+}
+
+void UTA_CombatComponent::Hit()
+{
+	GEngine->AddOnScreenDebugMessage(98, 2.0f, FColor::Red, TEXT("Hit"));
+
+	// 피격 몽타주 재생 등 기타 처리
+}
+
+void UTA_CombatComponent::Die()
+{
+	GEngine->AddOnScreenDebugMessage(98, 2.0f, FColor::Red, TEXT("Die"));
+
+	// 사망 몽타주 재생 등 기타 처리
 }

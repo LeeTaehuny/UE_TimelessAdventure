@@ -22,17 +22,12 @@ void UTA_InventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	int32 num = 60;
-	int32 num2 = 70;
+	// TEST
 	int32 n1 = 1;
 	int32 n2 = 1;
-	AddItem(TEXT("HPPotion"), num);
-	AddItem(TEXT("STPotion"), num2);
 	AddItem(TEXT("B_Crystal"), n1);
 	AddItem(TEXT("G_Crystal"), n2);
-
-	// TEST
-	AddGold(7);
+	AddGold(50);
 }
 
 void UTA_InventoryComponent::ConvertInventory()

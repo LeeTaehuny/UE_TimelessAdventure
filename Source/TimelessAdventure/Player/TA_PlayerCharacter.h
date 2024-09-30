@@ -36,6 +36,8 @@ public:
 	FORCEINLINE class UTA_InventoryComponent* GetInventoryComponent() { return TA_InventoryComponent; }
 	FORCEINLINE class USpringArmComponent* GetSpringArmComponent() { return SpringArmComp; }
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 // Camera Component
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")

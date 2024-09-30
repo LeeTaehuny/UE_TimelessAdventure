@@ -60,3 +60,12 @@ void ATA_PlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 }
+
+float ATA_PlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	TA_CombatComponent->TakeDamage(DamageAmount, DamageCauser);
+
+	return Damage;
+}

@@ -235,5 +235,19 @@ private:
 	TMap<EEquippedState, TSubclassOf<class ATA_WeaponBase>> WeaponClassMap;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
-	TObjectPtr<class ATA_WeaponBase> EquippedWeapon; 
+	TObjectPtr<class ATA_WeaponBase> EquippedWeapon;
+
+// Damage
+public:
+	void TakeDamage(float DamageAmount, AActor* DamageCauser);
+	
+private:
+	void Hit();
+	void Die();
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float AttackDistance;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float AttackDamage;
 };
