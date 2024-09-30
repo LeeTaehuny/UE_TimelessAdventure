@@ -9,7 +9,6 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
 
 ATA_PlayerCharacter::ATA_PlayerCharacter()
 {
@@ -47,11 +46,6 @@ void ATA_PlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	APlayerController* pc = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	pc->bEnableClickEvents = true;		// 클릭
-	pc->bEnableMouseOverEvents = true;	// hover
-	
-	
 }
 
 void ATA_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
