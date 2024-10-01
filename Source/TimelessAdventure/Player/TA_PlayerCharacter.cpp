@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "HR/HR_StopAbilityComponent.h"
 
 ATA_PlayerCharacter::ATA_PlayerCharacter()
 {
@@ -35,6 +36,7 @@ ATA_PlayerCharacter::ATA_PlayerCharacter()
 	TA_InputComponent = CreateDefaultSubobject<UTA_InputComponent>(TEXT("InputComponent"));
 	TA_CombatComponent = CreateDefaultSubobject<UTA_CombatComponent>(TEXT("TA_CombatComponent"));
 	TA_InventoryComponent = CreateDefaultSubobject<UTA_InventoryComponent>(TEXT("TA_InventoryComponent"));
+	TA_StopAbilityComponent = CreateDefaultSubobject<UHR_StopAbilityComponent>(TEXT("TA_StopAbilityComponent"));
 }
 
 void ATA_PlayerCharacter::BeginPlay()

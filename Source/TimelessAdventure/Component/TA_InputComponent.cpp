@@ -10,6 +10,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
+#include "HR/HR_StopAbilityComponent.h"
 
 UTA_InputComponent::UTA_InputComponent()
 {
@@ -124,6 +125,9 @@ void UTA_InputComponent::LeftClick()
 	case EPlayerState::PS_Combat:
 		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->Attack();
 		break;
+	case EPlayerState::PS_StopAbilityMode:
+		if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
+		break;
 	}
 }
 
@@ -193,6 +197,17 @@ void UTA_InputComponent::Interaction()
 	{
 	case EPlayerState::PS_Combat:
 		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->Interaction();
+		break;
+	}
+}
+
+void UTA_InputComponent::TabClick()
+{
+	// 나중에 UI 띄우는 것으로 수정 
+	switch (PlayerState)
+	{
+	case EPlayerState::PS_StopAbilityMode:
+		if (IsValid(OwnerPlayer->GetStopAbilityComponent())) OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin();
 		break;
 	}
 }

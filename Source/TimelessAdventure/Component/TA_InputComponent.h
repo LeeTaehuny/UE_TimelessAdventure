@@ -11,7 +11,8 @@
 UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
-	PS_Combat,	// 전투
+	PS_Combat,			// 전투
+	PS_StopAbilityMode,		// 정지 능력 모드
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -49,6 +50,9 @@ protected:
 	void ConvertInventory();						// 인벤토리 On/Off
 	void NumClick(int32 ClickNum);					// 숫자 키보드 입력
 	void Interaction();								// 상호작용
+	// hr
+	void TabClick();								// 공격, 플레이어 기능 (오브젝트 정지, 오브젝트 control)
+	
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -88,6 +92,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Interaction;
+
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Tab;
 
 // Member
 private:

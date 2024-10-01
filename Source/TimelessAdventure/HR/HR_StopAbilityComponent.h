@@ -24,4 +24,21 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+
+	// click시 stop 모드 종료 + 모드 사용할 수 있는지 시간 체크
+
+// input에 대한 처리 함수
+public:
+	void StopAbilityBegin();
+	void StopAbilityEnd();
+
+// Mouse 이벤트 on off 함수
+private:
+	void ActivateMouseEvent();
+	void DeactivateMouseEvent();
+
+// 자주 사용하는 PlayerController 할당
+private:
+	class APlayerController* PlayerController;
+	
 };

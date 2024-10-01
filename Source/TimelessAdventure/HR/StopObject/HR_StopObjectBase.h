@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HR_StopableObjectBase.generated.h"
+#include "HR_StopObjectBase.generated.h"
 
 // 이벤트 함수 선언 정의 & 바인드 
 
 UCLASS(Abstract)
-class TIMELESSADVENTURE_API AHR_StopableObjectBase : public AActor
+class TIMELESSADVENTURE_API AHR_StopObjectBase : public AActor
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	AHR_StopableObjectBase();
+	AHR_StopObjectBase();
 
 protected:
 	// Called when the game starts or when spawned
@@ -25,13 +25,28 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-//
+// 멤버 변수 
 private:
-	bool isStopped = false;
+	bool bIsStopped = false;
+	FTimerHandle StopTimer;
 
+// Components
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class UStaticMeshComponent* ObjectMesh;
+
+// Material
+public:
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	class UMaterial* SelectableMaterial;
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	class UMaterial* ClickableMaterial;
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	class UMaterial* DefaultMaterial;
+	
 // 순수 가상 함수
 protected:
-	virtual void Move() PURE_VIRTUAL(AHR_StopableObjectBase::Move, );
+	virtual void Move(float DeltaTime) PURE_VIRTUAL(AHR_StopableObjectBase::Move, );
 
 // 기본 Base 함수
 protected:
@@ -43,8 +58,12 @@ protected:
 	void OnBeginMouse(AActor* TouchedActor);
 	void OnEndMouse(AActor* TouchedActor);
 	void OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed);
-	
-	
+
+// Material 변경 함수
+public:
+	void ChangeMaterialToSelectable();
+	void ChangeMaterialToClickable();
+	void ChangeMaterialToDefault();
 	
 	
 	
