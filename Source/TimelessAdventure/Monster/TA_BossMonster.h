@@ -39,6 +39,9 @@ protected:
 	// 돌 던지기
 	virtual void Throw() override;
 
+	// 데미지 반환
+	FORCEINLINE virtual float GetDamage() override { return Damage; }
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
@@ -59,6 +62,16 @@ private:
 
 	UPROPERTY(EditAnywhere, Category ="Monster")
 	FName StoneSocketName;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	float MaxHp;
+
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	float CurrentHp;
+
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	float Damage;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Monster")

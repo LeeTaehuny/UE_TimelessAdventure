@@ -2,10 +2,13 @@
 
 
 #include "Gimmick/TA_ThrowStone.h"
+#include "Interface/MonsterInterface.h"
 
+#include "GameFramework/Character.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ATA_ThrowStone::ATA_ThrowStone()
 {
@@ -29,6 +32,8 @@ ATA_ThrowStone::ATA_ThrowStone()
 	ProjectileMovementComponent->bIsHomingProjectile = true;
 	ProjectileMovementComponent->HomingAccelerationMagnitude = HomingAccelerationMagnitude;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
+
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ATA_ThrowStone::OnComponentBeginOverlap);
 }
 
 void ATA_ThrowStone::BeginPlay()
@@ -36,6 +41,7 @@ void ATA_ThrowStone::BeginPlay()
 	Super::BeginPlay();
 	
 	ProjectileMovementComponent->SetActive(false);
+	SetLifeSpan(3.0f);
 }
 
 void ATA_ThrowStone::Tick(float DeltaTime)
@@ -54,5 +60,25 @@ void ATA_ThrowStone::Fire(AActor* Target, FVector Direction)
 
 	// 발사
 	ProjectileMovementComponent->SetActive(true);
+}
+
+void ATA_ThrowStone::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 맞은 액터가 캐릭터인 경우
+	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+	{
+		// 몬스터 인터페이스 받아오기
+		if (IMonsterInterface* MI = Cast<IMonsterInterface>(GetOwner()))
+		{
+			// 데미지 전달
+			UGameplayStatics::ApplyDamage(Character, MI->GetDamage(), GetOwner()->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
+		}
+	}
+
+	// TODO : 폭발 이펙트 생성
+	//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Effect, GetActorTransform());
+	
+	// 삭제
+	Destroy();
 }
 

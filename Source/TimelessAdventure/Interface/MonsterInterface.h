@@ -30,4 +30,5 @@ public:
 	virtual void SetAIAttackDelegate(const FOnAttackEndDelegate& OnAttackEnd) = 0;
 	virtual void SpawnStone() = 0;
 	virtual void Throw() = 0;
+	virtual float GetDamage() = 0;
 };

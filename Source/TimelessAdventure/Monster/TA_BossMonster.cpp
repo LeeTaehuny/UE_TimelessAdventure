@@ -24,12 +24,17 @@ ATA_BossMonster::ATA_BossMonster()
 
 	// AI State Setting
 	ChangeState(EBossState::BS_Idle);
+
+	MaxHp = 100.0f;
+	CurrentHp = MaxHp;
+	Damage = 10.0f;
 }
 
 void ATA_BossMonster::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	CurrentHp = MaxHp;
 }
 
 void ATA_BossMonster::ThrowStone()
@@ -58,6 +63,7 @@ void ATA_BossMonster::SpawnStone()
 	TempStone = GetWorld()->SpawnActor<ATA_ThrowStone>(StoneClass, StoneTransform);
 	if (TempStone)
 	{
+		TempStone->SetOwner(this);
 		TempStone->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, StoneSocketName);
 	}
 }
