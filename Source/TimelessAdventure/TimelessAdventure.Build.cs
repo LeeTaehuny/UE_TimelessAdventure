@@ -10,7 +10,7 @@ public class TimelessAdventure : ModuleRules
 
         PublicIncludePaths.AddRange(new string[] { "TimelessAdventure" });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "NavigationSystem", "AIModule", "GameplayTasks" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "NavigationSystem", "AIModule", "GameplayTasks", "MotionWarping" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
