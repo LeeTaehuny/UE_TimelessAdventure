@@ -40,5 +40,10 @@ private:
 // 자주 사용하는 PlayerController 할당
 private:
 	class APlayerController* PlayerController;
+
+private:
+	// 임시
+	UPROPERTY(EditAnywhere, Category = "Stop Object Manager")
+	class AHR_StopObjectManager* StopObjectManager;
 	
 };

@@ -3,6 +3,7 @@
 
 #include "HR_StopAbilityComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "StopObject/HR_StopObjectManager.h"
 
 
 // Sets default values for this component's properties
@@ -27,7 +28,8 @@ void UHR_StopAbilityComponent::BeginPlay()
 	PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	
 	DeactivateMouseEvent();
-	
+
+	StopObjectManager = GetWorld()->SpawnActor<AHR_StopObjectManager>(FVector::ZeroVector, FRotator::ZeroRotator);
 }
 
 
@@ -50,7 +52,8 @@ void UHR_StopAbilityComponent::StopAbilityBegin()
 	//		> Component에 Collider를 붙여서 그 범위 안에 있는 Stopable Object들의 Material 변경
 	PlayerController->bShowMouseCursor = true;
 	ActivateMouseEvent();
-	
+
+	StopObjectManager->ChangeMaterialToSelectableAll();
 	
 }
 
@@ -59,8 +62,11 @@ void UHR_StopAbilityComponent::StopAbilityEnd()
 	// Stop Object mode 종료
 	// 1) 마우스 커서 끔
 	// 2) 마우스 이벤트 deactive
+	// 3) Material 색 원래 상태로 돌리기
 	PlayerController->bShowMouseCursor = false;
 	DeactivateMouseEvent();
+
+	StopObjectManager->ChangeMaterialToDefaultAll();
 	
 }
 

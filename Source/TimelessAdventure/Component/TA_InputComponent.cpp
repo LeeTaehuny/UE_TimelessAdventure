@@ -61,6 +61,7 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(IA_Num1, ETriggerEvent::Started, this, &UTA_InputComponent::NumClick, 1);
 	EnhancedInputComponent->BindAction(IA_Num2, ETriggerEvent::Started, this, &UTA_InputComponent::NumClick, 2);
 	EnhancedInputComponent->BindAction(IA_Interaction, ETriggerEvent::Started, this, &UTA_InputComponent::Interaction);
+	EnhancedInputComponent->BindAction(IA_Tab, ETriggerEvent::Started, this, &UTA_InputComponent::TabClick);
 }
 
 void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
@@ -120,6 +121,9 @@ void UTA_InputComponent::BasicJump()
 
 void UTA_InputComponent::LeftClick()
 {
+	// 나중에 수정
+	if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
+	
 	switch (PlayerState)
 	{
 	case EPlayerState::PS_Combat:
@@ -204,12 +208,7 @@ void UTA_InputComponent::Interaction()
 void UTA_InputComponent::TabClick()
 {
 	// 나중에 UI 띄우는 것으로 수정 
-	switch (PlayerState)
-	{
-	case EPlayerState::PS_StopAbilityMode:
-		if (IsValid(OwnerPlayer->GetStopAbilityComponent())) OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin();
-		break;
-	}
+	if (IsValid(OwnerPlayer->GetStopAbilityComponent())) OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin();
 }
 
 void UTA_InputComponent::ChangeState(EPlayerState NewState)

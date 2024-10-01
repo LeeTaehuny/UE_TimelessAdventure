@@ -25,7 +25,7 @@ AHR_StopObjectBase::AHR_StopObjectBase()
 	ConstructorHelpers::FObjectFinder<UMaterial>ClickableMat(TEXT("/Script/Engine.Material'/Game/HR/Material/M_ClickableColor.M_ClickableColor'"));
 	if(SelectableMat.Succeeded())
 	{
-		ClickableMaterial = SelectableMat.Object;
+		ClickableMaterial = ClickableMat.Object;
 	}
 	
 	// 델리게이트와 바인드
@@ -38,6 +38,9 @@ AHR_StopObjectBase::AHR_StopObjectBase()
 void AHR_StopObjectBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Default Material 저장
+	DefaultMaterial = Cast<UMaterial>(ObjectMesh->GetMaterial(0));
 	
 }
 
@@ -102,7 +105,7 @@ void AHR_StopObjectBase::ChangeMaterialToDefault()
 {
 	if(DefaultMaterial)
 	{
-		ObjectMesh->SetMaterial(0, DefaultMaterial);
+		if(ObjectMesh) ObjectMesh->SetMaterial(0, DefaultMaterial);
 	}
 }
 

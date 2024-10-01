@@ -55,8 +55,12 @@ protected:
 	// Mouse over end > Actor의 Material Change(SelectableMaterial)
 	// Mouse Click > Material change?, Interact() 수행, Stop 능력 사용 종료 
 		// Interact() -> isStopped 변수 세팅, Timer 설정
+
+	UFUNCTION()
 	void OnBeginMouse(AActor* TouchedActor);
+	UFUNCTION()
 	void OnEndMouse(AActor* TouchedActor);
+	UFUNCTION()
 	void OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed);
 
 // Material 변경 함수

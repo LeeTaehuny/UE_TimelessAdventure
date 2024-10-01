@@ -21,6 +21,7 @@ void AHR_StopObjectManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	int32 i = 0;
 	// level에 배치된 모든 StopObject 가져와서 배열에 저장
 	// 1) UGameplayStatics::GetAllActorsOfClass() -> 성능이 더 안 좋음
 	// 2) Iterator 사용 > EngineUtils.h 헤더 포함해야함 -> 성능이 더 좋다 함
@@ -37,14 +38,16 @@ void AHR_StopObjectManager::BeginPlay()
 	// 	}
 	// }
 
-	for(TActorIterator<AHR_StopObjectBase> Iter(GetWorld()); Iter; ++Iter)
-	{
-		AHR_StopObjectBase* TempObject = Cast<AHR_StopObjectBase>(*Iter);
-		if(TempObject)
-		{
-			StopObjects.Add(TempObject);
-		}
-	}
+	// 모든 Stop Object 가져오기
+	//for(TActorIterator<AHR_StopObjectBase> Iter(GetWorld()); Iter; ++Iter)
+	//{
+	//	AHR_StopObjectBase* TempObject = Cast<AHR_StopObjectBase>(*Iter);
+	//	if(TempObject)
+	//	{
+	//		StopObjects.Add(TempObject);
+	//	}
+	//}
+	
 	
 }
 
@@ -56,25 +59,28 @@ void AHR_StopObjectManager::Tick(float DeltaTime)
 
 void AHR_StopObjectManager::ChangeMaterialToSelectableAll()
 {
+	if(StopObjects.Num() > 0){ UE_LOG(LogTemp, Warning, TEXT("oo")); }
+	else UE_LOG(LogTemp, Warning, TEXT("XX"));
+	
 	// 모든 StopObject Material 변경
-	for(AHR_StopObjectBase* StopObject : StopObjects)
-	{
-		if(StopObject)
-		{
-			StopObject->ChangeMaterialToSelectable();
-		}
-	}
+	// for(AHR_StopObjectBase* StopObject : StopObjects)
+	// {
+	// 	if(StopObject)
+	// 	{
+	// 		StopObject->ChangeMaterialToSelectable();
+	// 	}
+	// }
 }
 
 void AHR_StopObjectManager::ChangeMaterialToDefaultAll()
 {
 	// 모든 StopObject Material 변경
-	for(AHR_StopObjectBase* StopObject : StopObjects)
-	{
-		if(StopObject)
-		{
-			StopObject->ChangeMaterialToDefault();
-		}
-	}
+	//for(AHR_StopObjectBase* StopObject : StopObjects)
+	//{
+	//	if(StopObject)
+	//	{
+	//		StopObject->ChangeMaterialToDefault();
+	//	}
+	//}
 }
 

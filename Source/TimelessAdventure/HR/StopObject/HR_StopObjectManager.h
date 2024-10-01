@@ -25,8 +25,9 @@ public:
 
 // StopObject 관리
 private:
-	UPROPERTY(VisibleDefaultsOnly, Category = "StopObjects")
+	UPROPERTY(VisibleAnywhere, Category = "StopObjects")
 	TArray<class AHR_StopObjectBase*> StopObjects;
+	//TArray<AActor*> StopObjects;
 
 // Stop Objects Material 변경 함수
 public:
