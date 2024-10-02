@@ -46,11 +46,15 @@ void UHR_StopAbilityComponent::StopAbilityBegin()
 {
 	// Stop Object mode 시작
 	// 1) 마우스 커서 보이기
+	//		- 마우스 커서 crosshair로 변경
+	//		- 마우스 위치 중심으로 초기화ㅁㄴ
 	// 2) 마우스 이벤트 Active
 	// 3) StopableObject를 관리하는 Manager를 통해서 Stopable Object들의 Material을 수정
 	//		> Stopable Object를 TArray를 통해서 모든 Object material 변경
 	//		> Component에 Collider를 붙여서 그 범위 안에 있는 Stopable Object들의 Material 변경
 	PlayerController->bShowMouseCursor = true;
+	PlayerController->CurrentMouseCursor = EMouseCursor::Crosshairs;
+	PlayerController->SetMouseLocation(1000, 350);
 	ActivateMouseEvent();
 
 	StopObjectManager->ChangeMaterialToSelectableAll();
@@ -64,10 +68,9 @@ void UHR_StopAbilityComponent::StopAbilityEnd()
 	// 2) 마우스 이벤트 deactive
 	// 3) Material 색 원래 상태로 돌리기
 	PlayerController->bShowMouseCursor = false;
+	PlayerController->CurrentMouseCursor = EMouseCursor::Default;
 	DeactivateMouseEvent();
 
-	StopObjectManager->ChangeMaterialToDefaultAll();
-	
 }
 
 void UHR_StopAbilityComponent::ActivateMouseEvent()

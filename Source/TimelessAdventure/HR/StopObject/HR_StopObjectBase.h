@@ -26,7 +26,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 // 멤버 변수 
-private:
+protected:
 	bool bIsStopped = false;
 	FTimerHandle StopTimer;
 
@@ -38,12 +38,11 @@ protected:
 // Material
 public:
 	UPROPERTY(EditAnywhere, Category = "Materials")
-	class UMaterial* SelectableMaterial;
+	class UMaterialInstance* SelectableMI;
 	UPROPERTY(EditAnywhere, Category = "Materials")
-	class UMaterial* ClickableMaterial;
-	UPROPERTY(EditAnywhere, Category = "Materials")
-	class UMaterial* DefaultMaterial;
-	
+	class UMaterialInstance* ClickableMI;
+
+
 // 순수 가상 함수
 protected:
 	virtual void Move(float DeltaTime) PURE_VIRTUAL(AHR_StopableObjectBase::Move, );

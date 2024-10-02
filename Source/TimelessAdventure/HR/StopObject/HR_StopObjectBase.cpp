@@ -17,15 +17,15 @@ AHR_StopObjectBase::AHR_StopObjectBase()
 	// RootComponent = ObjectMesh;
 
 	// Material 할당
-	ConstructorHelpers::FObjectFinder<UMaterial>SelectableMat(TEXT("/Script/Engine.Material'/Game/HR/Material/M_SelectableColor.M_SelectableColor'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance>SelectableMat(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/HR/Material/MI_SelectableOverlayColor.MI_SelectableOverlayColor'"));
 	if(SelectableMat.Succeeded())
 	{
-		SelectableMaterial = SelectableMat.Object;
+		SelectableMI = SelectableMat.Object;
 	}
-	ConstructorHelpers::FObjectFinder<UMaterial>ClickableMat(TEXT("/Script/Engine.Material'/Game/HR/Material/M_ClickableColor.M_ClickableColor'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance>ClickableMat(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/HR/Material/MI_ClickableOverlayColor.MI_ClickableOverlayColor'"));
 	if(SelectableMat.Succeeded())
 	{
-		ClickableMaterial = ClickableMat.Object;
+		ClickableMI = ClickableMat.Object;
 	}
 	
 	// 델리게이트와 바인드
@@ -38,10 +38,6 @@ AHR_StopObjectBase::AHR_StopObjectBase()
 void AHR_StopObjectBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Default Material 저장
-	DefaultMaterial = Cast<UMaterial>(ObjectMesh->GetMaterial(0));
-	
 }
 
 // Called every frame
@@ -80,6 +76,7 @@ void AHR_StopObjectBase::OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed
 	// Create Lamda를 통해서 람다 함수를 생성해서 넘겨주는 것과 그냥 [] 넘겨주는 것과 뭐가 다른가
 	GetWorld()->GetTimerManager().SetTimer(StopTimer, FTimerDelegate::CreateLambda([this](){
 		bIsStopped = false;
+		ChangeMaterialToDefault();
 	}), 5.0f, false);
 
 	
@@ -87,27 +84,29 @@ void AHR_StopObjectBase::OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed
 
 void AHR_StopObjectBase::ChangeMaterialToSelectable()
 {
-	if(SelectableMaterial)
+	if(SelectableMI && ObjectMesh)
 	{
-		ObjectMesh->SetMaterial(0, SelectableMaterial);
+		ObjectMesh->SetOverlayMaterial(SelectableMI);
 	}
 }
 
 void AHR_StopObjectBase::ChangeMaterialToClickable()
 {
-	if(ClickableMaterial)
+	if(SelectableMI && ObjectMesh)
 	{
-		ObjectMesh->SetMaterial(0, ClickableMaterial);
+		ObjectMesh->SetOverlayMaterial(ClickableMI);
 	}
 }
 
 void AHR_StopObjectBase::ChangeMaterialToDefault()
 {
-	if(DefaultMaterial)
+	if(ObjectMesh)
 	{
-		if(ObjectMesh) ObjectMesh->SetMaterial(0, DefaultMaterial);
+		ObjectMesh->SetOverlayMaterial(nullptr);
 	}
 }
+
+
 
 
 

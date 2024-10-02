@@ -26,6 +26,9 @@ void AHR_TestObjectMoveForward::Tick(float DeltaTime)
 
 void AHR_TestObjectMoveForward::Move(float DeltaTime)
 {
-	//Super::Move(DeltaTime);
+	// 일단 등속 이동
+	FVector newLocation = GetActorLocation() + (GetActorForwardVector() * DeltaTime * 100.f);
+	SetActorLocation(newLocation);
+	
 }
 

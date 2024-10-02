@@ -27,7 +27,7 @@ public:
 
 	// click시 stop 모드 종료 + 모드 사용할 수 있는지 시간 체크
 
-// input에 대한 처리 함수
+// input에 대한 처리, Stop Ability 사용
 public:
 	void StopAbilityBegin();
 	void StopAbilityEnd();

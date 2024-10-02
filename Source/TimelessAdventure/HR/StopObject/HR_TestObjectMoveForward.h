@@ -27,5 +27,9 @@ public:
 protected:
 	virtual void Move(float DeltaTime) override;	
 
+// setting 변수
+public:
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float MoveSpeed;
 
 };
