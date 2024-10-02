@@ -41,6 +41,15 @@ private:
 private:
 	class APlayerController* PlayerController;
 
+// Collider Component
+private:
+	TObjectPtr<class USphereComponent> SphereCollider;
+	
+// Stop Object detect Radius
+protected:
+	UPROPERTY(EditAnywhere, Category="Detect Radius")
+	float Radius = 500.f;
+
 private:
 	// 임시
 	UPROPERTY(EditAnywhere, Category = "Stop Object Manager")

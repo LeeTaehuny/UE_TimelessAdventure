@@ -2,7 +2,11 @@
 
 
 #include "HR_StopAbilityComponent.h"
+
+#include "LandscapeGizmoActiveActor.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/TA_PlayerCharacter.h"
 #include "StopObject/HR_StopObjectManager.h"
 
 
@@ -13,7 +17,9 @@ UHR_StopAbilityComponent::UHR_StopAbilityComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-
+	// Collider 생성
+	SphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collider"));
+	SphereCollider->SetSphereRadius(Radius);
 }
 
 
@@ -21,6 +27,9 @@ UHR_StopAbilityComponent::UHR_StopAbilityComponent()
 void UHR_StopAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SphereCollider->SetupAttachment(OwnerPlayer->GetRootComponent());
+
 
 	// player controller에서 Click 이벤트 사용 설정
 	// 근데 default가 true인 것 같음..

@@ -36,6 +36,7 @@ public:
 	FORCEINLINE class UTA_InventoryComponent* GetInventoryComponent() { return TA_InventoryComponent; }
 	FORCEINLINE class USpringArmComponent* GetSpringArmComponent() { return SpringArmComp; }
 	FORCEINLINE class UHR_StopAbilityComponent* GetStopAbilityComponent() {return TA_StopAbilityComponent; }
+	FORCEINLINE class USceneComponent* GetRootComponent() { return RootComponent; }
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
