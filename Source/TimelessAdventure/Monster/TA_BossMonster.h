@@ -21,18 +21,38 @@ protected:
 
 public:
 	FOnAttackEndDelegate OnAttackEndDelegate;
+	FOnJumpBackEndDelegate OnJumpEndDelegate;
 
 	virtual void SetAIAttackDelegate(const FOnAttackEndDelegate& InOnAttackFinished) override;
+	virtual void SetAIJumpDelegate(const FOnJumpBackEndDelegate& OnJumpEnd) override;
 	virtual void ChangeState(EBossState NewState) override;
 	virtual void RangedAttack() override;
+	virtual void MeleeAttack() override;
+	virtual void JumpBack(float Distance) override;
 
 protected:
+	// * 원거리 (거리 1500)
 	// 돌 던지기 공격
 	void ThrowStone();
 	void ThrowStoneEnd(class UAnimMontage* Montage, bool IsEnded);
 	// 점프 근접 공격
 	void JumpAttack();
 	void JumpAttackEnd(class UAnimMontage* Montage, bool IsEnded);
+	// 근접 텔레포트 공격
+	void TeleportAttack();
+	void TeleportCallBack();
+	void TeleportAttackEnd(class UAnimMontage* Montage, bool IsEnded);
+
+
+	// * 근거리
+	// 근접 일반 공격
+	void BaseAttack();
+	void BaseAttackEnd(class UAnimMontage* Montage, bool IsEnded);
+	// 근접 넉백 공격
+	void KnockbackAttack();
+	void KnockbackAttackEnd(class UAnimMontage* Montage, bool IsEnded);
+
+	void JumpBackEnd(class UAnimMontage* Montage, bool IsEnded);
 
 	// 돌 스폰
 	virtual void SpawnStone() override;
@@ -41,6 +61,10 @@ protected:
 
 	// 데미지 반환
 	FORCEINLINE virtual float GetDamage() override { return Damage; }
+	// 공격 체크 - 일반
+	virtual void BaseAttackCheck() override;
+	// 공격 체크 - 넉백
+	virtual void KnockbackAttackCheck() override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -52,6 +76,18 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Monster")
 	TObjectPtr<class UAnimMontage> ThrowAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	TObjectPtr<class UAnimMontage> BaseAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	TObjectPtr<class UAnimMontage> KnockbackAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	TObjectPtr<class UAnimMontage> JumpBackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	TObjectPtr<class UAnimMontage> TeleportAttackMontage;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Monster")
@@ -72,6 +108,13 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Monster")
 	float Damage;
+
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	float AttackDistance;
+
+// Action
+private:
+	bool bCanJumpBack;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Monster")

@@ -9,11 +9,13 @@
 #include "Item/TA_Bow.h"
 #include "Player/TA_PlayerController.h"
 #include "Interface/InteractionInterface.h"
+#include "Data/DT_Knockback.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/DamageEvents.h"
 
 UTA_CombatComponent::UTA_CombatComponent()
 {
@@ -316,7 +318,7 @@ void UTA_CombatComponent::AttackMove(float InAttackMoveForce)
 	OwnerPlayer->GetCharacterMovement()->AddImpulse(Impulse, true);
 
 	// 공격 판정 체크
-	TArray<FHitResult> HirResults;
+	TArray<FHitResult> HitResults;
 
 	FVector Start = OwnerPlayer->GetActorLocation();
 	FVector End = Start + OwnerPlayer->GetActorForwardVector() * AttackDistance;
@@ -325,7 +327,7 @@ void UTA_CombatComponent::AttackMove(float InAttackMoveForce)
 	Params.AddIgnoredActor(OwnerPlayer);
 
 	GetWorld()->SweepMultiByChannel(
-		HirResults,
+		HitResults,
 		Start,
 		End,
 		FQuat::Identity,
@@ -334,9 +336,9 @@ void UTA_CombatComponent::AttackMove(float InAttackMoveForce)
 		Params
 	);
 
-	if (HirResults.Num() > 0)
+	if (HitResults.Num() > 0)
 	{
-		for (FHitResult Target : HirResults)
+		for (const FHitResult& Target : HitResults)
 		{
 			// 데미지 전달
 			UGameplayStatics::ApplyDamage(Target.GetActor(), AttackDamage, OwnerPlayer->GetController(), OwnerPlayer, UDamageType::StaticClass());
@@ -799,9 +801,16 @@ void UTA_CombatComponent::EquipWeapon()
 	}
 }
 
-void UTA_CombatComponent::TakeDamage(float DamageAmount, AActor* DamageCauser)
+void UTA_CombatComponent::TakeDamage(float DamageAmount, AActor* DamageCauser, FDamageEvent const& DamageEvent)
 {
-	GEngine->AddOnScreenDebugMessage(99, 2.0f, FColor::Red, FString::Printf(TEXT("TakeDamage %f"), DamageAmount));
+	if (DamageEvent.DamageTypeClass == UDT_Knockback::StaticClass())
+	{
+		GEngine->AddOnScreenDebugMessage(99, 2.0f, FColor::Red, FString::Printf(TEXT("TakeDamage knockback %f"), DamageAmount));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(99, 2.0f, FColor::Red, FString::Printf(TEXT("TakeDamage %f"), DamageAmount));
+	}
 }
 
 void UTA_CombatComponent::Hit()

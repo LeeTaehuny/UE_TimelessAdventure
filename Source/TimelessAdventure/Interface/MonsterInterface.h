@@ -8,6 +8,7 @@
 #include "MonsterInterface.generated.h"
 
 DECLARE_DELEGATE(FOnAttackEndDelegate)
+DECLARE_DELEGATE(FOnJumpBackEndDelegate)
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -27,8 +28,17 @@ class TIMELESSADVENTURE_API IMonsterInterface
 public:
 	virtual void ChangeState(EBossState NewState) = 0;
 	virtual void RangedAttack() = 0;
-	virtual void SetAIAttackDelegate(const FOnAttackEndDelegate& OnAttackEnd) = 0;
+	virtual void MeleeAttack() = 0;
+
 	virtual void SpawnStone() = 0;
 	virtual void Throw() = 0;
 	virtual float GetDamage() = 0;
+
+	virtual	void BaseAttackCheck() = 0;
+	virtual	void KnockbackAttackCheck() = 0;
+
+	virtual void JumpBack(float Distance) = 0;
+
+	virtual void SetAIAttackDelegate(const FOnAttackEndDelegate& OnAttackEnd) = 0;
+	virtual void SetAIJumpDelegate(const FOnJumpBackEndDelegate& OnJumpEnd) = 0;
 };

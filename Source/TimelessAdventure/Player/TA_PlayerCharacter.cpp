@@ -65,7 +65,7 @@ float ATA_PlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Da
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	TA_CombatComponent->TakeDamage(DamageAmount, DamageCauser);
+	TA_CombatComponent->TakeDamage(DamageAmount, DamageCauser, DamageEvent);
 
 	return Damage;
 }

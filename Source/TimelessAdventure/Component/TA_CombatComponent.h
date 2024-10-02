@@ -239,7 +239,7 @@ private:
 
 // Damage
 public:
-	void TakeDamage(float DamageAmount, AActor* DamageCauser);
+	void TakeDamage(float DamageAmount, AActor* DamageCauser, FDamageEvent const& DamageEvent);
 	
 private:
 	void Hit();
