@@ -283,6 +283,13 @@ void ATA_BossMonster::JumpBack(float Distance)
 		return;
 	}
 
+	float RandNum = FMath::RandRange(0.0f, 1.0f);
+	if (RandNum >= 0.3f) 
+	{
+		OnJumpEndDelegate.Execute();
+		return;
+	}
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
@@ -353,32 +360,26 @@ void ATA_BossMonster::ChangeState(EBossState NewState)
 
 void ATA_BossMonster::RangedAttack()
 {
-	if (CurrentHp >= MaxHp * 0.5f)
+	int32 AttackIdx = FMath::RandRange(0, 2);
+
+	switch (AttackIdx)
 	{
-		// 1페이즈
+	case 0:
+		ThrowStone();
+		break;
+
+	case 1:
+		TeleportAttack();
+		break;
+
+	case 2:
 		JumpAttack();
-	}
-	else
-	{
-		// 2페이즈
-		int32 AttackIdx = FMath::RandRange(0, 1);
-
-		switch (AttackIdx)
-		{
-		case 0:
-			ThrowStone();
-			break;
-
-		case 1:
-			TeleportAttack();
-			break;
-		}
+		break;
 	}
 }
 
 void ATA_BossMonster::MeleeAttack()
 {
-	// 1 페이즈 / 2 페이즈 공용
 	int32 AttackIdx = FMath::RandRange(0, 1);
 
 	switch (AttackIdx)

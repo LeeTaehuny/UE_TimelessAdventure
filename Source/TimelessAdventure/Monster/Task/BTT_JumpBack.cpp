@@ -23,9 +23,6 @@ EBTNodeResult::Type UBTT_JumpBack::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 		IMonsterInterface* MonsterInterface = Cast<IMonsterInterface>(AIController->GetPawn());
 		if (MonsterInterface)
 		{
-			// 점프 Back
-			MonsterInterface->JumpBack(JumpBackDistance);
-
 			// 공격 종료 델리게이트 생성
 			FOnJumpBackEndDelegate OnJumpBackEndDelegate;
 			OnJumpBackEndDelegate.BindLambda(
@@ -36,6 +33,9 @@ EBTNodeResult::Type UBTT_JumpBack::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 			);
 
 			MonsterInterface->SetAIJumpDelegate(OnJumpBackEndDelegate);
+
+			// 점프 Back
+			MonsterInterface->JumpBack(JumpBackDistance);
 
 			// 진행 중 반환
 			return EBTNodeResult::InProgress;
