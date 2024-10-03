@@ -12,6 +12,7 @@ UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
 	PS_Combat,	// 전투
+	PS_Gimmick
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )

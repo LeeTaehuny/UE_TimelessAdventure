@@ -10,12 +10,14 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
+#include "Gimmick/Sangeon/TA_GrapRotateComponent.h"
 
 UTA_InputComponent::UTA_InputComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
 	PlayerState = EPlayerState::PS_Combat;
+	PlayerState = EPlayerState::PS_Gimmick;
 }
 
 void UTA_InputComponent::BeginPlay()
@@ -205,6 +207,12 @@ void UTA_InputComponent::ChangeState(EPlayerState NewState)
 	switch (NewState)
 	{
 	case EPlayerState::PS_Combat:
+		break;
+	case EPlayerState::PS_Gimmick:
+		if(IsValid(OwnerPlayer->GetGrapRotateComponent()))
+		{
+			OwnerPlayer->GetGrapRotateComponent()->CreateWidget();
+		}
 		break;
 	}
 	
