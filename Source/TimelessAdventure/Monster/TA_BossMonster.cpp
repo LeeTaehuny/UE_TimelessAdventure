@@ -11,6 +11,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 
 ATA_BossMonster::ATA_BossMonster()
@@ -32,7 +33,9 @@ ATA_BossMonster::ATA_BossMonster()
 	Damage = 10.0f;
 	AttackDistance = 300.0f;
 
-	bCanJumpBack = false;
+	// 돌 던지기 공격 관련 변수 초기화
+	ThrowStoneCoolTime = 5.0f;
+	bCanThrowStoneAttack = true;
 }
 
 void ATA_BossMonster::BeginPlay()
@@ -47,6 +50,9 @@ void ATA_BossMonster::ThrowStone()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
+		// 스킬 사용 가능 여부 변경
+		bCanThrowStoneAttack = false;
+
 		AnimInstance->Montage_Play(ThrowAttackMontage);
 
 		FOnMontageEnded EndDelegate;
@@ -59,6 +65,15 @@ void ATA_BossMonster::ThrowStone()
 void ATA_BossMonster::ThrowStoneEnd(UAnimMontage* Montage, bool IsEnded)
 {
 	OnAttackEndDelegate.Execute();
+
+	// 쿨타임 적용
+	FTimerHandle ThrowStoneTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(ThrowStoneTimerHandle, FTimerDelegate::CreateLambda(
+		[this]()
+		{
+			bCanThrowStoneAttack = true;
+		}
+	), ThrowStoneCoolTime, false);
 }
 
 void ATA_BossMonster::SpawnStone()
@@ -156,6 +171,37 @@ void ATA_BossMonster::KnockbackAttackCheck()
 	}
 }
 
+float ATA_BossMonster::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float ReslutDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	Hit(DamageAmount);
+
+	return ReslutDamage;
+}
+
+void ATA_BossMonster::Hit(float HitDamage)
+{
+	CurrentHp -= HitDamage;
+
+	if (CurrentHp <= 0.0f)
+	{
+		CurrentHp = 0.0f;
+
+		// AI 상태 사망으로 변경
+		ATA_BossController* BossController = Cast<ATA_BossController>(GetController());
+		if (BossController)
+		{
+			BossController->GetBlackboardComponent()->SetValueAsEnum(BBKEY_STATE, static_cast<uint8>(EBossState::BS_Die));
+		}
+	}
+}
+
+void ATA_BossMonster::Die()
+{
+	Destroy();
+}
+
 void ATA_BossMonster::JumpAttack()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -174,7 +220,10 @@ void ATA_BossMonster::JumpAttack()
 					Destination,
 					GetActorRotation()
 				);
-
+				
+				// 콜리전 프리셋 설정
+				GetCapsuleComponent()->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));
+				
 				AnimInstance->Montage_Play(JumpAttackMontage);
 
 				FOnMontageEnded EndDelegate;
@@ -189,6 +238,9 @@ void ATA_BossMonster::JumpAttack()
 void ATA_BossMonster::JumpAttackEnd(UAnimMontage* Montage, bool IsEnded)
 {
 	OnAttackEndDelegate.Execute();
+
+	// 콜리전 프리셋 설정
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
 }
 
 void ATA_BossMonster::TeleportAttack()
@@ -275,21 +327,6 @@ void ATA_BossMonster::KnockbackAttackEnd(UAnimMontage* Montage, bool IsEnded)
 
 void ATA_BossMonster::JumpBack(float Distance)
 {
-	// 초기 1회 무시
-	if (!bCanJumpBack)
-	{
-		bCanJumpBack = true;
-		OnJumpEndDelegate.Execute();
-		return;
-	}
-
-	float RandNum = FMath::RandRange(0.0f, 1.0f);
-	if (RandNum >= 0.3f) 
-	{
-		OnJumpEndDelegate.Execute();
-		return;
-	}
-
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
@@ -310,6 +347,9 @@ void ATA_BossMonster::JumpBack(float Distance)
 					GetActorRotation()
 				);
 
+				// 콜리전 프리셋 설정
+				GetCapsuleComponent()->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));
+
 				AnimInstance->Montage_Play(JumpBackMontage);
 
 				FOnMontageEnded EndDelegate;
@@ -325,6 +365,14 @@ void ATA_BossMonster::JumpBackEnd(UAnimMontage* Montage, bool IsEnded)
 {
 	// 완료 태스크
 	OnJumpEndDelegate.Execute();
+
+	// 콜리전 프리셋 설정
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
+}
+
+float ATA_BossMonster::GetHealthPercent()
+{
+	return (CurrentHp / MaxHp);
 }
 
 void ATA_BossMonster::SetAIAttackDelegate(const FOnAttackEndDelegate& OnAttackEnd)
@@ -349,7 +397,7 @@ void ATA_BossMonster::ChangeState(EBossState NewState)
 	case EBossState::BS_Attack:
 		GetCharacterMovement()->MaxWalkSpeed = 600;
 		break;
-	case EBossState::BS_Chase:
+	case EBossState::BS_Special:
 		break;
 	default:
 		break;
@@ -360,27 +408,31 @@ void ATA_BossMonster::ChangeState(EBossState NewState)
 
 void ATA_BossMonster::RangedAttack()
 {
-	int32 AttackIdx = FMath::RandRange(0, 2);
-
-	switch (AttackIdx)
+	// 체력이 절반 이상 남아있는 경우
+	if (GetHealthPercent() >= 0.5f)
 	{
-	case 0:
-		ThrowStone();
-		break;
-
-	case 1:
-		TeleportAttack();
-		break;
-
-	case 2:
+		// 점프 근접 공격 수행
 		JumpAttack();
-		break;
+		return;
+	}
+	
+	// 체력이 절반 이하인 경우
+	// * 돌 던지기 스킬이 가능한 경우
+	if (bCanThrowStoneAttack)
+	{
+		// 돌 던지기 스킬 사용
+		ThrowStone();
+	}
+	// * 순간이동 공격 사용
+	else
+	{
+		TeleportAttack();
 	}
 }
 
 void ATA_BossMonster::MeleeAttack()
 {
-	int32 AttackIdx = FMath::RandRange(0, 1);
+	int32 AttackIdx = FMath::RandRange(0, 2);
 
 	switch (AttackIdx)
 	{
@@ -390,6 +442,10 @@ void ATA_BossMonster::MeleeAttack()
 
 	case 1:
 		KnockbackAttack();
+		break;
+
+	case 2:
+		TeleportAttack();
 		break;
 	}
 }

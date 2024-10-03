@@ -41,4 +41,7 @@ public:
 
 	virtual void SetAIAttackDelegate(const FOnAttackEndDelegate& OnAttackEnd) = 0;
 	virtual void SetAIJumpDelegate(const FOnJumpBackEndDelegate& OnJumpEnd) = 0;
+
+	virtual float GetHealthPercent() = 0;
+	virtual void Die() = 0;
 };

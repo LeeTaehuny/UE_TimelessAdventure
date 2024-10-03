@@ -19,7 +19,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:
+protected:
 	FOnAttackEndDelegate OnAttackEndDelegate;
 	FOnJumpBackEndDelegate OnJumpEndDelegate;
 
@@ -29,6 +29,7 @@ public:
 	virtual void RangedAttack() override;
 	virtual void MeleeAttack() override;
 	virtual void JumpBack(float Distance) override;
+	virtual float GetHealthPercent() override;
 
 protected:
 	// * 원거리 (거리 1500)
@@ -114,9 +115,16 @@ private:
 
 // Action
 private:
-	bool bCanJumpBack;
+	bool bCanThrowStoneAttack;
+
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	float ThrowStoneCoolTime;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Monster")
 	EBossState BossState;
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	void Hit(float HitDamage);
+	virtual void Die() override;
 };
