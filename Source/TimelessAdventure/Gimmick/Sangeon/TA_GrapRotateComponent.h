@@ -33,7 +33,7 @@ public:
 
 	FRotator NewRotator;
 	void RotateObject(float RotationValue);
-	bool bShiftHeld = true;
+	bool bShiftHeld = false;
 	bool bctrlheld = false;
 
 protected:

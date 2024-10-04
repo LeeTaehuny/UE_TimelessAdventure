@@ -297,15 +297,16 @@ void UTA_GrapRotateComponent::RotateObject(float RotationValue)
 	//ATA_PlayerCharacter* Player = Cast<ATA_PlayerCharacter>(GetOwner());
 	//if(Player)
 	//{
+	/*
 	if(HeldObject)
 	{
 
 		FRotator CurrentRotation = HeldObject->GetActorRotation();
 		//UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *CurrentRotation.ToString());
 		
-		FRotator CurrentRotationX = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw, CurrentRotation.Roll + RotationValue);
-		FRotator CurrentRotationY = FRotator(CurrentRotation.Pitch + RotationValue, CurrentRotation.Yaw, CurrentRotation.Roll);
-		FRotator CurrentRotationZ = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw + RotationValue, CurrentRotation.Roll + RotationValue);
+		FRotator CurrentRotationX = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw, FMath::Fmod(CurrentRotation.Roll + RotationValue, 360.0f));
+		FRotator CurrentRotationY = FRotator(FMath::Fmod(CurrentRotation.Pitch + RotationValue, 360.0f), CurrentRotation.Yaw, CurrentRotation.Roll);
+		FRotator CurrentRotationZ = FRotator(CurrentRotation.Pitch, FMath::Fmod(CurrentRotation.Yaw + RotationValue, 360.0f), CurrentRotation.Roll + RotationValue);
 
 		FRotator SelectedRotator1 = bShiftHeld ? CurrentRotationY : CurrentRotationZ;
 		FRotator SelectedRotator2 = bctrlheld ? CurrentRotationX : SelectedRotator1;
@@ -313,6 +314,35 @@ void UTA_GrapRotateComponent::RotateObject(float RotationValue)
 		//UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *SelectedRotator2.ToString());
 
 		HeldObject->SetActorRotation(NewRotator);
+	}
+	*/
+	if (HeldObject)
+	{
+		// 현재 회전을 쿼터니언으로 변환
+		FQuat CurrentRotation = HeldObject->GetActorQuat();
+        
+		// 회전할 축을 설정 (X, Y, Z에 따라 다르게)
+		FVector RotationAxis;
+        
+		if (bShiftHeld) // X축 회전
+		{
+			RotationAxis = FVector(1.0f, 0.0f, 0.0f);
+		}
+		else if (bctrlheld) // Z축 회전
+		{
+			RotationAxis = FVector(0.0f, 0.0f, 1.0f);
+		}
+		else // Y축 회전
+		{
+			RotationAxis = FVector(0.0f, 1.0f, 0.0f);
+		}
+
+		// 쿼터니언으로 회전 값 적용
+		FQuat DeltaRotation = FQuat(RotationAxis, FMath::DegreesToRadians(RotationValue));
+		FQuat NewRotation = CurrentRotation * DeltaRotation;
+
+		// 회전 값 적용
+		HeldObject->SetActorRotation(NewRotation);
 	}
 }
 

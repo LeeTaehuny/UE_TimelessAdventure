@@ -273,7 +273,7 @@ void UTA_InputComponent::Rotate(const FInputActionValue& ActionValue)
 		float RotationValue = ActionValue.Get<float>();
 		if(OwnerPlayer->GetGrapRotateComponent())
 		{
-			OwnerPlayer->GetGrapRotateComponent()->RotateObject(RotationValue * 5.0f);
+			OwnerPlayer->GetGrapRotateComponent()->RotateObject(RotationValue * 10.0f);
 		}
 	}
 }
