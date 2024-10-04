@@ -28,6 +28,7 @@ public:
 	void SetInteractionText(FText NewText);
 	bool GetInventoryVisible();
 
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf<class UUserWidget> WeaponSelectWidgetClass;
@@ -41,7 +42,5 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UTA_HUD> HUDWidget;
 
-	// 
-	UPROPERTY()
-	TObjectPtr<class UUserWidget> StateChange;
+
 };

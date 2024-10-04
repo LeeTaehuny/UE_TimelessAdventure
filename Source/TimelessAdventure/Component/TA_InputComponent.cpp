@@ -67,7 +67,6 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(IA_Interaction, ETriggerEvent::Started, this, &UTA_InputComponent::Interaction);
 	EnhancedInputComponent->BindAction(IA_Tab, ETriggerEvent::Started, this, &UTA_InputComponent::TabClick);	
 	EnhancedInputComponent->BindAction(IA_Grap, ETriggerEvent::Triggered, this, &UTA_InputComponent::Grap);
-	EnhancedInputComponent->BindAction(IA_Switch, ETriggerEvent::Started, this, &UTA_InputComponent::SwitchState);
 	EnhancedInputComponent->BindAction(IA_Rotate, ETriggerEvent::Triggered, this, &UTA_InputComponent::Rotate);
 	EnhancedInputComponent->BindAction(IA_z, ETriggerEvent::Started, this, &UTA_InputComponent::SetZ);
 	EnhancedInputComponent->BindAction(IA_z, ETriggerEvent::Completed, this, &UTA_InputComponent::SetZfalse);

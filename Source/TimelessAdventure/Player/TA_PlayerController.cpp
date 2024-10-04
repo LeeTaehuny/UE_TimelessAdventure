@@ -161,3 +161,12 @@ bool ATA_PlayerController::GetInventoryVisible()
 {
 	return HUDWidget->GetInventoryVisibility();
 }
+
+void ATA_PlayerController::SetVisibleStateChangeWidget(bool Value)
+{
+	if (StateChange)
+	{
+		if(Value) {StateChange->SetVisibility(ESlateVisibility::Visible);}
+		else StateChange->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
