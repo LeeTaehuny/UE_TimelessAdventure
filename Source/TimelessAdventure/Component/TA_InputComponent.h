@@ -50,6 +50,8 @@ protected:
 	void ConvertInventory();						// 인벤토리 On/Off
 	void NumClick(int32 ClickNum);					// 숫자 키보드 입력
 	void Interaction();								// 상호작용
+	void Grap();									// 그랩
+	void SwitchState();
 
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
@@ -90,6 +92,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Interaction;
 
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Grap;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Switch;
 // Member
 private:
 	// 플레이어의 현재 상태

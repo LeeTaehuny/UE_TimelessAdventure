@@ -17,7 +17,6 @@ UTA_InputComponent::UTA_InputComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	PlayerState = EPlayerState::PS_Combat;
-	PlayerState = EPlayerState::PS_Gimmick;
 }
 
 void UTA_InputComponent::BeginPlay()
@@ -62,6 +61,8 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(IA_Num1, ETriggerEvent::Started, this, &UTA_InputComponent::NumClick, 1);
 	EnhancedInputComponent->BindAction(IA_Num2, ETriggerEvent::Started, this, &UTA_InputComponent::NumClick, 2);
 	EnhancedInputComponent->BindAction(IA_Interaction, ETriggerEvent::Started, this, &UTA_InputComponent::Interaction);
+	EnhancedInputComponent->BindAction(IA_Grap, ETriggerEvent::Triggered, this, &UTA_InputComponent::Grap);
+	EnhancedInputComponent->BindAction(IA_Switch, ETriggerEvent::Started, this, &UTA_InputComponent::SwitchState);
 }
 
 void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
@@ -199,19 +200,58 @@ void UTA_InputComponent::Interaction()
 	}
 }
 
+void UTA_InputComponent::Grap()
+{
+	if(IsValid(OwnerPlayer->GetGrapRotateComponent()))
+	{
+		if(OwnerPlayer->GetGrapRotateComponent()->HeldObject)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("drop"));
+			OwnerPlayer->GetGrapRotateComponent()->DropObject();			
+		}
+		else
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("pickup"));
+
+			OwnerPlayer->GetGrapRotateComponent()->PickupObject();
+		}
+	}
+}
+
+void UTA_InputComponent::SwitchState()
+{
+	if(PlayerState == EPlayerState::PS_Combat)
+	{
+		ChangeState(EPlayerState::PS_Gimmick);
+	}else if(PlayerState == EPlayerState::PS_Gimmick)
+	{
+		ChangeState(EPlayerState::PS_Combat);
+	}
+}
+
 void UTA_InputComponent::ChangeState(EPlayerState NewState)
 {
-	if (PlayerState == NewState) return;
+	//if (PlayerState == NewState) return;
 	
 	// 새로 들어온 상태에 따라 처리
 	switch (NewState)
 	{
 	case EPlayerState::PS_Combat:
+		UE_LOG(LogTemp, Display, TEXT("Combat"));
+
+		PlayerState = NewState;
 		break;
 	case EPlayerState::PS_Gimmick:
+		UE_LOG(LogTemp, Display, TEXT("Gimmick"));
+		PlayerState = NewState;
+
 		if(IsValid(OwnerPlayer->GetGrapRotateComponent()))
 		{
-			OwnerPlayer->GetGrapRotateComponent()->CreateWidget();
+			OwnerPlayer->GetGrapRotateComponent()->updatewidget();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Display, TEXT("err"));
 		}
 		break;
 	}

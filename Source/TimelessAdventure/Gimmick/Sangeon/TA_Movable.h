@@ -22,14 +22,17 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+
+	UStaticMeshComponent* GetMeshComponent();
 	
-	bool Locked;
+	bool IsLocked;
 	
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void SelfDrop();
 	
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
-	bool SelfPickup(UPrimitiveComponent* ParentComp);
+	bool SelfPickup(USceneComponent* ParentComp);
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MovableMesh;
