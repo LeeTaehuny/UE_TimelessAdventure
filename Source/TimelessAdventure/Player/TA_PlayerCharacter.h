@@ -31,12 +31,12 @@ public:
 public:
 	FORCEINLINE virtual class UTA_CombatComponent* GetCombatComponent() override { return TA_CombatComponent; }
 	FORCEINLINE virtual class UTA_InventoryComponent* GetInventory() override { return TA_InventoryComponent; }
-	
 	FORCEINLINE class UTA_InputComponent* GetInputComponent() { return TA_InputComponent; }
 	FORCEINLINE class UTA_InventoryComponent* GetInventoryComponent() { return TA_InventoryComponent; }
 	FORCEINLINE class USpringArmComponent* GetSpringArmComponent() { return SpringArmComp; }
 	FORCEINLINE class UHR_StopAbilityComponent_T* GetStopAbilityComponent() {return TA_StopAbilityComponent_T; }
-
+	FORCEINLINE class UCameraComponent* GetCameraComponent() { return CameraComp; }
+	FORCEINLINE class UTA_GrapRotateComponent* GetGrapRotateComponent() { return TA_GrapRotateComponent; }
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 // Camera Component
@@ -65,5 +65,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UTA_InventoryComponent> TA_InventoryComponent;
 
-
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UTA_GrapRotateComponent> TA_GrapRotateComponent;
 };

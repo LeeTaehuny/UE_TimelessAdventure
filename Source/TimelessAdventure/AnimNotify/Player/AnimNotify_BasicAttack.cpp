@@ -7,7 +7,7 @@
 
 void UAnimNotify_BasicAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Notify"));
+	Super::Notify(MeshComp, Animation);
 
 	if (ICombatComponentInterface* CombatPlayer = Cast<ICombatComponentInterface>(MeshComp->GetOwner()))
 	{
