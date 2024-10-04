@@ -35,8 +35,7 @@ public:
 	FORCEINLINE class UTA_InputComponent* GetInputComponent() { return TA_InputComponent; }
 	FORCEINLINE class UTA_InventoryComponent* GetInventoryComponent() { return TA_InventoryComponent; }
 	FORCEINLINE class USpringArmComponent* GetSpringArmComponent() { return SpringArmComp; }
-	FORCEINLINE class UHR_StopAbilityComponent* GetStopAbilityComponent() {return TA_StopAbilityComponent; }
-	FORCEINLINE class USceneComponent* GetRootComponent() { return RootComponent; }
+	FORCEINLINE class UHR_StopAbilityComponent_T* GetStopAbilityComponent() {return TA_StopAbilityComponent_T; }
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -47,8 +46,15 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<class UCameraComponent> CameraComp;
+// Stop Ability Scene Comp
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UHR_StopAbilityComponent_Error> TA_StopAbilityComponent;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<class UHR_StopAbilityComponent_T> TA_StopAbilityComponent_T;
 
-// Components
+
+// Actor Components
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UTA_InputComponent> TA_InputComponent;
@@ -59,6 +65,5 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UTA_InventoryComponent> TA_InventoryComponent;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	TObjectPtr<class UHR_StopAbilityComponent> TA_StopAbilityComponent;
+
 };

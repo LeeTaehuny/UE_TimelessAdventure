@@ -7,9 +7,11 @@
 #include "Component/TA_InventoryComponent.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "HR/HR_StopAbilityComponent.h"
+#include "HR/HR_StopAbilityComponent_Error.h"
+#include "HR/HR_StopAbilityComponent_T.h"
 
 ATA_PlayerCharacter::ATA_PlayerCharacter()
 {
@@ -33,10 +35,18 @@ ATA_PlayerCharacter::ATA_PlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	SpringArmComp->bUsePawnControlRotation = true;
 
+
+	TA_StopAbilityComponent = CreateDefaultSubobject<UHR_StopAbilityComponent_Error>(TEXT("StopComp"));
+	TA_StopAbilityComponent->SetupAttachment(RootComponent);
+
+	TA_StopAbilityComponent_T = CreateDefaultSubobject<UHR_StopAbilityComponent_T>(TEXT("Stop Ability"));
+	TA_StopAbilityComponent_T->SetupAttachment(RootComponent);
+
 	TA_InputComponent = CreateDefaultSubobject<UTA_InputComponent>(TEXT("InputComponent"));
 	TA_CombatComponent = CreateDefaultSubobject<UTA_CombatComponent>(TEXT("TA_CombatComponent"));
 	TA_InventoryComponent = CreateDefaultSubobject<UTA_InventoryComponent>(TEXT("TA_InventoryComponent"));
-	TA_StopAbilityComponent = CreateDefaultSubobject<UHR_StopAbilityComponent>(TEXT("TA_StopAbilityComponent"));
+	
+	
 }
 
 void ATA_PlayerCharacter::BeginPlay()

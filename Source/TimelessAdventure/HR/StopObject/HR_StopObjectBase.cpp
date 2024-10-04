@@ -51,29 +51,39 @@ void AHR_StopObjectBase::Tick(float DeltaTime)
 	}
 }
 
-// 바인딩 함수 
+// 바인딩 함수
+// StopAbility의 Detect collider의 안에 들어와야지 동작해야함 
 void AHR_StopObjectBase::OnBeginMouse(AActor* TouchedActor)
 {
+	if(!bIsDetected) return;
+	
 	// Actor의 Material Clickable Color로 변경
 	ChangeMaterialToClickable();
 }
 
 void AHR_StopObjectBase::OnEndMouse(AActor* TouchedActor)
 {
+	if(!bIsDetected) return;
+	
 	// Actor의 Material Selectable Color로 변경 
 	ChangeMaterialToSelectable();
 }
 
 void AHR_StopObjectBase::OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
+	
+
+	if(!bIsDetected) return;
+
 	// @ Player character or StopAbilityComp에서의 정지 time을 가지고 와서 정지 시간을 설정해 주면 좋을 듯
-	// 고려 사항 > Material 변경(0.2s 정도)
 	// 1) bIsStopped 설정
 	// 2) Timer 설정
-
-	bIsStopped = true;
+	// 3) 색도 변경
 	
-	// Create Lamda를 통해서 람다 함수를 생성해서 넘겨주는 것과 그냥 [] 넘겨주는 것과 뭐가 다른가
+	bIsStopped = true;
+	ChangeMaterialToClickable();
+	
+	// ? Create Lamda를 통해서 람다 함수를 생성해서 넘겨주는 것과 그냥 [] 넘겨주는 것과 뭐가 다른가
 	GetWorld()->GetTimerManager().SetTimer(StopTimer, FTimerDelegate::CreateLambda([this](){
 		bIsStopped = false;
 		ChangeMaterialToDefault();

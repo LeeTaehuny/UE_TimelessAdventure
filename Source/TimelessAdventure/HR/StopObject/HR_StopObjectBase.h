@@ -25,10 +25,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+// Getter Setter
+public:
+	FORCEINLINE bool GetbIsDetected() const {return bIsDetected;};
+	FORCEINLINE void SetbIsDetected(bool b) { bIsDetected = b; };
+	
 // 멤버 변수 
 protected:
 	bool bIsStopped = false;
 	FTimerHandle StopTimer;
+	bool bIsDetected = false;
 
 // Components
 protected:
@@ -67,7 +73,7 @@ public:
 	void ChangeMaterialToSelectable();
 	void ChangeMaterialToClickable();
 	void ChangeMaterialToDefault();
-	
+
 	
 	
 };

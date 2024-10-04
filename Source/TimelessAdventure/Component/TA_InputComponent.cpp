@@ -10,7 +10,8 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
-#include "HR/HR_StopAbilityComponent.h"
+#include "HR/HR_StopAbilityComponent_Error.h"
+#include "HR/HR_StopAbilityComponent_T.h"
 
 UTA_InputComponent::UTA_InputComponent()
 {
@@ -207,8 +208,12 @@ void UTA_InputComponent::Interaction()
 
 void UTA_InputComponent::TabClick()
 {
+	OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin();
+	
 	// 나중에 UI 띄우는 것으로 수정 
-	if (IsValid(OwnerPlayer->GetStopAbilityComponent())) OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin();
+	if (IsValid(OwnerPlayer->GetStopAbilityComponent())) {OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin();}
+	else UE_LOG(LogTemp, Warning, TEXT("invalid"));
+
 }
 
 void UTA_InputComponent::ChangeState(EPlayerState NewState)
