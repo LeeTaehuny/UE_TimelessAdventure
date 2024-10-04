@@ -40,4 +40,8 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UTA_HUD> HUDWidget;
+
+	// 
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> StateChange;
 };

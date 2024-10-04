@@ -13,10 +13,8 @@ enum class EPlayerState : uint8
 {
 
 	PS_Combat,			// 전투
-	PS_StopAbilityMode,		// 정지 능력 모드
-
-
-	PS_Gimmick
+	PS_StopObject,	// 정지 능력 모드
+	PS_GrabObject
 
 };
 
@@ -56,11 +54,10 @@ protected:
 	void NumClick(int32 ClickNum);					// 숫자 키보드 입력
 	void Interaction();								// 상호작용
 	// hr
-	void TabClick();								// 공격, 플레이어 기능 (오브젝트 정지, 오브젝트 control)
+	void TabClick();								// HUD에 ModeChange UI 띄우기 (Tab 한번 더 클릭시 UI 제거)
 	
 
 	void Grap();									// 그랩
-	void SwitchState();
 	void Rotate(const FInputActionValue& Value);
 	void SetX();
 	void SetZ();
@@ -126,4 +123,7 @@ private:
 
 	// 임시 이동 입력값 저장용 변수
 	FVector2D MovementVector;
+
+	// Tab 두번 체크
+	bool bIsTab = false;
 };

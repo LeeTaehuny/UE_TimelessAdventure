@@ -143,7 +143,7 @@ void UTA_InputComponent::LeftClick()
 	case EPlayerState::PS_Combat:
 		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->Attack();
 		break;
-	case EPlayerState::PS_StopAbilityMode:
+	case EPlayerState::PS_StopObject:
 		if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
 		break;
 	}
@@ -235,7 +235,7 @@ void UTA_InputComponent::Grap()
 	{
 		return;
 	}
-	else if(PlayerState == EPlayerState::PS_Gimmick)
+	else if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(IsValid(OwnerPlayer->GetGrapRotateComponent()))
 		{
@@ -255,20 +255,10 @@ void UTA_InputComponent::Grap()
 	
 }
 
-void UTA_InputComponent::SwitchState()
-{
-	if(PlayerState == EPlayerState::PS_Combat)
-	{
-		ChangeState(EPlayerState::PS_Gimmick);
-	}else if(PlayerState == EPlayerState::PS_Gimmick)
-	{
-		ChangeState(EPlayerState::PS_Combat);
-	}
-}
 
 void UTA_InputComponent::Rotate(const FInputActionValue& ActionValue)
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		float RotationValue = ActionValue.Get<float>();
 		if(OwnerPlayer->GetGrapRotateComponent())
@@ -280,7 +270,7 @@ void UTA_InputComponent::Rotate(const FInputActionValue& ActionValue)
 
 void UTA_InputComponent::SetX()
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(OwnerPlayer->GetGrapRotateComponent())
 		{
@@ -290,7 +280,7 @@ void UTA_InputComponent::SetX()
 }
 void UTA_InputComponent::SetXfalse()
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(OwnerPlayer->GetGrapRotateComponent())
 		{
@@ -300,7 +290,7 @@ void UTA_InputComponent::SetXfalse()
 }
 void UTA_InputComponent::SetZ()
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(OwnerPlayer->GetGrapRotateComponent())
 		{
@@ -311,7 +301,7 @@ void UTA_InputComponent::SetZ()
 
 void UTA_InputComponent::SetZfalse()
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(OwnerPlayer->GetGrapRotateComponent())
 		{
@@ -332,7 +322,7 @@ void UTA_InputComponent::ChangeState(EPlayerState NewState)
 
 		PlayerState = NewState;
 		break;
-	case EPlayerState::PS_Gimmick:
+	case EPlayerState::PS_GrabObject:
 		UE_LOG(LogTemp, Display, TEXT("Gimmick"));
 		PlayerState = NewState;
 
