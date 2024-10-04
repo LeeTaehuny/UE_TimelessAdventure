@@ -318,7 +318,6 @@ void UTA_InputComponent::SetZfalse()
 			OwnerPlayer->GetGrapRotateComponent()->bctrlheld = false;
 		}
 	}
->>>>>>> eoneee_play
 }
 
 void UTA_InputComponent::ChangeState(EPlayerState NewState)
