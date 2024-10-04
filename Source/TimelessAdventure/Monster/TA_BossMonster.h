@@ -71,6 +71,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UNiagaraComponent> FXComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UNiagaraSystem> FX;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UParticleSystem> HitFX;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Monster")
 	TObjectPtr<class UAnimMontage> JumpAttackMontage;
@@ -116,9 +125,13 @@ private:
 // Action
 private:
 	bool bCanThrowStoneAttack;
+	bool bCanJumpBack;
 
 	UPROPERTY(EditAnywhere, Category = "Monster")
 	float ThrowStoneCoolTime;
+
+	UPROPERTY(EditAnywhere, Category = "Monster")
+	float JumpBackCoolTime;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Monster")

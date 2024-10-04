@@ -9,6 +9,9 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h" 
+#include "NiagaraSystem.h" 
 
 ATA_ThrowStone::ATA_ThrowStone()
 {
@@ -41,7 +44,12 @@ void ATA_ThrowStone::BeginPlay()
 	Super::BeginPlay();
 	
 	ProjectileMovementComponent->SetActive(false);
-	SetLifeSpan(3.0f);
+	
+	FTimerHandle DeleteTimerHandle;
+	FTimerDelegate DeleteDelegate;
+	DeleteDelegate.BindUObject(this, &ATA_ThrowStone::DestroyStone);
+
+	GetWorld()->GetTimerManager().SetTimer(DeleteTimerHandle, DeleteDelegate, 3.0f, false);
 }
 
 void ATA_ThrowStone::Tick(float DeltaTime)
@@ -75,9 +83,17 @@ void ATA_ThrowStone::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 		}
 	}
 
-	// TODO : 폭발 이펙트 생성
-	//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Effect, GetActorTransform());
-	
+	DestroyStone();
+}
+
+void ATA_ThrowStone::DestroyStone()
+{
+	// 이펙트 스폰
+	if (HitFX)
+	{
+		FXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitFX, GetActorLocation(), GetActorRotation());
+	}
+
 	// 삭제
 	Destroy();
 }

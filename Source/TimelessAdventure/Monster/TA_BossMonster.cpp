@@ -12,6 +12,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h" 
+#include "NiagaraSystem.h" 
 
 
 ATA_BossMonster::ATA_BossMonster()
@@ -28,7 +31,7 @@ ATA_BossMonster::ATA_BossMonster()
 	// AI State Setting
 	ChangeState(EBossState::BS_Idle);
 
-	MaxHp = 100.0f;
+	MaxHp = 1000.0f;
 	CurrentHp = MaxHp;
 	Damage = 10.0f;
 	AttackDistance = 300.0f;
@@ -36,6 +39,10 @@ ATA_BossMonster::ATA_BossMonster()
 	// 돌 던지기 공격 관련 변수 초기화
 	ThrowStoneCoolTime = 5.0f;
 	bCanThrowStoneAttack = true;
+
+	// 점프 회피 관련 변수 초기화
+	JumpBackCoolTime = 15.0f;
+	bCanJumpBack = true;
 }
 
 void ATA_BossMonster::BeginPlay()
@@ -175,6 +182,11 @@ float ATA_BossMonster::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 {
 	float ReslutDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	// 이펙트 스폰
+	FTransform Transform = GetActorTransform();
+	Transform.SetScale3D(FVector(1.5f));
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, Transform, true);
+
 	Hit(DamageAmount);
 
 	return ReslutDamage;
@@ -246,15 +258,25 @@ void ATA_BossMonster::JumpAttackEnd(UAnimMontage* Montage, bool IsEnded)
 void ATA_BossMonster::TeleportAttack()
 {
 	// 이펙트 스폰
+	if (FX)
+	{
+		FXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), FX, GetActorLocation(), GetActorRotation());
+	}
+
 	SetActorHiddenInGame(true);
 
 	// 타이머 설정
 	FTimerHandle TeleportHandle;
-	GetWorld()->GetTimerManager().SetTimer(TeleportHandle, this, &ATA_BossMonster::TeleportCallBack, 0.5f, false);
+	GetWorld()->GetTimerManager().SetTimer(TeleportHandle, this, &ATA_BossMonster::TeleportCallBack, 1.0f, false);
 }
 
 void ATA_BossMonster::TeleportCallBack()
 {
+	if (FXComponent) FXComponent->Deactivate();
+	if (FX)
+	{
+		FXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), FX, GetActorLocation(), GetActorRotation());
+	}
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
@@ -285,6 +307,7 @@ void ATA_BossMonster::TeleportCallBack()
 void ATA_BossMonster::TeleportAttackEnd(UAnimMontage* Montage, bool IsEnded)
 {
 	OnAttackEndDelegate.Execute();
+	FXComponent->Deactivate();
 }
 
 void ATA_BossMonster::BaseAttack()
@@ -327,6 +350,14 @@ void ATA_BossMonster::KnockbackAttackEnd(UAnimMontage* Montage, bool IsEnded)
 
 void ATA_BossMonster::JumpBack(float Distance)
 {
+	// 점프 회피를 할 수 없는 상태인 경우 종료
+	if (!bCanJumpBack)
+	{
+		// 완료 태스크
+		OnJumpEndDelegate.Execute();
+		return;
+	}
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
@@ -350,6 +381,9 @@ void ATA_BossMonster::JumpBack(float Distance)
 				// 콜리전 프리셋 설정
 				GetCapsuleComponent()->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));
 
+				// 점프 회피 비활성화
+				bCanJumpBack = false;
+
 				AnimInstance->Montage_Play(JumpBackMontage);
 
 				FOnMontageEnded EndDelegate;
@@ -368,6 +402,15 @@ void ATA_BossMonster::JumpBackEnd(UAnimMontage* Montage, bool IsEnded)
 
 	// 콜리전 프리셋 설정
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
+
+	// 쿨타임 적용
+	FTimerHandle JumpBackTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(JumpBackTimerHandle, FTimerDelegate::CreateLambda(
+		[this]()
+		{
+			bCanJumpBack = true;
+		}
+	), JumpBackCoolTime, false);
 }
 
 float ATA_BossMonster::GetHealthPercent()

@@ -98,6 +98,11 @@ Content/LookoutTower/*
 Content/MAEOakForest/*
 Content/Mediterranean_Coast/*
 Content/Biochemical_Monster_09/*
+Content/BlinkAndDashVFX/*
+Content/Pack_Effects_1/*
+Content/AdvancedNiagaraVFX/*
+Content/GoodFXImpact/*
+
 
 #Rider
 Plugins/Developer/RiderLink/*
