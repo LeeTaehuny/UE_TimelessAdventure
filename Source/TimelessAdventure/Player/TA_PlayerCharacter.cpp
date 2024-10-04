@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HR/HR_StopAbilityComponent_Error.h"
 #include "HR/HR_StopAbilityComponent_T.h"
+#include "Gimmick/Sangeon/TA_GrapRotateComponent.h"
 
 ATA_PlayerCharacter::ATA_PlayerCharacter()
 {
@@ -47,6 +48,7 @@ ATA_PlayerCharacter::ATA_PlayerCharacter()
 	TA_InventoryComponent = CreateDefaultSubobject<UTA_InventoryComponent>(TEXT("TA_InventoryComponent"));
 	
 	
+	TA_GrapRotateComponent = CreateDefaultSubobject<UTA_GrapRotateComponent>(TEXT("TA_GrapRotateComponent"));
 }
 
 void ATA_PlayerCharacter::BeginPlay()

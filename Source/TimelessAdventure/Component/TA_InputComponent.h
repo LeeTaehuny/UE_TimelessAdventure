@@ -11,8 +11,13 @@
 UENUM(BlueprintType)
 enum class EPlayerState : uint8
 {
+
 	PS_Combat,			// 전투
 	PS_StopAbilityMode,		// 정지 능력 모드
+
+
+	PS_Gimmick
+
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -54,6 +59,13 @@ protected:
 	void TabClick();								// 공격, 플레이어 기능 (오브젝트 정지, 오브젝트 control)
 	
 
+	void Grap();									// 그랩
+	void SwitchState();
+	void Rotate(const FInputActionValue& Value);
+	void SetX();
+	void SetZ();
+	void SetXfalse();
+	void SetZfalse();
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
 
@@ -96,6 +108,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Tab;
 
+	TObjectPtr<class UInputAction> IA_Grap;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Switch;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Rotate;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_z;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_x;
+	
 // Member
 private:
 	// 플레이어의 현재 상태
