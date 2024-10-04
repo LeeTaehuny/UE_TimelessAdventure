@@ -16,6 +16,7 @@ enum class ECombatState : uint8
 	CS_Roll,			// 구르기 (회피)
 	CS_Attack,			// 공격
 	CS_Special,			// 특수 동작
+	CS_Hit,				// 피격
 };
 
 UENUM(BlueprintType)
@@ -171,6 +172,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Anims")
 	TObjectPtr<class UAnimMontage> PickupMontage;
 
+	// Hit Montage
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> HitMontage;
+
 // Stat
 private:
 	void UseStamina(float InValue);
@@ -242,7 +247,7 @@ public:
 	void TakeDamage(float DamageAmount, AActor* DamageCauser, FDamageEvent const& DamageEvent);
 	
 private:
-	void Hit();
+	void Hit(float InDamage);
 	void Die();
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
@@ -250,4 +255,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float AttackDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float LaunchDistance;
 };

@@ -14,4 +14,13 @@ class TIMELESSADVENTURE_API ATA_Gold : public ATA_ItemBase
 {
 	GENERATED_BODY()
 	
+public:
+	ATA_Gold();
+
+protected:
+	virtual void Interaction(ACharacter* Target) override;
+
+private:
+	UPROPERTY(EditAnywhere)
+	int32 GlodAmount;
 };

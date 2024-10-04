@@ -264,6 +264,7 @@ void ATA_BossMonster::TeleportAttack()
 	}
 
 	SetActorHiddenInGame(true);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// 타이머 설정
 	FTimerHandle TeleportHandle;
@@ -284,6 +285,7 @@ void ATA_BossMonster::TeleportCallBack()
 		if (BossController)
 		{
 			SetActorHiddenInGame(false);
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 			AActor* TargetActor = Cast<AActor>(BossController->GetBlackboardComponent()->GetValueAsObject(BBKEY_PLAYER));
 			if (TargetActor)

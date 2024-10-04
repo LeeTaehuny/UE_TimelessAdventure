@@ -47,6 +47,7 @@ UTA_CombatComponent::UTA_CombatComponent()
 	TempEquippedState = EEquippedState::ES_Idle;
 
 	AttackDistance = 300.0f;
+	LaunchDistance = 3000.0f;
 }
 
 void UTA_CombatComponent::BeginPlay()
@@ -158,6 +159,7 @@ void UTA_CombatComponent::Walk(FVector ForwardDir, FVector RightDir, FVector2D M
 {
 	if (!IsValid(OwnerPlayer)) return;
 	if (CombatState == ECombatState::CS_Attack) return;
+	if (bIsGuard) return;
 
 	OwnerPlayer->AddMovementInput(ForwardDir, MovementVector2D.X);
 	OwnerPlayer->AddMovementInput(RightDir, MovementVector2D.Y);
@@ -389,14 +391,10 @@ void UTA_CombatComponent::RightClickEnd()
 		break;
 	case EEquippedState::ES_Sword:
 		bIsGuard = false;
-		OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
 		ChangeState(ECombatState::CS_Idle);
 		break;
 	case EEquippedState::ES_Bow:
-		bIsHold = false;
-		bCanShoot = false;
-
 		OwnerPlayer->bUseControllerRotationYaw = false;
 		OwnerPlayer->GetCharacterMovement()->bOrientRotationToMovement = true;
 		
@@ -614,7 +612,7 @@ void UTA_CombatComponent::DrawArrowEnd(UAnimMontage* Montage, bool IsEnded)
 
 void UTA_CombatComponent::ShootArrow()
 {
-	if (bCanShoot && bIsHold)
+	if (bCanShoot && bIsHold && !bIsAttacking)
 	{
 		UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
 		if (AnimInstance)
@@ -650,9 +648,6 @@ void UTA_CombatComponent::GuardStart()
 	if (OwnerPlayer->GetCharacterMovement()->IsFalling()) return;
 	if (bIsGuard) return;
 
-	// 플레이어 이동 제한
-	OwnerPlayer->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-
 	// 상태 변경
 	ChangeState(ECombatState::CS_Special);
 
@@ -666,6 +661,8 @@ void UTA_CombatComponent::ResetBow()
 	{
 		BowWeapon->SetIsHold(false);
 		BowWeapon->RemoveArrow();
+		bIsHold = false;
+		bCanShoot = false;
 	}
 
 	ATA_PlayerController* PC = Cast<ATA_PlayerController>(OwnerPlayer->GetController());
@@ -803,19 +800,51 @@ void UTA_CombatComponent::EquipWeapon()
 
 void UTA_CombatComponent::TakeDamage(float DamageAmount, AActor* DamageCauser, FDamageEvent const& DamageEvent)
 {
+	// 피격 받은 방향 구하기
+	FVector Direction = (OwnerPlayer->GetActorLocation() - DamageCauser->GetActorLocation()).GetSafeNormal();
+
+	// 현재 방어 중인 경우
+	if (bIsGuard)
+	{
+		// 방어 방향이 올바른지 (90도 오차 내) 체크
+		// * 현재 플레이어가 바라보는 방향과 피격받은 역방향
+		float DotProduct = FVector::DotProduct(OwnerPlayer->GetActorForwardVector(), -1.0f * Direction);
+		float Angle = FMath::RadiansToDegrees(FMath::Acos(DotProduct));
+
+		// 만약 각도가 90도 이내라면?
+		if (FMath::Abs(Angle) <= 90.0f)
+		{
+			// 조금만 밀려나게 설정
+			OwnerPlayer->LaunchCharacter(Direction * LaunchDistance * 0.5f, true, false);
+
+			return;
+		}
+	}
+	
+	// 방어중이 아닌 경우
 	if (DamageEvent.DamageTypeClass == UDT_Knockback::StaticClass())
 	{
 		GEngine->AddOnScreenDebugMessage(99, 2.0f, FColor::Red, FString::Printf(TEXT("TakeDamage knockback %f"), DamageAmount));
+		OwnerPlayer->LaunchCharacter(Direction * LaunchDistance * 2, true, false);
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(99, 2.0f, FColor::Red, FString::Printf(TEXT("TakeDamage %f"), DamageAmount));
+		OwnerPlayer->LaunchCharacter(Direction * LaunchDistance, true, false);
 	}
+	
+	// 데미지 처리
+	Hit(DamageAmount);
 }
 
-void UTA_CombatComponent::Hit()
+void UTA_CombatComponent::Hit(float InDamage)
 {
-	GEngine->AddOnScreenDebugMessage(98, 2.0f, FColor::Red, TEXT("Hit"));
+	GEngine->AddOnScreenDebugMessage(98, 2.0f, FColor::Red, FString::Printf(TEXT("Hit %f"), InDamage));
+
+	if (IsValid(EquippedWeapon) && EquippedWeapon->GetWeaponType() == EWeaponType::WT_Bow)
+	{
+		ResetBow();
+	}
 
 	// 피격 몽타주 재생 등 기타 처리
 }
