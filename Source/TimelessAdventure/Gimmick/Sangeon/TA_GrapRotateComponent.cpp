@@ -301,7 +301,7 @@ void UTA_GrapRotateComponent::RotateObject(float RotationValue)
 	{
 
 		FRotator CurrentRotation = HeldObject->GetActorRotation();
-		UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *CurrentRotation.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *CurrentRotation.ToString());
 		
 		FRotator CurrentRotationX = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw, CurrentRotation.Roll + RotationValue);
 		FRotator CurrentRotationY = FRotator(CurrentRotation.Pitch + RotationValue, CurrentRotation.Yaw, CurrentRotation.Roll);
@@ -310,7 +310,7 @@ void UTA_GrapRotateComponent::RotateObject(float RotationValue)
 		FRotator SelectedRotator1 = bShiftHeld ? CurrentRotationY : CurrentRotationZ;
 		FRotator SelectedRotator2 = bctrlheld ? CurrentRotationX : SelectedRotator1;
 		NewRotator = SelectedRotator2;
-		UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *SelectedRotator2.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *SelectedRotator2.ToString());
 
 		HeldObject->SetActorRotation(NewRotator);
 	}
