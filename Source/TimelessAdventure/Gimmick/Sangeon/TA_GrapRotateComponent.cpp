@@ -204,7 +204,8 @@ void UTA_GrapRotateComponent::PickupObject()
 					return;
 				}
 				HeldObject = MovableActor;
-				FVector CurrentLocation = HeldObject->GetMeshComponent()->GetRelativeLocation();
+				FVector CurrentLocation = HeldObject->GetActorLocation();
+				
 				StartLerping(CurrentLocation);
 				GetWorld()->GetTimerManager().ClearTimer(CrosshairTimerHandle);
 				UTA_GrapCrosshair* GrapCrosshair = Cast<UTA_GrapCrosshair>(CrosshairWidget);
@@ -257,7 +258,7 @@ void UTA_GrapRotateComponent::LerpProgress(float Value)
 		FVector A = LerpStartLocation;
 		FVector B = Distance* FVector(1,0,0);
 		FVector NewLocation = FMath::Lerp(A, B, Value);
-		HeldObject->GetMeshComponent()->SetRelativeLocation(NewLocation, false, nullptr, ETeleportType::TeleportPhysics);
+		HeldObject->SetActorLocation(NewLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	}
 }
 void UTA_GrapRotateComponent::DropObject()
@@ -288,7 +289,30 @@ void UTA_GrapRotateComponent::DropObject()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("dropobjectfail"))
+	}
+}
+
+void UTA_GrapRotateComponent::RotateObject(float RotationValue)
+{
+	//ATA_PlayerCharacter* Player = Cast<ATA_PlayerCharacter>(GetOwner());
+	//if(Player)
+	//{
+	if(HeldObject)
+	{
+
+		FRotator CurrentRotation = HeldObject->GetActorRotation();
+		UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *CurrentRotation.ToString());
+		
+		FRotator CurrentRotationX = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw, CurrentRotation.Roll + RotationValue);
+		FRotator CurrentRotationY = FRotator(CurrentRotation.Pitch + RotationValue, CurrentRotation.Yaw, CurrentRotation.Roll);
+		FRotator CurrentRotationZ = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw + RotationValue, CurrentRotation.Roll + RotationValue);
+
+		FRotator SelectedRotator1 = bShiftHeld ? CurrentRotationY : CurrentRotationZ;
+		FRotator SelectedRotator2 = bctrlheld ? CurrentRotationX : SelectedRotator1;
+		NewRotator = SelectedRotator2;
+		UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *SelectedRotator2.ToString());
+
+		HeldObject->SetActorRotation(NewRotator);
 	}
 }
 

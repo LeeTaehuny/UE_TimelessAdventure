@@ -8,9 +8,10 @@ ATA_Movable::ATA_Movable()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	///RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	MovableMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MovableMesh"));
-	MovableMesh->SetupAttachment(RootComponent);
+	//MovableMesh->SetupAttachment(RootComponent);
+	RootComponent = MovableMesh;
 
 	MovableMesh->SetSimulatePhysics(true);
 }

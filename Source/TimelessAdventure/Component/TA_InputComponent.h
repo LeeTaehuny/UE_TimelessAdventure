@@ -52,7 +52,11 @@ protected:
 	void Interaction();								// 상호작용
 	void Grap();									// 그랩
 	void SwitchState();
-
+	void Rotate(const FInputActionValue& Value);
+	void SetX();
+	void SetZ();
+	void SetXfalse();
+	void SetZfalse();
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputMappingContext> IMC_Player;
 
@@ -96,6 +100,13 @@ protected:
 	TObjectPtr<class UInputAction> IA_Grap;
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Switch;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_Rotate;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_z;
+	UPROPERTY(EditAnywhere, Category = "InputAction")
+	TObjectPtr<class UInputAction> IA_x;
+	
 // Member
 private:
 	// 플레이어의 현재 상태

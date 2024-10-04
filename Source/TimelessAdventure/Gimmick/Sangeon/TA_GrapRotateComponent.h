@@ -31,6 +31,11 @@ public:
 	UPROPERTY()
 	class ATA_Movable* HeldObject;
 
+	FRotator NewRotator;
+	void RotateObject(float RotationValue);
+	bool bShiftHeld = true;
+	bool bctrlheld = false;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI", meta = (AllowPrivateAccess = "true"))
 	UUserWidget* CrosshairWidget;

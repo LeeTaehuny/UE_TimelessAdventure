@@ -63,6 +63,14 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(IA_Interaction, ETriggerEvent::Started, this, &UTA_InputComponent::Interaction);
 	EnhancedInputComponent->BindAction(IA_Grap, ETriggerEvent::Triggered, this, &UTA_InputComponent::Grap);
 	EnhancedInputComponent->BindAction(IA_Switch, ETriggerEvent::Started, this, &UTA_InputComponent::SwitchState);
+	EnhancedInputComponent->BindAction(IA_Rotate, ETriggerEvent::Triggered, this, &UTA_InputComponent::Rotate);
+	EnhancedInputComponent->BindAction(IA_z, ETriggerEvent::Started, this, &UTA_InputComponent::SetZ);
+	EnhancedInputComponent->BindAction(IA_z, ETriggerEvent::Completed, this, &UTA_InputComponent::SetZfalse);
+	EnhancedInputComponent->BindAction(IA_x, ETriggerEvent::Started, this, &UTA_InputComponent::SetX);
+	EnhancedInputComponent->BindAction(IA_x, ETriggerEvent::Completed, this, &UTA_InputComponent::SetXfalse);
+
+	
+	
 }
 
 void UTA_InputComponent::BasicMove(const FInputActionValue& Value)
@@ -202,20 +210,28 @@ void UTA_InputComponent::Interaction()
 
 void UTA_InputComponent::Grap()
 {
-	if(IsValid(OwnerPlayer->GetGrapRotateComponent()))
+	if(PlayerState == EPlayerState::PS_Combat)
 	{
-		if(OwnerPlayer->GetGrapRotateComponent()->HeldObject)
+		return;
+	}
+	else if(PlayerState == EPlayerState::PS_Gimmick)
+	{
+		if(IsValid(OwnerPlayer->GetGrapRotateComponent()))
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("drop"));
-			OwnerPlayer->GetGrapRotateComponent()->DropObject();			
-		}
-		else
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("pickup"));
+			if(OwnerPlayer->GetGrapRotateComponent()->HeldObject)
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("drop"));
+				OwnerPlayer->GetGrapRotateComponent()->DropObject();			
+			}
+			else
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("pickup"));
 
-			OwnerPlayer->GetGrapRotateComponent()->PickupObject();
+				OwnerPlayer->GetGrapRotateComponent()->PickupObject();
+			}
 		}
 	}
+	
 }
 
 void UTA_InputComponent::SwitchState()
@@ -226,6 +242,60 @@ void UTA_InputComponent::SwitchState()
 	}else if(PlayerState == EPlayerState::PS_Gimmick)
 	{
 		ChangeState(EPlayerState::PS_Combat);
+	}
+}
+
+void UTA_InputComponent::Rotate(const FInputActionValue& ActionValue)
+{
+	if(PlayerState == EPlayerState::PS_Gimmick)
+	{
+		float RotationValue = ActionValue.Get<float>();
+		if(OwnerPlayer->GetGrapRotateComponent())
+		{
+			OwnerPlayer->GetGrapRotateComponent()->RotateObject(RotationValue * 5.0f);
+		}
+	}
+}
+
+void UTA_InputComponent::SetX()
+{
+	if(PlayerState == EPlayerState::PS_Gimmick)
+	{
+		if(OwnerPlayer->GetGrapRotateComponent())
+		{
+			OwnerPlayer->GetGrapRotateComponent()->bShiftHeld = true;
+		}
+	}
+}
+void UTA_InputComponent::SetXfalse()
+{
+	if(PlayerState == EPlayerState::PS_Gimmick)
+	{
+		if(OwnerPlayer->GetGrapRotateComponent())
+		{
+			OwnerPlayer->GetGrapRotateComponent()->bShiftHeld = false;
+		}
+	}
+}
+void UTA_InputComponent::SetZ()
+{
+	if(PlayerState == EPlayerState::PS_Gimmick)
+	{
+		if(OwnerPlayer->GetGrapRotateComponent())
+		{
+			OwnerPlayer->GetGrapRotateComponent()->bctrlheld = true;
+		}
+	}
+}
+
+void UTA_InputComponent::SetZfalse()
+{
+	if(PlayerState == EPlayerState::PS_Gimmick)
+	{
+		if(OwnerPlayer->GetGrapRotateComponent())
+		{
+			OwnerPlayer->GetGrapRotateComponent()->bctrlheld = false;
+		}
 	}
 }
 
