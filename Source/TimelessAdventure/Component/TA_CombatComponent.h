@@ -176,6 +176,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Anims")
 	TObjectPtr<class UAnimMontage> HitMontage;
 
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> GuardHitMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> DeathMontage;
+
 // Stat
 private:
 	void UseStamina(float InValue);
@@ -247,7 +253,8 @@ public:
 	void TakeDamage(float DamageAmount, AActor* DamageCauser, FDamageEvent const& DamageEvent);
 	
 private:
-	void Hit(float InDamage);
+	void Hit(float InDamage, float InPlaySpeed);
+	void HitEnd(class UAnimMontage* Montage, bool IsEnded);
 	void Die();
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
