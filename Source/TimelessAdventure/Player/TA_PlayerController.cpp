@@ -6,6 +6,7 @@
 #include "UI/TA_HUD.h"
 #include "Interface/InventoryInterface.h"
 #include "Component/TA_InventoryComponent.h"
+#include "UI/HR_StateChange.h"
 
 
 ATA_PlayerController::ATA_PlayerController()
@@ -43,6 +44,17 @@ void ATA_PlayerController::BeginPlay()
 
 			InventoryInterface->GetInventory()->OnChangeInventory.AddUObject(HUDWidget, &UTA_HUD::UpdateInventory);
 			InventoryInterface->GetInventory()->OnChangeGold.AddUObject(HUDWidget, &UTA_HUD::UpdateGold);
+		}
+	}
+
+	if(StateChangeWidgetClass)
+	{
+		StateChangeWidget = CreateWidget<UHR_StateChange>(GetWorld(), StateChangeWidgetClass);
+		if (StateChangeWidget)
+		{
+			StateChangeWidget->SetOwnerPlayer(GetPawn());
+			StateChangeWidget->AddToViewport();
+			SetVisibleStateChangeWidget(false);
 		}
 	}
 }
@@ -164,9 +176,10 @@ bool ATA_PlayerController::GetInventoryVisible()
 
 void ATA_PlayerController::SetVisibleStateChangeWidget(bool Value)
 {
-	if (StateChange)
+	if (StateChangeWidget)
 	{
-		if(Value) {StateChange->SetVisibility(ESlateVisibility::Visible);}
-		else StateChange->SetVisibility(ESlateVisibility::Hidden);
+		if(Value) {StateChangeWidget->SetVisibility(ESlateVisibility::Visible);}
+		else StateChangeWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
+

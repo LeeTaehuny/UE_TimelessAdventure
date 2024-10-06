@@ -57,7 +57,7 @@ protected:
 	void TabClick();								// HUD에 ModeChange UI 띄우기 (Tab 한번 더 클릭시 UI 제거)
 	
 
-	void Grap();									// 그랩
+	void Grap();									// 그랩 
 	void Rotate(const FInputActionValue& Value);
 	void SetX();
 	void SetZ();
@@ -107,8 +107,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Grap;
 	UPROPERTY(EditAnywhere, Category = "InputAction")
-	TObjectPtr<class UInputAction> IA_Switch;
-	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_Rotate;
 	UPROPERTY(EditAnywhere, Category = "InputAction")
 	TObjectPtr<class UInputAction> IA_z;
@@ -126,4 +124,13 @@ private:
 
 	// Tab 두번 체크
 	bool bIsTab = false;
+
+// State 변경 함수
+public:
+	UFUNCTION(BlueprintCallable, Category = "Change State")
+	void ChangeStateToCombat();
+	UFUNCTION(BlueprintCallable, Category = "Change State")
+	void ChangeStateToStopObject();
+	UFUNCTION(BlueprintCallable, Category = "Change State")
+	void ChangeStateToGrabObject();
 };

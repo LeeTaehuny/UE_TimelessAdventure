@@ -67,4 +67,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UTA_GrapRotateComponent> TA_GrapRotateComponent;
+
+// HUD..
+
 };

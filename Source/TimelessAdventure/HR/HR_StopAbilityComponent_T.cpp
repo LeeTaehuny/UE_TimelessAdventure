@@ -3,9 +3,13 @@
 
 #include "HR_StopAbilityComponent_T.h"
 
+#include "Component/TA_InputComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/TA_PlayerCharacter.h"
+#include "Player/TA_PlayerController.h"
 #include "StopObject/HR_StopObjectBase.h"
+#include "UI/TA_HUD.h"
 
 
 // Sets default values for this component's properties
@@ -30,8 +34,12 @@ void UHR_StopAbilityComponent_T::BeginPlay()
 	PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
 	// 이벤트 비활성화
-	DeactivateMouseEvent();
+	//DeactivateMouseEvent();
+	ActivateMouseEvent();
 	DetectCollider->SetGenerateOverlapEvents(false);
+
+	// 시간 게이지
+	SetTimeEnergy();
 	
 }
 
@@ -44,6 +52,26 @@ void UHR_StopAbilityComponent_T::OnRegister()
 	DetectCollider->SetSphereRadius(Radius);
 	DetectCollider->SetupAttachment(this);
 	DetectCollider->RegisterComponent();
+
+	// sm 등록
+	OverlayMesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), TEXT("Overlay mesh"));
+	OverlayMesh->SetupAttachment(this);
+	OverlayMesh->RegisterComponent();
+
+	/*ConstructorHelpers::FObjectFinder<UStaticMesh>SMSphere(TEXT("/Script/Engine.StaticMesh'/Game/HR/Material/Sphere.Sphere'"));
+	if(SMSphere.Succeeded())
+	{
+		OverlayMesh->SetStaticMesh(SMSphere.Object);
+	}
+	OverlayMesh->SetWorldScale3D(FVector(10, 10, 10));*/
+
+	/*ConstructorHelpers::FObjectFinder<UMaterialInterface>MISphere(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/HR/Material/MI_SelectableOverlayColor.MI_SelectableOverlayColor'"));
+	if(MISphere.Succeeded())
+	{
+		OverlayMesh->SetMaterial(0, MISphere.Object);
+	}
+	OverlayMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	OverlayMesh->SetVisibility(false);*/
 	
 
 	// 델리게이트에 바인딩
@@ -81,17 +109,20 @@ void UHR_StopAbilityComponent_T::StopAbilityBegin()
 	// 3) StopableObject를 관리하는 Manager를 통해서 Stopable Object들의 Material을 수정
 	//		> Stopable Object를 TArray를 통해서 모든 Object material 변경
 	//		> Component에 Collider를 붙여서 그 범위 안에 있는 Stopable Object들의 Material 변경
+	PlayerController->bShowMouseCursor = false;
 	PlayerController->bShowMouseCursor = true;
 	PlayerController->CurrentMouseCursor = EMouseCursor::Crosshairs;
 	PlayerController->SetMouseLocation(1000, 350);
-	ActivateMouseEvent();
+	//ActivateMouseEvent();
 
 	// Line 그리기 위한 bool
 	bIsTabClick = true;
 	// overlap 이벤트 활성화
 	DetectCollider->SetGenerateOverlapEvents(true);
 
-	//StopObjectManager->ChangeMaterialToSelectableAll();
+	// 장만 활성화
+	OverlayMesh->SetVisibility(true);
+
 }
 
 // 마우스 클릭시 호출
@@ -113,6 +144,7 @@ void UHR_StopAbilityComponent_T::StopAbilityEnd()
 	// 1) Overlap 이벤트 비활성화
 	// 2) 마우스 이벤트 비활성화
 	// 3) 마우스 커서 끄기
+	// 4) Playerstate 변경 
 
 	// Line 그리기 위한 bool
 	bIsTabClick = false;
@@ -123,7 +155,14 @@ void UHR_StopAbilityComponent_T::StopAbilityEnd()
 	PlayerController->bShowMouseCursor = false;
 	PlayerController->CurrentMouseCursor = EMouseCursor::Default;
 	// 마우스 이벤트 비화성화 
-	DeactivateMouseEvent();
+	// DeactivateMouseEvent();
+
+	// 상태 변경
+	ATA_PlayerCharacter* PlayerCharacter = Cast<ATA_PlayerCharacter>(GetOwner());
+	PlayerCharacter->GetInputComponent()->ChangeStateToCombat();
+	
+	// 장만 활성화
+	OverlayMesh->SetVisibility(false);
 	
 	
 }
@@ -140,8 +179,31 @@ void UHR_StopAbilityComponent_T::DeactivateMouseEvent()
 	PlayerController->bEnableMouseOverEvents = false;
 }
 
+void UHR_StopAbilityComponent_T::SetTimeEnergy()
+{
+	float Percent = CurretTimeEnergy / MaxTimeEnergy;
+
+	ATA_PlayerController* taPC = Cast<ATA_PlayerController>(PlayerController);
+
+	UTA_HUD* hud = Cast<UTA_HUD>(taPC->GetHUD());
+	if(hud)
+	{
+		hud->SetPBPercentTimeEnergy(Percent);
+	}
+	
+}
+
+void UHR_StopAbilityComponent_T::UseTimeEnergy()
+{
+	if(CurretTimeEnergy >= Consumption)
+	{
+		CurretTimeEnergy -= Consumption;
+		SetTimeEnergy();
+	}
+}
+
 void UHR_StopAbilityComponent_T::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// StopObjectBase인경우 Material Selectable로 변경
 	// Detected 됐는지 체크

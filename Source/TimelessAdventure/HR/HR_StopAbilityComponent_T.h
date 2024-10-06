@@ -44,6 +44,8 @@ private:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Collider");
 	TObjectPtr<class USphereComponent> DetectCollider;
+	UPROPERTY(VisibleAnywhere, Category = "Collider");
+	TObjectPtr<class UStaticMeshComponent> OverlayMesh;
 	
 // Stop Object Collider Radius
 protected:
@@ -51,7 +53,19 @@ protected:
 	float Radius = 500.f;
 private:
 	bool bIsTabClick = false;
-	
+	// 시간 게이지
+	float MaxTimeEnergy = 50;
+	float CurretTimeEnergy = 50;
+
+	float Consumption = 10;
+
+// 시간 게이지 계산
+public:
+	void SetTimeEnergy();
+
+	// 시간 사용
+	void UseTimeEnergy();
+
 // Collision event
 protected:
 	UFUNCTION()
@@ -59,4 +73,7 @@ protected:
 	UFUNCTION()
 	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+// 장막 visible
+
+	
 };

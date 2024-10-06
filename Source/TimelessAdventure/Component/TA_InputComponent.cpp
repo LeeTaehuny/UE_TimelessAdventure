@@ -11,10 +11,11 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 
-#include "HR/HR_StopAbilityComponent_Error.h"
 #include "HR/HR_StopAbilityComponent_T.h"
 
 #include "Gimmick/Sangeon/TA_GrapRotateComponent.h"
+#include "Player/TA_PlayerController.h"
+
 
 UTA_InputComponent::UTA_InputComponent()
 {
@@ -134,8 +135,6 @@ void UTA_InputComponent::BasicJump()
 
 void UTA_InputComponent::LeftClick()
 {
-	// 나중에 수정
-	if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
 	
 	switch (PlayerState)
 	{
@@ -143,7 +142,8 @@ void UTA_InputComponent::LeftClick()
 		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->Attack();
 		break;
 	case EPlayerState::PS_StopObject:
-		if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
+		//if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
+		//PlayerState = EPlayerState::PS_Combat;
 		break;
 	}
 }
@@ -219,13 +219,36 @@ void UTA_InputComponent::Interaction()
 }
 
 
-	void UTA_InputComponent::TabClick()
+void UTA_InputComponent::TabClick()
 {
-	OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin();
-
-	// 나중에 UI 띄우는 것으로 수정 
-	if (IsValid(OwnerPlayer->GetStopAbilityComponent())) { OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin(); }
-	else UE_LOG(LogTemp, Warning, TEXT("invalid"));
+	// UI 띄우기
+	UE_LOG(LogTemp, Warning, TEXT("Input TabClick"));
+	ATA_PlayerController* PC = Cast<ATA_PlayerController>(OwnerPlayer->GetController());
+	if (PC)
+	{
+		PC->SetMouseLocation(640, 360);
+		if(!bIsTab)
+		{
+			// Tab 처음이면 위젯 띄우기
+			PC->bShowMouseCursor = true;
+			PC->SetVisibleStateChangeWidget(true);
+			bIsTab = true;
+		}
+		else
+		{
+			// 위젯 지우기
+			PC->bShowMouseCursor = false;
+			PC->SetVisibleStateChangeWidget(false);
+			bIsTab = false;
+			
+			if(PlayerState == EPlayerState::PS_StopObject)
+			{
+				// Stop Object mode end
+				if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
+			}
+		}
+		
+	}
 }
 
 void UTA_InputComponent::Grap()
@@ -307,6 +330,21 @@ void UTA_InputComponent::SetZfalse()
 			OwnerPlayer->GetGrapRotateComponent()->bctrlheld = false;
 		}
 	}
+}
+
+void UTA_InputComponent::ChangeStateToCombat()
+{
+	PlayerState = EPlayerState::PS_Combat;
+}
+
+void UTA_InputComponent::ChangeStateToStopObject()
+{
+	PlayerState = EPlayerState::PS_StopObject;
+}
+
+void UTA_InputComponent::ChangeStateToGrabObject()
+{
+	PlayerState = EPlayerState::PS_GrabObject;
 }
 
 void UTA_InputComponent::ChangeState(EPlayerState NewState)

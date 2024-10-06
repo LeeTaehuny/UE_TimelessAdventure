@@ -2,9 +2,13 @@
 
 #pragma once
 
+#include "../UI/TA_HUD.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "TA_PlayerController.generated.h"
+
+
 
 /**
  * 
@@ -27,20 +31,27 @@ public:
 	void VisibleInteractionWidget(bool Value);
 	void SetInteractionText(FText NewText);
 	bool GetInventoryVisible();
+	void SetVisibleStateChangeWidget(bool Value);
 
+// Get
+public:
+	FORCEINLINE TObjectPtr<class UTA_HUD> GetHUD(){return HUDWidget;};
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf<class UUserWidget> WeaponSelectWidgetClass;
-
 	UPROPERTY()
 	TObjectPtr<class UTA_ChangeWeapon> WeaponSelectWidget;
 
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf<class UUserWidget> HUDWidgetClass;
-
 	UPROPERTY()
 	TObjectPtr<class UTA_HUD> HUDWidget;
+
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	TSubclassOf<class UUserWidget> StateChangeWidgetClass;
+	UPROPERTY()
+	TObjectPtr<class UHR_StateChange> StateChangeWidget;
 
 
 };
