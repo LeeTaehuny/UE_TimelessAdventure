@@ -17,6 +17,7 @@ enum class ECombatState : uint8
 	CS_Attack,			// 공격
 	CS_Special,			// 특수 동작
 	CS_Hit,				// 피격
+	CS_Die,				// 사망
 };
 
 UENUM(BlueprintType)
@@ -97,6 +98,9 @@ public:
 	// Middle click
 	void MiddleClickStart();
 	void MiddleClickEnd();
+
+	// Respawn
+	void Respawn();
 
 // ComboAttack
 private:

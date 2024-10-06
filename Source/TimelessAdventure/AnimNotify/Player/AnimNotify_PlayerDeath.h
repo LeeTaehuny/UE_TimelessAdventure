@@ -14,4 +14,7 @@ class TIMELESSADVENTURE_API UAnimNotify_PlayerDeath : public UAnimNotify
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
 };

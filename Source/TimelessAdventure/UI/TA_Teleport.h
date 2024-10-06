@@ -18,6 +18,7 @@ protected:
 	virtual bool Initialize() override;
 	
 public:
+	void Init();
 	void UpdateTeleport();
 
 protected:

@@ -35,6 +35,10 @@ void UTA_StoneMenu::Init()
 {
 	Shop->SetOwnerPlayer(OwnerActor);
 	Shop->Init();
+	Teleport->SetOwnerPlayer(OwnerActor);
+	Teleport->Init();
+
+	WS_Menu->SetActiveWidgetIndex(0);
 }
 
 void UTA_StoneMenu::UpdateWidget()
@@ -65,5 +69,6 @@ void UTA_StoneMenu::CloseWidget()
 	if (ATA_Stone* Stone = Cast<ATA_Stone>(OwnerActor))
 	{
 		Stone->SetVisibilityStoneMenu(false);
+		WS_Menu->SetActiveWidgetIndex(0);
 	}
 }

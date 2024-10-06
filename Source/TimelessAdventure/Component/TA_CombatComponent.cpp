@@ -10,9 +10,11 @@
 #include "Player/TA_PlayerController.h"
 #include "Interface/InteractionInterface.h"
 #include "Data/DT_Knockback.h"
+#include "Game/TA_MainGameMode.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/DamageEvents.h"
@@ -57,7 +59,11 @@ void UTA_CombatComponent::BeginPlay()
 
 	Init();
 
-	CurrentHp /= 2;
+	ATA_MainGameMode* GM = Cast<ATA_MainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GM)
+	{
+		GM->SetRespawnLocation(OwnerPlayer->GetActorLocation());
+	}
 }
 
 void UTA_CombatComponent::SetChangeWeaponState(EEquippedState NewState)
@@ -159,7 +165,7 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 void UTA_CombatComponent::Walk(FVector ForwardDir, FVector RightDir, FVector2D MovementVector2D)
 {
 	if (!IsValid(OwnerPlayer)) return;
-	if (CombatState == ECombatState::CS_Attack || CombatState == ECombatState::CS_Hit) return;
+	if (CombatState == ECombatState::CS_Attack || CombatState == ECombatState::CS_Hit || CombatState == ECombatState::CS_Die) return;
 	if (bIsGuard) return;
 
 	OwnerPlayer->AddMovementInput(ForwardDir, MovementVector2D.X);
@@ -170,7 +176,7 @@ void UTA_CombatComponent::DashStart()
 {
 	if (!IsValid(OwnerPlayer)) return;
 	// 플레이어가 Roll/Attack 상태인 경우
-	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Attack || CombatState == ECombatState::CS_Hit)
+	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Attack)
 	{
 		// 데쉬 상태 임시 저장 후 반환
 		TempState = ECombatState::CS_Dash;
@@ -208,7 +214,7 @@ void UTA_CombatComponent::DashEnd()
 void UTA_CombatComponent::RollStart(FVector2D InMovementVector)
 {
 	if (!IsValid(OwnerPlayer)) return;
-	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Special || CombatState == ECombatState::CS_Hit) return;
+	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Special || CombatState == ECombatState::CS_Hit || CombatState == ECombatState::CS_Die) return;
 	if (OwnerPlayer->GetCharacterMovement()->IsFalling()) return;
 
 	// 현재 체력에서 구르기가 가능한 경우
@@ -275,7 +281,7 @@ void UTA_CombatComponent::Attack()
 {
 	if (!OwnerPlayer) return;
 	// Roll / Hit 상태인 경우 반환
-	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Hit) return;
+	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Hit || CombatState == ECombatState::CS_Die) return;
 
 	// Special 상태인 경우
 	if (CombatState == ECombatState::CS_Special)
@@ -359,7 +365,7 @@ void UTA_CombatComponent::RightClickStart()
 	if (bIsAttacking) return;
 
 	// Idle, Dash 상태가 아니라면 반환
-	if (!(CombatState == ECombatState::CS_Idle) && !(CombatState == ECombatState::CS_Dash)) return;
+	if (CombatState != ECombatState::CS_Idle && CombatState != ECombatState::CS_Dash) return;
 
 	switch (EquippedState)
 	{
@@ -442,6 +448,8 @@ void UTA_CombatComponent::MiddleClickEnd()
 	}
 }
 
+
+
 void UTA_CombatComponent::JumpAttack()
 {
 	if (!JumpAttackMontages.Find(EquippedState) || !IsValid(JumpAttackMontages[EquippedState])) return;
@@ -507,8 +515,8 @@ void UTA_CombatComponent::EndCombo(UAnimMontage* Montage, bool IsEnded)
 	bIsComboInput = false;
 	ComboCount = 0;
 
-	if (CombatState == ECombatState::CS_Attack)
-		ChangeState(TempState);
+	if (CombatState != ECombatState::CS_Hit && CombatState != ECombatState::CS_Die)
+		ChangeState(ECombatState::CS_Idle);
 }
 
 void UTA_CombatComponent::SetComboTimer()
@@ -531,6 +539,9 @@ void UTA_CombatComponent::CheckCombo()
 {
 	// 타이머 초기화
 	ComboTimerHandle.Invalidate();
+
+	// 피격 or 사망 상태인 경우 반환
+	if (CombatState == ECombatState::CS_Hit || CombatState == ECombatState::CS_Die) return;
 
 	// 콤보 입력이 들어온 경우
 	if (bIsComboInput)
@@ -802,7 +813,7 @@ void UTA_CombatComponent::EquipWeapon()
 void UTA_CombatComponent::TakeDamage(float DamageAmount, AActor* DamageCauser, FDamageEvent const& DamageEvent)
 {
 	// 현재 상태가 roll이면 반환
-	if (CombatState == ECombatState::CS_Roll) return;
+	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Die) return;
 
 	// 피격 받은 방향 구하기
 	FVector Direction = (OwnerPlayer->GetActorLocation() - DamageCauser->GetActorLocation()).GetSafeNormal();
@@ -835,35 +846,29 @@ void UTA_CombatComponent::TakeDamage(float DamageAmount, AActor* DamageCauser, F
 	if (DamageEvent.DamageTypeClass == UDT_Knockback::StaticClass())
 	{
 		OwnerPlayer->LaunchCharacter(Direction * LaunchDistance * 2, true, false);
-		PlaySpeed = 0.8f;
+		PlaySpeed = 0.5f;
 	}
 	// 일반 공격에 맞은 경우
 	else
 	{
 		OwnerPlayer->LaunchCharacter(Direction * LaunchDistance, true, false);
-		PlaySpeed = 1.2f;
+		PlaySpeed = 0.8f;
 	}
 
 	if (HitFX)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, OwnerPlayer->GetActorTransform(), true);
 	}
-	
+
+	// 히트 상태로 변환
+	ChangeState(ECombatState::CS_Hit);
+
 	// 데미지 처리
 	Hit(DamageAmount, PlaySpeed);
 }
 
 void UTA_CombatComponent::Hit(float InDamage, float InPlaySpeed)
 {
-	// 체력 감소
-	CurrentHp -= InDamage;
-	if (CurrentHp <= 0.0f)
-	{
-		CurrentHp = 0.0f;
-		Die();
-		return;
-	}
-
 	UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
 	if (!AnimInstance) return;
 
@@ -876,18 +881,31 @@ void UTA_CombatComponent::Hit(float InDamage, float InPlaySpeed)
 	// 현재 공격 중인 경우
 	if (bIsAttacking)
 	{
-		// 현재 몽타주 재생 중인 경우
-		if (AnimInstance->IsAnyMontagePlaying())
-		{
-			// 모든 몽타주 종료
-			AnimInstance->StopAllMontages(0.0f);
-		}
+		bIsAttacking = false;
+		bIsComboInput = false;
+		ComboCount = 0;
+	}
+
+	// 현재 몽타주 재생 중인 경우
+	if (AnimInstance->IsAnyMontagePlaying())
+	{
+		// 모든 몽타주 종료
+		AnimInstance->StopAllMontages(0.0f);
 	}
 
 	// 현재 방어 중인 경우
 	if (bIsGuard)
 	{
 		bIsGuard = false;
+	}
+
+	// 체력 감소
+	CurrentHp -= InDamage;
+	if (CurrentHp <= 0.0f)
+	{
+		CurrentHp = 0.0f;
+		Die();
+		return;
 	}
 
 	// 피격 몽타주 재생 등 기타 처리
@@ -899,15 +917,18 @@ void UTA_CombatComponent::Hit(float InDamage, float InPlaySpeed)
 
 	// HitMontage가 종료되면 EndDelegate에 연동된 HitEnd함수 호출
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, HitMontage);
-
-	// 히트 상태로 변환
-	ChangeState(ECombatState::CS_Hit);
 }
 
 void UTA_CombatComponent::HitEnd(UAnimMontage* Montage, bool IsEnded)
 {
-	// 일반 상태로 변환
-	ChangeState(ECombatState::CS_Idle);
+	UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
+	if (!AnimInstance) return;
+
+	if (!AnimInstance->Montage_IsPlaying(HitMontage))
+	{
+		// 일반 상태로 변환
+		ChangeState(ECombatState::CS_Idle);
+	}
 }
 
 void UTA_CombatComponent::Die()
@@ -916,7 +937,23 @@ void UTA_CombatComponent::Die()
 	UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
+		// 상태 변경
+		ChangeState(ECombatState::CS_Die);
 		// 사망 몽타주 재생
 		AnimInstance->Montage_Play(DeathMontage);
+	}
+}
+
+void UTA_CombatComponent::Respawn()
+{
+	ATA_MainGameMode* GM = Cast<ATA_MainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GM)
+	{
+		// 상태 변경
+		ChangeState(ECombatState::CS_Idle);
+		// 초기화
+		Init();
+		// 리스폰
+		GM->RespawnPlayer();
 	}
 }
