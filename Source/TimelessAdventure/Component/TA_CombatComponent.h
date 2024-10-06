@@ -257,6 +257,9 @@ private:
 	void HitEnd(class UAnimMontage* Montage, bool IsEnded);
 	void Die();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UParticleSystem> HitFX;
+
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float AttackDistance;
 

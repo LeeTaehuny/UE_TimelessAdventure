@@ -3,6 +3,7 @@
 
 #include "UI/TA_StoneMenu.h"
 #include "UI/TA_Shop.h"
+#include "UI/TA_Teleport.h"
 #include "Gimmick/TA_Stone.h"
 
 #include "Components/WidgetSwitcher.h"
@@ -51,8 +52,11 @@ void UTA_StoneMenu::SwitchShop()
 
 void UTA_StoneMenu::SwitchTeleport()
 {
-	// TODO
-	WS_Menu->SetActiveWidgetIndex(0);
+	if (Teleport)
+	{
+		Teleport->UpdateTeleport();
+		WS_Menu->SetActiveWidget(Teleport);
+	}
 }
 
 void UTA_StoneMenu::CloseWidget()

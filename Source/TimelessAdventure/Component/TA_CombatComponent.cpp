@@ -16,6 +16,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/DamageEvents.h"
+#include "NiagaraSystem.h"
 
 UTA_CombatComponent::UTA_CombatComponent()
 {
@@ -46,7 +47,7 @@ UTA_CombatComponent::UTA_CombatComponent()
 	EquippedState = EEquippedState::ES_Idle;
 	TempEquippedState = EEquippedState::ES_Idle;
 
-	AttackDistance = 300.0f;
+	AttackDistance = 200.0f;
 	LaunchDistance = 3000.0f;
 }
 
@@ -800,6 +801,9 @@ void UTA_CombatComponent::EquipWeapon()
 
 void UTA_CombatComponent::TakeDamage(float DamageAmount, AActor* DamageCauser, FDamageEvent const& DamageEvent)
 {
+	// 현재 상태가 roll이면 반환
+	if (CombatState == ECombatState::CS_Roll) return;
+
 	// 피격 받은 방향 구하기
 	FVector Direction = (OwnerPlayer->GetActorLocation() - DamageCauser->GetActorLocation()).GetSafeNormal();
 
@@ -838,6 +842,11 @@ void UTA_CombatComponent::TakeDamage(float DamageAmount, AActor* DamageCauser, F
 	{
 		OwnerPlayer->LaunchCharacter(Direction * LaunchDistance, true, false);
 		PlaySpeed = 1.2f;
+	}
+
+	if (HitFX)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, OwnerPlayer->GetActorTransform(), true);
 	}
 	
 	// 데미지 처리

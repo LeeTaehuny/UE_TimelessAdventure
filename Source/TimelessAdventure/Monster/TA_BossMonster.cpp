@@ -34,7 +34,7 @@ ATA_BossMonster::ATA_BossMonster()
 	MaxHp = 1000.0f;
 	CurrentHp = MaxHp;
 	Damage = 10.0f;
-	AttackDistance = 300.0f;
+	AttackDistance = 200.0f;
 
 	// 돌 던지기 공격 관련 변수 초기화
 	ThrowStoneCoolTime = 5.0f;
@@ -117,7 +117,7 @@ void ATA_BossMonster::BaseAttackCheck()
 	// 공격 판정 체크
 	TArray<FHitResult> HitResults;
 
-	FVector Start = GetActorLocation();
+	FVector Start = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	FVector End = Start + GetActorForwardVector() * AttackDistance;
 
 	FCollisionQueryParams Params;
@@ -150,7 +150,7 @@ void ATA_BossMonster::KnockbackAttackCheck()
 	// 공격 판정 체크
 	TArray<FHitResult> HitResults;
 
-	FVector Start = GetActorLocation();
+	FVector Start = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	FVector End = Start + GetActorForwardVector() * AttackDistance;
 
 	FCollisionQueryParams Params;
@@ -175,6 +175,38 @@ void ATA_BossMonster::KnockbackAttackCheck()
 		}
 
 		DrawDebugSphere(GetWorld(), End, 100.0f, 12, FColor::Red, false, 2.0f);
+	}
+}
+
+void ATA_BossMonster::JumpAttackCheck()
+{
+	// 공격 판정 체크
+	TArray<FHitResult> HitResults;
+
+	FVector Start = GetActorLocation();
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	GetWorld()->SweepMultiByChannel(
+		HitResults,
+		Start,
+		Start,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel5,
+		FCollisionShape::MakeSphere(300.0f),
+		Params
+	);
+
+	if (HitResults.Num() > 0)
+	{
+		for (const FHitResult& Target : HitResults)
+		{
+			// 데미지 전달
+			UGameplayStatics::ApplyDamage(Target.GetActor(), Damage, GetController(), this, UDamageType::StaticClass());
+		}
+
+		DrawDebugSphere(GetWorld(), Start, 300.0f, 12, FColor::Red, false, 2.0f);
 	}
 }
 
