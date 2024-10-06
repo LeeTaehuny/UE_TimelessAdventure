@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TA_MovableComponent.h"
 #include "Component/TA_PlayerComponentBase.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TimelineComponent.h"
@@ -28,9 +29,13 @@ public:
 
 	void PickupObject();
 	void DropObject();
+	//UPROPERTY()
+	//class ATA_Movable* HeldObject;
 	UPROPERTY()
-	class ATA_Movable* HeldObject;
-
+	class AActor* HeldObject;
+	//UPROPERTY()
+	//UTA_MovableComponent* HeldObject;
+	
 	FRotator NewRotator;
 	void RotateObject(float RotationValue);
 	bool bShiftHeld = false;

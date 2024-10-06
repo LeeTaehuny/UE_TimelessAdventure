@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/ArrowComponent.h"
 #include "GameFramework/Actor.h"
 #include "TA_Movable.generated.h"
 
@@ -25,6 +26,7 @@ public:
 
 
 	UStaticMeshComponent* GetMeshComponent();
+	//UArrowComponent* GetArrowComponent();
 	
 	bool IsLocked;
 	
@@ -33,9 +35,14 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	bool SelfPickup(USceneComponent* ParentComp);
+
+	// Arrow Component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	UArrowComponent* Arrow;
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MovableMesh;
+
 
 	bool IsHeld;
 };

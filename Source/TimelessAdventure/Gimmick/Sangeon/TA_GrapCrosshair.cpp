@@ -12,7 +12,9 @@ void UTA_GrapCrosshair::UnHover()
 {
 	if(IMG_Crosshair)
 	{
-		IMG_Crosshair->SetRenderOpacity(0.3f);
+		UE_LOG(LogTemp, Warning, TEXT("UnHover"));
+
+		IMG_Crosshair->SetRenderOpacity(0.4f);
 	}
 	IsHover = false;
 }

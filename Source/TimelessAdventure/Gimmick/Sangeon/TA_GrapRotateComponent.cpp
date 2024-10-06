@@ -5,6 +5,7 @@
 
 #include "TA_GrapCrosshair.h"
 #include "TA_Movable.h"
+#include "TA_MovableComponent.h"
 #include "VectorUtil.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/SceneComponent.h"
@@ -85,7 +86,7 @@ void UTA_GrapRotateComponent::updatewidget()
 	{
 	}
 }
-
+/*
 void UTA_GrapRotateComponent::TraceValidTarget()
 {
 	FHitResult _Hit;
@@ -114,8 +115,7 @@ void UTA_GrapRotateComponent::TraceValidTarget()
 						GrapCrosshair->Hover();
 					}
 				}
-			}
-			
+			}			
 			//cast success
 			else
 			{
@@ -133,6 +133,61 @@ void UTA_GrapRotateComponent::TraceValidTarget()
 		{
 			GrapCrosshair->UnHover();
 		}
+	}
+	
+}
+*/
+
+
+void UTA_GrapRotateComponent::TraceValidTarget()
+{
+	FHitResult _Hit;
+	bool bLineTraceHit;
+	
+	LineTraceFromCamera(_Hit, bLineTraceHit);
+	UTA_GrapCrosshair* GrapCrosshair = Cast<UTA_GrapCrosshair>(CrosshairWidget);
+	if(!GrapCrosshair)
+	{
+		return;
+	}
+	if(bLineTraceHit)
+	{
+		AActor* HitActor = _Hit.GetActor();
+		//hit
+		if(HitActor)
+		{
+			UTA_MovableComponent* MovableComp = HitActor->FindComponentByClass<UTA_MovableComponent>();
+			
+			//cast success
+			if(MovableComp)
+			{
+				AActor* MovableActor = MovableComp->GetOwner();
+				if(!MovableComp->IsLocked)
+				{
+					if(!GrapCrosshair->IsHovered())
+					{
+						GrapCrosshair->Hover();
+					}
+				}
+			}
+			
+			//cast success
+			else
+			{
+				//if(GrapCrosshair->IsHovered())
+				//{
+					GrapCrosshair->UnHover();
+				//}
+			}
+		}
+	}
+	else
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Nocollision"));
+		//if(GrapCrosshair->IsHovered())
+		//{
+			GrapCrosshair->UnHover();
+		//}
 	}
 	
 }
@@ -169,7 +224,7 @@ void UTA_GrapRotateComponent::LineTraceFromCamera(FHitResult& OutHit, bool& bHit
 	//UE_LOG(LogTemp, Warning, TEXT("%s"),bHit ? TEXT("true") : TEXT("false"));
 
 }
-
+/*
 void UTA_GrapRotateComponent::PickupObject()
 {
 	FHitResult _Hit;
@@ -224,7 +279,67 @@ void UTA_GrapRotateComponent::PickupObject()
 
 	
 }
+*/
 
+
+void UTA_GrapRotateComponent::PickupObject()
+{
+	FHitResult _Hit;
+	bool bLineTraceHit;
+	LineTraceFromCamera(_Hit, bLineTraceHit);
+	ATA_PlayerCharacter* Player = Cast<ATA_PlayerCharacter>(GetOwner());
+	if(!Player)
+	{
+		return;
+	}
+	if(bLineTraceHit)
+	{
+
+		AActor* HitActor = _Hit.GetActor();
+
+		//ATA_Movable* MovableActor = Cast<ATA_Movable>(HitActor);
+		UTA_MovableComponent* MovableComp = HitActor->FindComponentByClass<UTA_MovableComponent>();
+		
+		ATA_PlayerCharacter* PlayerCharacter = Cast<ATA_PlayerCharacter>(Player);
+		
+
+		if(MovableComp)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("pickup"));
+			AActor* MovableActor = MovableComp->GetOwner();
+
+			bool bPickupSuccess = MovableComp->SelfPickup(PlayerCharacter->GetCameraComponent());
+			if(bPickupSuccess)
+			{
+				UStaticMeshComponent* MeshComponent = HitActor->FindComponentByClass<UStaticMeshComponent>();
+				
+				if(MeshComponent == nullptr)
+				{
+					//UE_LOG(LogTemp, Warning, TEXT("meshcomp is null"));
+					return;
+				}
+				HeldObject = MovableActor;
+				FVector CurrentLocation = HeldObject->GetActorLocation();
+				
+				StartLerping(CurrentLocation);
+				GetWorld()->GetTimerManager().ClearTimer(CrosshairTimerHandle);
+				UTA_GrapCrosshair* GrapCrosshair = Cast<UTA_GrapCrosshair>(CrosshairWidget);
+				GrapCrosshair->Hover();
+				FVector StartingBounds = SetObjectBounds();
+				//StartingDistance = FVector::Dist(FVector(0,0,0), HeldObject->GetRelativeLocation());
+				//StartingScale = HeldObject->GetComponentScale();
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+
+
+	
+}
+/*
 FVector UTA_GrapRotateComponent::SetObjectBounds()
 {
 	FVector BoxExtent = FVector::ZeroVector;
@@ -238,7 +353,20 @@ FVector UTA_GrapRotateComponent::SetObjectBounds()
 	}
 	return BoxExtent;
 }
-
+*/
+FVector UTA_GrapRotateComponent::SetObjectBounds()
+{
+	FVector BoxExtent = FVector::ZeroVector;
+	if(HeldObject)
+	{
+		FVector Origin;
+		//		float SphereRadius;
+		HeldObject->GetActorBounds(false,Origin, BoxExtent);
+		
+		//BoxExtent = HeldObject->Bounds.BoxExtent;
+	}
+	return BoxExtent;
+}
 void UTA_GrapRotateComponent::StartLerping(FVector NewStartLocation)
 {
 	LerpStartLocation = NewStartLocation;
@@ -250,6 +378,7 @@ void UTA_GrapRotateComponent::StartLerping(FVector NewStartLocation)
 	
 	
 }
+/*
 void UTA_GrapRotateComponent::LerpProgress(float Value)
 {
 	if(HeldObject)
@@ -261,6 +390,53 @@ void UTA_GrapRotateComponent::LerpProgress(float Value)
 		HeldObject->SetActorLocation(NewLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	}
 }
+*/
+void UTA_GrapRotateComponent::LerpProgress(float Value)
+{
+	if(HeldObject)
+	{
+		float Distance = FVector::Dist(StartLocation, FVector(0, 0, 0));
+		FVector A = LerpStartLocation;
+		FVector B = Distance* FVector(1,0,0);
+		FVector NewLocation = FMath::Lerp(A, B, Value);
+		HeldObject->SetActorLocation(NewLocation, false, nullptr, ETeleportType::TeleportPhysics);
+	}
+}
+void UTA_GrapRotateComponent::DropObject()
+{
+	
+	if(HeldObject)
+	{
+		//ATA_PlayerCharacter* Player = Cast<ATA_PlayerCharacter>(GetOwner());
+		//AActor* Owner = GetOwner();
+		//if(Owner)
+		//{
+		//ATA_Movable* MovableActor = Cast<ATA_Movable>(HeldObject);
+		UTA_MovableComponent* MovableComp = Cast<UTA_MovableComponent>((HeldObject->FindComponentByClass<UTA_MovableComponent>()));
+		if(MovableComp)
+		{
+			AActor* MovableActor = MovableComp->GetOwner();
+			
+			MovableComp->SelfDrop();
+			UTA_GrapCrosshair* GrapCrosshair = Cast<UTA_GrapCrosshair>(CrosshairWidget);
+			GrapCrosshair->UnHover();
+
+			HeldObject = NULL;
+			GetWorld()->GetTimerManager().SetTimer(
+				CrosshairTimerHandle,
+				this,
+				&UTA_GrapRotateComponent::TraceValidTarget,
+				0.1f,
+				true
+			);
+		}
+		
+	}
+	else
+	{
+	}
+}
+/*
 void UTA_GrapRotateComponent::DropObject()
 {
 	
@@ -290,8 +466,64 @@ void UTA_GrapRotateComponent::DropObject()
 	else
 	{
 	}
+}*/
+/*
+void UTA_GrapRotateComponent::RotateObject(float RotationValue)
+{
+	//ATA_PlayerCharacter* Player = Cast<ATA_PlayerCharacter>(GetOwner());
+	//if(Player)
+	//{
+	/*
+	if(HeldObject)
+	{
+
+		FRotator CurrentRotation = HeldObject->GetActorRotation();
+		//UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *CurrentRotation.ToString());
+		
+		FRotator CurrentRotationX = FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw, FMath::Fmod(CurrentRotation.Roll + RotationValue, 360.0f));
+		FRotator CurrentRotationY = FRotator(FMath::Fmod(CurrentRotation.Pitch + RotationValue, 360.0f), CurrentRotation.Yaw, CurrentRotation.Roll);
+		FRotator CurrentRotationZ = FRotator(CurrentRotation.Pitch, FMath::Fmod(CurrentRotation.Yaw + RotationValue, 360.0f), CurrentRotation.Roll + RotationValue);
+
+		FRotator SelectedRotator1 = bShiftHeld ? CurrentRotationY : CurrentRotationZ;
+		FRotator SelectedRotator2 = bctrlheld ? CurrentRotationX : SelectedRotator1;
+		NewRotator = SelectedRotator2;
+		//UE_LOG(LogTemp, Warning, TEXT("Current Rotation: %s"), *SelectedRotator2.ToString());
+
+		HeldObject->SetActorRotation(NewRotator);
+	}
+	*/
+/*
+	if (HeldObject)
+	{
+		// 현재 회전을 쿼터니언으로 변환
+		FQuat CurrentRotation = HeldObject->GetActorQuat();
+        
+		// 회전할 축을 설정 (X, Y, Z에 따라 다르게)
+		FVector RotationAxis;
+        
+		if (bShiftHeld) // X축 회전
+		{
+			RotationAxis = FVector(1.0f, 0.0f, 0.0f);
+		}
+		else if (bctrlheld) // Z축 회전
+		{
+			RotationAxis = FVector(0.0f, 0.0f, 1.0f);
+		}
+		else // Y축 회전
+		{
+			RotationAxis = FVector(0.0f, 1.0f, 0.0f);
+		}
+
+		// 쿼터니언으로 회전 값 적용
+		FQuat DeltaRotation = FQuat(RotationAxis, FMath::DegreesToRadians(RotationValue));
+		FQuat NewRotation = CurrentRotation * DeltaRotation;
+
+		// 회전 값 적용
+		HeldObject->SetActorRotation(NewRotation);
+	}
 }
 
+*/
 void UTA_GrapRotateComponent::RotateObject(float RotationValue)
 {
 	//ATA_PlayerCharacter* Player = Cast<ATA_PlayerCharacter>(GetOwner());
