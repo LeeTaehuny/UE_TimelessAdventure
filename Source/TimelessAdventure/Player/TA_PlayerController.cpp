@@ -5,7 +5,9 @@
 #include "UI/TA_ChangeWeapon.h"
 #include "UI/TA_HUD.h"
 #include "Interface/InventoryInterface.h"
+#include "Interface/CombatComponentInterface.h"
 #include "Component/TA_InventoryComponent.h"
+#include "Component/TA_CombatComponent.h"
 #include "UI/HR_StateChange.h"
 
 
@@ -44,6 +46,12 @@ void ATA_PlayerController::BeginPlay()
 
 			InventoryInterface->GetInventory()->OnChangeInventory.AddUObject(HUDWidget, &UTA_HUD::UpdateInventory);
 			InventoryInterface->GetInventory()->OnChangeGold.AddUObject(HUDWidget, &UTA_HUD::UpdateGold);
+
+			ICombatComponentInterface* CombatInterface = Cast<ICombatComponentInterface>(GetPawn());
+			if (!CombatInterface) return;
+
+			CombatInterface->GetCombatComponent()->ChangeHpDelegate.AddUObject(HUDWidget, &UTA_HUD::SetPBPercentHealth);
+			CombatInterface->GetCombatComponent()->ChangeStaminaDelegate.AddUObject(HUDWidget, &UTA_HUD::SetPBPercentStamina);
 		}
 	}
 

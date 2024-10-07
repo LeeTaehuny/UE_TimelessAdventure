@@ -88,6 +88,10 @@ void UTA_CombatComponent::Init()
 
 	// 이동속도 초기화
 	OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+	// 체력 / 스테미너 초기화
+	ChangeHpDelegate.Broadcast(1.0f);
+	ChangeStaminaDelegate.Broadcast(1.0f);
 }
 
 void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -107,6 +111,8 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 			// Idle 상태로 변경
 			ChangeState(ECombatState::CS_Idle);
 		}
+
+		ChangeStaminaDelegate.Broadcast(CurrentStamina / MaxStamina);
 	}
 	// 현재 Idle상태인 경우
 	else if (CombatState == ECombatState::CS_Idle)
@@ -117,6 +123,8 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		{
 			CurrentStamina = MaxStamina;
 		}
+
+		ChangeStaminaDelegate.Broadcast(CurrentStamina / MaxStamina);
 	}
 
 	// 현재 Hold 중인 경우
@@ -704,6 +712,8 @@ void UTA_CombatComponent::UseStamina(float InValue)
 		// Idle 상태로 변경
 		ChangeState(ECombatState::CS_Idle);
 	}
+
+	ChangeStaminaDelegate.Broadcast(CurrentStamina / MaxStamina);
 }
 
 void UTA_CombatComponent::Interaction()
@@ -735,12 +745,14 @@ void UTA_CombatComponent::Interaction()
 void UTA_CombatComponent::HealStat(float HpPercent, float StaminaPercent)
 {
 	CurrentStamina += (MaxStamina * StaminaPercent);
+	ChangeStaminaDelegate.Broadcast(CurrentStamina / MaxStamina);
 	if (CurrentStamina >= MaxStamina)
 	{
 		CurrentStamina = MaxStamina;
 	}
 
 	CurrentHp += (MaxHp * HpPercent);
+	ChangeHpDelegate.Broadcast(CurrentHp / MaxHp);
 	if (CurrentHp >= MaxHp)
 	{
 		CurrentHp = MaxHp;
@@ -901,6 +913,7 @@ void UTA_CombatComponent::Hit(float InDamage, float InPlaySpeed)
 
 	// 체력 감소
 	CurrentHp -= InDamage;
+	ChangeHpDelegate.Broadcast(CurrentHp / MaxHp);
 	if (CurrentHp <= 0.0f)
 	{
 		CurrentHp = 0.0f;
