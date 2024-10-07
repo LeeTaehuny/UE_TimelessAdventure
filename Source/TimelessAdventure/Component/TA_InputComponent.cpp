@@ -11,10 +11,11 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 
-#include "HR/HR_StopAbilityComponent_Error.h"
 #include "HR/HR_StopAbilityComponent_T.h"
 
 #include "Gimmick/Sangeon/TA_GrapRotateComponent.h"
+#include "Player/TA_PlayerController.h"
+
 
 UTA_InputComponent::UTA_InputComponent()
 {
@@ -67,7 +68,6 @@ void UTA_InputComponent::AddInput(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent->BindAction(IA_Interaction, ETriggerEvent::Started, this, &UTA_InputComponent::Interaction);
 	EnhancedInputComponent->BindAction(IA_Tab, ETriggerEvent::Started, this, &UTA_InputComponent::TabClick);	
 	EnhancedInputComponent->BindAction(IA_Grap, ETriggerEvent::Triggered, this, &UTA_InputComponent::Grap);
-	EnhancedInputComponent->BindAction(IA_Switch, ETriggerEvent::Started, this, &UTA_InputComponent::SwitchState);
 	EnhancedInputComponent->BindAction(IA_Rotate, ETriggerEvent::Triggered, this, &UTA_InputComponent::Rotate);
 	EnhancedInputComponent->BindAction(IA_z, ETriggerEvent::Started, this, &UTA_InputComponent::SetZ);
 	EnhancedInputComponent->BindAction(IA_z, ETriggerEvent::Completed, this, &UTA_InputComponent::SetZfalse);
@@ -135,16 +135,15 @@ void UTA_InputComponent::BasicJump()
 
 void UTA_InputComponent::LeftClick()
 {
-	// 나중에 수정
-	if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
 	
 	switch (PlayerState)
 	{
 	case EPlayerState::PS_Combat:
 		if (IsValid(OwnerPlayer->GetCombatComponent())) OwnerPlayer->GetCombatComponent()->Attack();
 		break;
-	case EPlayerState::PS_StopAbilityMode:
-		if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
+	case EPlayerState::PS_StopObject:
+		//if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
+		//PlayerState = EPlayerState::PS_Combat;
 		break;
 	}
 }
@@ -220,13 +219,36 @@ void UTA_InputComponent::Interaction()
 }
 
 
-	void UTA_InputComponent::TabClick()
+void UTA_InputComponent::TabClick()
 {
-	OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin();
-
-	// 나중에 UI 띄우는 것으로 수정 
-	if (IsValid(OwnerPlayer->GetStopAbilityComponent())) { OwnerPlayer->GetStopAbilityComponent()->StopAbilityBegin(); }
-	else UE_LOG(LogTemp, Warning, TEXT("invalid"));
+	// UI 띄우기
+	UE_LOG(LogTemp, Warning, TEXT("Input TabClick"));
+	ATA_PlayerController* PC = Cast<ATA_PlayerController>(OwnerPlayer->GetController());
+	if (PC)
+	{
+		PC->SetMouseLocation(640, 360);
+		if(!bIsTab)
+		{
+			// Tab 처음이면 위젯 띄우기
+			PC->bShowMouseCursor = true;
+			PC->SetVisibleStateChangeWidget(true);
+			bIsTab = true;
+		}
+		else
+		{
+			// 위젯 지우기
+			PC->bShowMouseCursor = false;
+			PC->SetVisibleStateChangeWidget(false);
+			bIsTab = false;
+			
+			if(PlayerState == EPlayerState::PS_StopObject)
+			{
+				// Stop Object mode end
+				if(IsValid(OwnerPlayer->GetStopAbilityComponent())) (OwnerPlayer->GetStopAbilityComponent())->StopAbilityEnd();
+			}
+		}
+		
+	}
 }
 
 void UTA_InputComponent::Grap()
@@ -235,7 +257,7 @@ void UTA_InputComponent::Grap()
 	{
 		return;
 	}
-	else if(PlayerState == EPlayerState::PS_Gimmick)
+	else if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(IsValid(OwnerPlayer->GetGrapRotateComponent()))
 		{
@@ -255,20 +277,10 @@ void UTA_InputComponent::Grap()
 	
 }
 
-void UTA_InputComponent::SwitchState()
-{
-	if(PlayerState == EPlayerState::PS_Combat)
-	{
-		ChangeState(EPlayerState::PS_Gimmick);
-	}else if(PlayerState == EPlayerState::PS_Gimmick)
-	{
-		ChangeState(EPlayerState::PS_Combat);
-	}
-}
 
 void UTA_InputComponent::Rotate(const FInputActionValue& ActionValue)
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		float RotationValue = ActionValue.Get<float>();
 		if(OwnerPlayer->GetGrapRotateComponent())
@@ -280,7 +292,7 @@ void UTA_InputComponent::Rotate(const FInputActionValue& ActionValue)
 
 void UTA_InputComponent::SetX()
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(OwnerPlayer->GetGrapRotateComponent())
 		{
@@ -290,7 +302,7 @@ void UTA_InputComponent::SetX()
 }
 void UTA_InputComponent::SetXfalse()
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(OwnerPlayer->GetGrapRotateComponent())
 		{
@@ -300,7 +312,7 @@ void UTA_InputComponent::SetXfalse()
 }
 void UTA_InputComponent::SetZ()
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(OwnerPlayer->GetGrapRotateComponent())
 		{
@@ -311,13 +323,28 @@ void UTA_InputComponent::SetZ()
 
 void UTA_InputComponent::SetZfalse()
 {
-	if(PlayerState == EPlayerState::PS_Gimmick)
+	if(PlayerState == EPlayerState::PS_GrabObject)
 	{
 		if(OwnerPlayer->GetGrapRotateComponent())
 		{
 			OwnerPlayer->GetGrapRotateComponent()->bctrlheld = false;
 		}
 	}
+}
+
+void UTA_InputComponent::ChangeStateToCombat()
+{
+	PlayerState = EPlayerState::PS_Combat;
+}
+
+void UTA_InputComponent::ChangeStateToStopObject()
+{
+	PlayerState = EPlayerState::PS_StopObject;
+}
+
+void UTA_InputComponent::ChangeStateToGrabObject()
+{
+	PlayerState = EPlayerState::PS_GrabObject;
 }
 
 void UTA_InputComponent::ChangeState(EPlayerState NewState)
@@ -332,7 +359,7 @@ void UTA_InputComponent::ChangeState(EPlayerState NewState)
 
 		PlayerState = NewState;
 		break;
-	case EPlayerState::PS_Gimmick:
+	case EPlayerState::PS_GrabObject:
 		UE_LOG(LogTemp, Display, TEXT("Gimmick"));
 		PlayerState = NewState;
 

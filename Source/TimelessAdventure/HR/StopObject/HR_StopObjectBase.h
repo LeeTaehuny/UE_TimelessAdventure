@@ -32,9 +32,13 @@ public:
 	
 // 멤버 변수 
 protected:
+	// Tick에 사용
 	bool bIsStopped = false;
 	FTimerHandle StopTimer;
+	// overlap에 사용 
 	bool bIsDetected = false;
+
+	class UHR_StopAbilityComponent_T* StopAbilityComponent;
 
 // Components
 protected:
@@ -42,11 +46,13 @@ protected:
 	class UStaticMeshComponent* ObjectMesh;
 
 // Material
-public:
-	UPROPERTY(EditAnywhere, Category = "Materials")
-	class UMaterialInstance* SelectableMI;
-	UPROPERTY(EditAnywhere, Category = "Materials")
-	class UMaterialInstance* ClickableMI;
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Materials")
+	class UMaterialInterface* SelectableMI;
+	UPROPERTY(VisibleAnywhere, Category = "Materials")
+	class UMaterialInterface* ClickableMI;
+	UPROPERTY(VisibleAnywhere, Category = "Materials")
+	class UMaterialInterface* StopMI;
 
 
 // 순수 가상 함수
@@ -73,7 +79,7 @@ public:
 	void ChangeMaterialToSelectable();
 	void ChangeMaterialToClickable();
 	void ChangeMaterialToDefault();
+	void ChangeMaterialToStop();
 
-	
 	
 };

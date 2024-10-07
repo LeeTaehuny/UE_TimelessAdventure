@@ -27,6 +27,13 @@ public:
 	void UpdateInventory();
 	void UpdateGold();
 
+// prograssbar 함수
+public:
+	void SetPBPercentHealth(float Percent);
+	void SetPBPercentStamina(float Percent);
+	void SetPBPercentTimeEnergy(float Percent);
+	
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> IMG_Aim;
@@ -39,4 +46,12 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTA_Interaction> InteractionWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UProgressBar> PB_Health;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UProgressBar> PB_Stamina;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UProgressBar> PB_TimeEnergy;
+	
 };

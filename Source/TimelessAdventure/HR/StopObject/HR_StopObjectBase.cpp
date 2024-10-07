@@ -4,6 +4,9 @@
 #include "HR_StopObjectBase.h"
 
 #include "MovieSceneObjectBindingID.h"
+#include "HR/HR_StopAbilityComponent_T.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/TA_PlayerCharacter.h"
 
 
 // Sets default values
@@ -17,15 +20,20 @@ AHR_StopObjectBase::AHR_StopObjectBase()
 	// RootComponent = ObjectMesh;
 
 	// Material 할당
-	ConstructorHelpers::FObjectFinder<UMaterialInstance>SelectableMat(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/HR/Material/MI_SelectableOverlayColor.MI_SelectableOverlayColor'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInterface>SelectableMat(TEXT("/Script/Engine.Material'/Game/HR/Material/M_SelectableOverlayClor.M_SelectableOverlayClor'"));
 	if(SelectableMat.Succeeded())
 	{
 		SelectableMI = SelectableMat.Object;
 	}
-	ConstructorHelpers::FObjectFinder<UMaterialInstance>ClickableMat(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/HR/Material/MI_ClickableOverlayColor.MI_ClickableOverlayColor'"));
+	ConstructorHelpers::FObjectFinder<UMaterialInterface>ClickableMat(TEXT("/Script/Engine.Material'/Game/HR/Material/M_ClickableOverlayColor.M_ClickableOverlayColor'"));
 	if(SelectableMat.Succeeded())
 	{
 		ClickableMI = ClickableMat.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UMaterialInterface>StopMat(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/HR/Material/MI_ClickableOverlayColor.MI_ClickableOverlayColor'"));
+	if(StopMat.Succeeded())
+	{
+		StopMI = StopMat.Object;
 	}
 	
 	// 델리게이트와 바인드
@@ -38,6 +46,16 @@ AHR_StopObjectBase::AHR_StopObjectBase()
 void AHR_StopObjectBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ATA_PlayerCharacter* Player = Cast<ATA_PlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if(Player)
+	{
+		if(IsValid(Player->GetStopAbilityComponent()))
+		{
+			StopAbilityComponent = Player->GetStopAbilityComponent();
+		}
+	}
+	
 }
 
 // Called every frame
@@ -74,14 +92,18 @@ void AHR_StopObjectBase::OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed
 	
 
 	if(!bIsDetected) return;
-
+	
 	// @ Player character or StopAbilityComp에서의 정지 time을 가지고 와서 정지 시간을 설정해 주면 좋을 듯
 	// 1) bIsStopped 설정
 	// 2) Timer 설정
 	// 3) 색도 변경
+	// 4) 시간 게이지 사용
 	
 	bIsStopped = true;
-	ChangeMaterialToClickable();
+	ChangeMaterialToStop();
+	StopAbilityComponent->UseTimeEnergy();
+	StopAbilityComponent->StopAbilityEnd();
+	
 	
 	// ? Create Lamda를 통해서 람다 함수를 생성해서 넘겨주는 것과 그냥 [] 넘겨주는 것과 뭐가 다른가
 	GetWorld()->GetTimerManager().SetTimer(StopTimer, FTimerDelegate::CreateLambda([this](){
@@ -110,9 +132,17 @@ void AHR_StopObjectBase::ChangeMaterialToClickable()
 
 void AHR_StopObjectBase::ChangeMaterialToDefault()
 {
-	if(ObjectMesh)
+	if(ObjectMesh &&!bIsStopped)
 	{
 		ObjectMesh->SetOverlayMaterial(nullptr);
+	}
+}
+
+void AHR_StopObjectBase::ChangeMaterialToStop()
+{
+	if(StopMI && ObjectMesh)
+	{
+		ObjectMesh->SetOverlayMaterial(StopMI);
 	}
 }
 

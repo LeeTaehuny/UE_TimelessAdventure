@@ -7,10 +7,15 @@
 #include "UI/TA_Interaction.h"
 
 #include "Components/Image.h"
+#include "Components/ProgressBar.h"
 
 void UTA_HUD::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	PB_Health = Cast<UProgressBar>(GetWidgetFromName("PB_Health"));
+	PB_Stamina = Cast<UProgressBar>(GetWidgetFromName("PB_Stamina"));
+	PB_TimeEnergy = Cast<UProgressBar>(GetWidgetFromName("PB_TimeEnergy"));
 }
 
 bool UTA_HUD::GetInventoryVisibility()
@@ -80,4 +85,29 @@ void UTA_HUD::UpdateInventory()
 void UTA_HUD::UpdateGold()
 {
 	InventoryWidget->UpdateGold();
+}
+
+
+void UTA_HUD::SetPBPercentHealth(float Percent)
+{
+	if(PB_Health)
+	{
+		PB_Health->SetPercent(Percent);
+	}
+}
+void UTA_HUD::SetPBPercentStamina(float Percent)
+{
+	if(PB_Stamina)
+	{
+		PB_Stamina->SetPercent(Percent);
+	}
+}
+
+void UTA_HUD::SetPBPercentTimeEnergy(float Percent)
+{
+	if(PB_TimeEnergy)
+	{
+		UE_LOG(LogTemp, Display, TEXT("SetPBPercentTimeEnergy: %f"), Percent);
+		PB_TimeEnergy->SetPercent(Percent);
+	}
 }
