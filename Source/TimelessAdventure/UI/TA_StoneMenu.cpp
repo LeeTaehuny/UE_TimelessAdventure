@@ -3,6 +3,7 @@
 
 #include "UI/TA_StoneMenu.h"
 #include "UI/TA_Shop.h"
+#include "UI/TA_Teleport.h"
 #include "Gimmick/TA_Stone.h"
 
 #include "Components/WidgetSwitcher.h"
@@ -34,6 +35,10 @@ void UTA_StoneMenu::Init()
 {
 	Shop->SetOwnerPlayer(OwnerActor);
 	Shop->Init();
+	Teleport->SetOwnerPlayer(OwnerActor);
+	Teleport->Init();
+
+	WS_Menu->SetActiveWidgetIndex(0);
 }
 
 void UTA_StoneMenu::UpdateWidget()
@@ -51,8 +56,11 @@ void UTA_StoneMenu::SwitchShop()
 
 void UTA_StoneMenu::SwitchTeleport()
 {
-	// TODO
-	WS_Menu->SetActiveWidgetIndex(0);
+	if (Teleport)
+	{
+		Teleport->UpdateTeleport();
+		WS_Menu->SetActiveWidget(Teleport);
+	}
 }
 
 void UTA_StoneMenu::CloseWidget()
@@ -61,5 +69,6 @@ void UTA_StoneMenu::CloseWidget()
 	if (ATA_Stone* Stone = Cast<ATA_Stone>(OwnerActor))
 	{
 		Stone->SetVisibilityStoneMenu(false);
+		WS_Menu->SetActiveWidgetIndex(0);
 	}
 }

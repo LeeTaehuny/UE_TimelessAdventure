@@ -36,6 +36,7 @@ public:
 
 	virtual	void BaseAttackCheck() = 0;
 	virtual	void KnockbackAttackCheck() = 0;
+	virtual void JumpAttackCheck() = 0;
 
 	virtual void JumpBack(float Distance) = 0;
 

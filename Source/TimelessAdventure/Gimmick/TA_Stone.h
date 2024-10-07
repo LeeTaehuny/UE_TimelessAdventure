@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Interface/InteractionInterface.h"
 #include "Data/TA_ItemData.h"
+#include "Data/TA_MapType.h"
 #include "TA_Stone.generated.h"
 
 UCLASS()
@@ -58,4 +59,11 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UTA_StoneMenu> StoneWidget;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Option", meta = (AllowPrivateAccess = "true"))
+	EMapType Type;
+
+	UPROPERTY(EditAnywhere, Category = "Option", meta = (AllowPrivateAccess = "true"), meta = (MakeEditWidget = true))
+	FVector TargetLocation;
 };

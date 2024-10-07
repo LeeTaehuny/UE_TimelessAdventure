@@ -22,12 +22,6 @@ void UTA_InventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// TEST
-	int32 n1 = 1;
-	int32 n2 = 1;
-	AddItem(TEXT("B_Crystal"), n1);
-	AddItem(TEXT("G_Crystal"), n2);
-	AddGold(50);
 }
 
 void UTA_InventoryComponent::ConvertInventory()
