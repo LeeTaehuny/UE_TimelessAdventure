@@ -42,7 +42,7 @@ protected:
 
 // Components
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPROPERTY(EditAnywhere,Category = "Components")
 	class UStaticMeshComponent* ObjectMesh;
 
 // Material

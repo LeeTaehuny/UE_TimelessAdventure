@@ -99,9 +99,10 @@ void ATA_ThrowStone::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 			// ������ ����
 			UGameplayStatics::ApplyDamage(Character, MI->GetDamage(), GetOwner()->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
 		}
+
+		DestroyStone();
 	}
 
-	DestroyStone();
 }
 
 void ATA_ThrowStone::DestroyStone()
