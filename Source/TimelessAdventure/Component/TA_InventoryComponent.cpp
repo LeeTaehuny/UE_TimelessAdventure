@@ -8,6 +8,8 @@
 #include "Interface/CombatComponentInterface.h"
 
 #include "Game/TA_GameInstance.h"
+#include "Sound/SoundWave.h"
+#include "Kismet/GameplayStatics.h"
 
 UTA_InventoryComponent::UTA_InventoryComponent()
 {
@@ -321,6 +323,11 @@ bool UTA_InventoryComponent::PurchaseItem(FName ItemName, int32 Price)
 		{
 			// 소지 골드 수정
 			Gold -= Price;
+
+			if (PurchaseSound)
+			{
+				UGameplayStatics::PlaySound2D(GetWorld(), PurchaseSound);
+			}
 
 			OnChangeGold.Broadcast();
 			return true;

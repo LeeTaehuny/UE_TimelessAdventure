@@ -12,6 +12,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h" 
 #include "NiagaraSystem.h" 
+#include "Components/AudioComponent.h"
+#include "Sound/SoundWave.h"
 
 ATA_ThrowStone::ATA_ThrowStone()
 {
@@ -37,6 +39,8 @@ ATA_ThrowStone::ATA_ThrowStone()
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
 
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ATA_ThrowStone::OnComponentBeginOverlap);
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
 }
 
 void ATA_ThrowStone::BeginPlay()
@@ -81,6 +85,13 @@ void ATA_ThrowStone::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 			// 데미지 전달
 			UGameplayStatics::ApplyDamage(Character, MI->GetDamage(), GetOwner()->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
 		}
+	}
+
+	if (AudioComp)
+	{
+		//AudioComp->SetSound(ExplosionSound);
+		//AudioComp->Play();
+		UGameplayStatics::PlaySound2D(GetWorld(), ExplosionSound);
 	}
 
 	DestroyStone();

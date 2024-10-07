@@ -18,6 +18,9 @@ class TIMELESSADVENTURE_API ATA_MainGameMode : public AGameModeBase
 public:
 	ATA_MainGameMode();
 
+protected:
+	virtual void BeginPlay() override;
+
 public:
 	void RespawnPlayer();
 	void TeleportPlayer(EMapType MapType);
@@ -56,4 +59,14 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<AActor> Boss;
+
+private:
+	UPROPERTY()
+	TObjectPtr<class UAudioComponent> AudioComp;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class USoundWave> BGM_Basic;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class USoundWave> BGM_Boss;
 };

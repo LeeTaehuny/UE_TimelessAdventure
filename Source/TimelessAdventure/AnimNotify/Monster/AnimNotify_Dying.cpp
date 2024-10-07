@@ -2,14 +2,17 @@
 
 
 #include "AnimNotify/Monster/AnimNotify_Dying.h"
-#include "Interface/MonsterInterface.h"
+#include "Game/TA_MainGameMode.h"
+
+#include "Kismet/GameplayStatics.h"
 
 void UAnimNotify_Dying::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	Super::Notify(MeshComp, Animation);
 
-	if (IMonsterInterface* MonsterInterface = Cast<IMonsterInterface>(MeshComp->GetOwner()))
+	ATA_MainGameMode* GM = Cast<ATA_MainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GM)
 	{
-		MonsterInterface->Die();
+		GM->DeathBoss();
 	}
 }

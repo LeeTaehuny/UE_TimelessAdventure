@@ -55,4 +55,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Setting")
 	float HomingAccelerationMagnitude;
 
+private:
+	UPROPERTY()
+	TObjectPtr<class UAudioComponent> AudioComp;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class USoundWave> ExplosionSound;
 };
