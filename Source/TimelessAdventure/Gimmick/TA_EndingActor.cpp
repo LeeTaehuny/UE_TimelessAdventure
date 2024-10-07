@@ -57,10 +57,10 @@ void ATA_EndingActor::Tick(float DeltaSeconds)
 
 	if (bIsOpen)
 	{
-		FVector NewDoorWorldLocation = GetTransform().TransformPosition(Door->GetRelativeLocation()) + GetActorForwardVector() * 100.0f * DeltaSeconds;
+		FVector NewDoorWorldLocation = GetTransform().TransformPosition(Door->GetRelativeLocation()) + GetActorForwardVector() * 200.0f * DeltaSeconds;
 		Door->SetWorldLocation(NewDoorWorldLocation);
 
-		if (FVector::Distance(DoorWorldLocation, NewDoorWorldLocation) >= 1000.0f)
+		if (FVector::Distance(DoorWorldLocation, NewDoorWorldLocation) >= 10000.0f)
 		{
 			bIsOpen = false;
 		}
