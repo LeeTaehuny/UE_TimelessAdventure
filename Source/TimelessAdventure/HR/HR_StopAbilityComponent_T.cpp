@@ -51,12 +51,14 @@ void UHR_StopAbilityComponent_T::OnRegister()
 	DetectCollider = NewObject<USphereComponent>(this, USphereComponent::StaticClass(), TEXT("Detect Collider"));
 	DetectCollider->SetSphereRadius(Radius);
 	DetectCollider->SetupAttachment(this);
+	DetectCollider->SetCollisionProfileName(TEXT("Time"));
 	DetectCollider->RegisterComponent();
 
 	// sm 등록
-	OverlayMesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), TEXT("Overlay mesh"));
+	/*OverlayMesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), TEXT("Overlay mesh"));
 	OverlayMesh->SetupAttachment(this);
 	OverlayMesh->RegisterComponent();
+	OverlayMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);*/
 
 	/*ConstructorHelpers::FObjectFinder<UStaticMesh>SMSphere(TEXT("/Script/Engine.StaticMesh'/Game/HR/Material/Sphere.Sphere'"));
 	if(SMSphere.Succeeded())
@@ -109,35 +111,22 @@ void UHR_StopAbilityComponent_T::StopAbilityBegin()
 	// 3) StopableObject를 관리하는 Manager를 통해서 Stopable Object들의 Material을 수정
 	//		> Stopable Object를 TArray를 통해서 모든 Object material 변경
 	//		> Component에 Collider를 붙여서 그 범위 안에 있는 Stopable Object들의 Material 변경
-	PlayerController->bShowMouseCursor = false;
+	ActivateMouseEvent();
 	PlayerController->bShowMouseCursor = true;
 	PlayerController->CurrentMouseCursor = EMouseCursor::Crosshairs;
 	PlayerController->SetMouseLocation(1000, 350);
-	//ActivateMouseEvent();
 
 	// Line 그리기 위한 bool
 	bIsTabClick = true;
 	// overlap 이벤트 활성화
 	DetectCollider->SetGenerateOverlapEvents(true);
 
-	// 장만 활성화
-	OverlayMesh->SetVisibility(true);
+	// 장막 활성화
+	//OverlayMesh->SetVisibility(true);
 
 }
 
-// 마우스 클릭시 호출
-// overlap 이벤트 비활성화, 마우스 커서 끄기, 마우스 이벤트 비활성화 
-// 1) stop object 클릭 -> 색 변경 X
-// 2) X 클릭 -> Material 색 Default로 변경
 
-// 마우스 클릭 받음
-// over begin >
-// over end > 
-// click > 
-
-// overlap
-// begin -> 머터리얼 Selectable로 수정 
-// end -> 머터리얼 Default로 수정 
 void UHR_StopAbilityComponent_T::StopAbilityEnd()
 {
 
@@ -162,7 +151,7 @@ void UHR_StopAbilityComponent_T::StopAbilityEnd()
 	PlayerCharacter->GetInputComponent()->ChangeStateToCombat();
 	
 	// 장막 활성화
-	OverlayMesh->SetVisibility(false);
+	//OverlayMesh->SetVisibility(false);
 	
 	
 }

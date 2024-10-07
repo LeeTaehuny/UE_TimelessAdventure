@@ -25,4 +25,5 @@ public:
 
 protected:
 	virtual void Move(float DeltaTime) override;
+
 };

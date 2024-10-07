@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "HR/StopObject/HR_StopObjectBase.h"
 #include "TA_ThrowStone.generated.h"
 
 UCLASS()
-class TIMELESSADVENTURE_API ATA_ThrowStone : public AActor
+class TIMELESSADVENTURE_API ATA_ThrowStone : public AHR_StopObjectBase
 {
 	GENERATED_BODY()
 	
@@ -19,6 +20,8 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void Move(float DeltaTime) override;
 
 public:
 	void Fire(AActor* Target, FVector Direction);
@@ -54,5 +57,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Setting")
 	float HomingAccelerationMagnitude;
+
+// Stop object의 OnMouseClicked를 오버로딩
+protected:
+	//void OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed) override;
 
 };
