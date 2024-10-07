@@ -8,6 +8,8 @@
 #include "Interface/MonsterInterface.h"
 #include "TA_BossMonster.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangedBossHpDelegate, float Percent);
+
 UCLASS()
 class TIMELESSADVENTURE_API ATA_BossMonster : public ACharacter, public IMonsterInterface
 {
@@ -18,10 +20,12 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 protected:
 	FOnAttackEndDelegate OnAttackEndDelegate;
 	FOnJumpBackEndDelegate OnJumpEndDelegate;
+	FOnChangedBossHpDelegate OnChangedBossHpDelegate;
 
 	virtual void SetAIAttackDelegate(const FOnAttackEndDelegate& InOnAttackFinished) override;
 	virtual void SetAIJumpDelegate(const FOnJumpBackEndDelegate& OnJumpEnd) override;
@@ -142,4 +146,11 @@ private:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	void Hit(float HitDamage);
 	virtual void Die() override;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	TSubclassOf<class UTA_BossHp> BossHpWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<class UTA_BossHp> BossHpWidget;
 };

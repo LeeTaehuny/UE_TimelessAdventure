@@ -46,6 +46,19 @@ void ATA_MainGameMode::SetRespawnLocation(FVector NewLocation)
 	RespawnLocation = NewLocation;
 }
 
+void ATA_MainGameMode::SetBoss(AActor* BossActor)
+{
+	Boss = BossActor;
+}
+
+void ATA_MainGameMode::DeathBoss()
+{
+	if (IsValid(Boss))
+	{
+		Boss->Destroy();
+	}
+}
+
 FVector ATA_MainGameMode::GetPoint(EMapType MapType)
 {
 	if (SpawnPoints.Find(MapType))

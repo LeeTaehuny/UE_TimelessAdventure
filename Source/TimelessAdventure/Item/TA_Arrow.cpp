@@ -59,7 +59,6 @@ void ATA_Arrow::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent
 	// 데미지 전달
 	UGameplayStatics::ApplyDamage(OtherActor, AttackDamage, GetWorld()->GetFirstPlayerController(), GetWorld()->GetFirstPlayerController()->GetPawn(), UDamageType::StaticClass());
 
-	GEngine->AddOnScreenDebugMessage(97, 2.0f, FColor::Red, TEXT("ArrowAttack"));
 	Destroy();
 }
 
