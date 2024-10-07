@@ -240,7 +240,6 @@ void UTA_InputComponent::TabClick()
 			PC->bShowMouseCursor = false;
 			PC->SetVisibleStateChangeWidget(false);
 			bIsTab = false;
-			
 			if(PlayerState == EPlayerState::PS_StopObject)
 			{
 				// Stop Object mode end
@@ -335,16 +334,19 @@ void UTA_InputComponent::SetZfalse()
 void UTA_InputComponent::ChangeStateToCombat()
 {
 	PlayerState = EPlayerState::PS_Combat;
+	OwnerPlayer->GetGrapRotateComponent()->DestroyWidget();
 }
 
 void UTA_InputComponent::ChangeStateToStopObject()
 {
 	PlayerState = EPlayerState::PS_StopObject;
+	OwnerPlayer->GetGrapRotateComponent()->DestroyWidget();
 }
 
 void UTA_InputComponent::ChangeStateToGrabObject()
 {
 	PlayerState = EPlayerState::PS_GrabObject;
+	OwnerPlayer->GetGrapRotateComponent()->updatewidget();
 }
 
 void UTA_InputComponent::ChangeState(EPlayerState NewState)

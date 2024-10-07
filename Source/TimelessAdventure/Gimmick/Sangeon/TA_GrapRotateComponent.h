@@ -22,6 +22,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* TickFunction);
 
 	void updatewidget();
+	void DestroyWidget();
 	void TraceValidTarget();
 	void LineTraceFromCamera(FHitResult& OutHit, bool& bHit);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")

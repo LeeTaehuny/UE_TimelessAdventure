@@ -61,31 +61,34 @@ void UTA_GrapRotateComponent::updatewidget()
 	{
 		return;
 	}
-	if(WidgetClass)
+	if(WidgetClass && !CrosshairWidget)
 	{
-
-		UUserWidget* WidgetInstance = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
-
-		if(WidgetInstance)
-		{
-
-			CrosshairWidget = WidgetInstance;
-			CrosshairWidget->AddToViewport();
-
-			GetWorld()->GetTimerManager().SetTimer(
-				CrosshairTimerHandle,
-				this,
-				&UTA_GrapRotateComponent::TraceValidTarget,
-				0.1f,
-				true
-			);
-			
-		}
+		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
 	}
-	else
+
+	if(CrosshairWidget)
 	{
+		CrosshairWidget->AddToViewport();
+
+		GetWorld()->GetTimerManager().SetTimer(
+			CrosshairTimerHandle,
+			this,
+			&UTA_GrapRotateComponent::TraceValidTarget,
+			0.1f,
+			true
+		);
+			
 	}
 }
+
+void UTA_GrapRotateComponent::DestroyWidget()
+{
+	if (CrosshairWidget)
+	{
+		CrosshairWidget->RemoveFromParent();
+	}
+}
+
 /*
 void UTA_GrapRotateComponent::TraceValidTarget()
 {
