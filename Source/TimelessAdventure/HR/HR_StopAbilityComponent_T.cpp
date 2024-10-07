@@ -161,7 +161,7 @@ void UHR_StopAbilityComponent_T::StopAbilityEnd()
 	ATA_PlayerCharacter* PlayerCharacter = Cast<ATA_PlayerCharacter>(GetOwner());
 	PlayerCharacter->GetInputComponent()->ChangeStateToCombat();
 	
-	// 장만 활성화
+	// 장막 활성화
 	OverlayMesh->SetVisibility(false);
 	
 	
