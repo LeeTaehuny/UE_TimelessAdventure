@@ -88,6 +88,10 @@ void UTA_CombatComponent::Init()
 
 	// 이동속도 초기화
 	OwnerPlayer->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+	// 체력 / 스테미너 초기화
+	ChangeHpDelegate.Broadcast(1.0f);
+	ChangeStaminaDelegate.Broadcast(1.0f);
 }
 
 void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -107,6 +111,8 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 			// Idle 상태로 변경
 			ChangeState(ECombatState::CS_Idle);
 		}
+
+		ChangeStaminaDelegate.Broadcast(CurrentStamina / MaxStamina);
 	}
 	// 현재 Idle상태인 경우
 	else if (CombatState == ECombatState::CS_Idle)
@@ -117,6 +123,8 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		{
 			CurrentStamina = MaxStamina;
 		}
+
+		ChangeStaminaDelegate.Broadcast(CurrentStamina / MaxStamina);
 	}
 
 	// 현재 Hold 중인 경우
@@ -128,38 +136,6 @@ void UTA_CombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	{
 		OwnerPlayer->GetSpringArmComponent()->TargetArmLength = FMath::FInterpTo(OwnerPlayer->GetSpringArmComponent()->TargetArmLength, IdleDistance, DeltaTime, 20.0f);
 	}
-	
-	// TEST : 로그
-	{
-		FString Name;
-
-		switch (CombatState)
-		{
-		case ECombatState::CS_Idle:
-			Name = TEXT("Idle");
-			break;
-		case ECombatState::CS_Dash:
-			Name = TEXT("Dash");
-			break;
-		case ECombatState::CS_Roll:
-			Name = TEXT("Roll");
-			break;
-		case ECombatState::CS_Attack:
-			Name = TEXT("Attack");
-			break;
-		case ECombatState::CS_Special:
-			Name = TEXT("Special");
-			break;
-		default:
-			break;
-		}
-
-		GEngine->AddOnScreenDebugMessage(3, 1.0f, FColor::Green, FString::Printf(TEXT("CurState : %s"), *Name));
-		GEngine->AddOnScreenDebugMessage(3, 1.0f, FColor::Green, FString::Printf(TEXT("CurHP : %.1f, MaxHP : %.1f"), CurrentHp, MaxHp));
-		GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Green, FString::Printf(TEXT("CurHealth : %.1f"), CurrentStamina));
-		GEngine->AddOnScreenDebugMessage(2, 1.0f, FColor::Green, FString::Printf(TEXT("Rate      : %.1f"), CurrentStamina / MaxStamina));
-	}
-	
 }
 
 void UTA_CombatComponent::Walk(FVector ForwardDir, FVector RightDir, FVector2D MovementVector2D)
@@ -352,8 +328,6 @@ void UTA_CombatComponent::AttackMove(float InAttackMoveForce)
 			// 데미지 전달
 			UGameplayStatics::ApplyDamage(Target.GetActor(), AttackDamage, OwnerPlayer->GetController(), OwnerPlayer, UDamageType::StaticClass());
 		}
-
-		DrawDebugSphere(GetWorld(), End, 50.0f, 12, FColor::Red, false, 2.0f);
 	}
 }
 
@@ -510,12 +484,20 @@ void UTA_CombatComponent::ComboStart()
 
 void UTA_CombatComponent::EndCombo(UAnimMontage* Montage, bool IsEnded)
 {
+	if (CombatState == ECombatState::CS_Roll || CombatState == ECombatState::CS_Die)
+	{
+		// 콤보 관련 변수 초기화
+		bIsAttacking = false;
+		bIsComboInput = false;
+		ComboCount = 0;
+		return;
+	}
 	// 콤보 관련 변수 초기화
 	bIsAttacking = false;
 	bIsComboInput = false;
 	ComboCount = 0;
 
-	if (CombatState != ECombatState::CS_Hit && CombatState != ECombatState::CS_Die)
+	if (CombatState != ECombatState::CS_Hit)
 		ChangeState(ECombatState::CS_Idle);
 }
 
@@ -704,6 +686,8 @@ void UTA_CombatComponent::UseStamina(float InValue)
 		// Idle 상태로 변경
 		ChangeState(ECombatState::CS_Idle);
 	}
+
+	ChangeStaminaDelegate.Broadcast(CurrentStamina / MaxStamina);
 }
 
 void UTA_CombatComponent::Interaction()
@@ -735,12 +719,14 @@ void UTA_CombatComponent::Interaction()
 void UTA_CombatComponent::HealStat(float HpPercent, float StaminaPercent)
 {
 	CurrentStamina += (MaxStamina * StaminaPercent);
+	ChangeStaminaDelegate.Broadcast(CurrentStamina / MaxStamina);
 	if (CurrentStamina >= MaxStamina)
 	{
 		CurrentStamina = MaxStamina;
 	}
 
 	CurrentHp += (MaxHp * HpPercent);
+	ChangeHpDelegate.Broadcast(CurrentHp / MaxHp);
 	if (CurrentHp >= MaxHp)
 	{
 		CurrentHp = MaxHp;
@@ -901,6 +887,7 @@ void UTA_CombatComponent::Hit(float InDamage, float InPlaySpeed)
 
 	// 체력 감소
 	CurrentHp -= InDamage;
+	ChangeHpDelegate.Broadcast(CurrentHp / MaxHp);
 	if (CurrentHp <= 0.0f)
 	{
 		CurrentHp = 0.0f;
@@ -937,6 +924,13 @@ void UTA_CombatComponent::Die()
 	UAnimInstance* AnimInstance = OwnerPlayer->GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
+		// 현재 몽타주 재생 중인 경우
+		if (AnimInstance->IsAnyMontagePlaying())
+		{
+			// 모든 몽타주 종료
+			AnimInstance->StopAllMontages(0.0f);
+		}
+
 		// 상태 변경
 		ChangeState(ECombatState::CS_Die);
 		// 사망 몽타주 재생
@@ -955,5 +949,7 @@ void UTA_CombatComponent::Respawn()
 		Init();
 		// 리스폰
 		GM->RespawnPlayer();
+		// 보스 소멸
+		GM->DeathBoss();
 	}
 }

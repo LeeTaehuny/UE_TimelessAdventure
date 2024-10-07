@@ -23,12 +23,16 @@ public:
 	void TeleportPlayer(EMapType MapType);
 	void AddPoint(EMapType MapType, FVector NewLocation);
 	void SetRespawnLocation(FVector NewLocation);
+	void SetBoss(AActor* BossActor);
+	void DeathBoss();
 	FVector GetPoint(EMapType MapType);
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetTeleportRuins() { bCanTeleportRuins = true; }
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetTeleportCave() { bCanTeleportCave = true; }
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE bool GetBossSpawnable() { return !IsValid(Boss); }
 
 	FORCEINLINE bool GetTeleportPrairie() { return bCanTeleportPrairie; }
 	FORCEINLINE bool GetTeleportRuins() { return bCanTeleportRuins; }
@@ -49,4 +53,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	bool bCanTeleportCave;
+
+	UPROPERTY()
+	TObjectPtr<AActor> Boss;
 };

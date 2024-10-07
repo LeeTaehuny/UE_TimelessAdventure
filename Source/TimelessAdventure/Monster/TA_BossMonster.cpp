@@ -6,6 +6,8 @@
 #include "Monster/TA_AIKeys.h"
 #include "Gimmick/TA_ThrowStone.h"
 #include "Data/DT_Knockback.h"
+#include "UI/TA_BossHp.h"
+#include "Game/TA_MainGameMode.h"
 
 #include "MotionWarpingComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -50,6 +52,33 @@ void ATA_BossMonster::BeginPlay()
 	Super::BeginPlay();
 	
 	CurrentHp = MaxHp;
+
+	if (BossHpWidgetClass)
+	{
+		BossHpWidget = Cast<UTA_BossHp>(CreateWidget(GetWorld(), BossHpWidgetClass));
+		if (BossHpWidget)
+		{
+			OnChangedBossHpDelegate.AddUObject(BossHpWidget, &UTA_BossHp::SetPBPercentHealth);
+			BossHpWidget->AddToViewport();
+		}
+		OnChangedBossHpDelegate.Broadcast(1.0f);
+	}
+
+	ATA_MainGameMode* GM = Cast<ATA_MainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GM)
+	{
+		GM->SetBoss(this);
+	}
+}
+
+void ATA_BossMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (BossHpWidget)
+	{
+		BossHpWidget->RemoveFromParent();
+	}
 }
 
 void ATA_BossMonster::ThrowStone()
@@ -140,8 +169,6 @@ void ATA_BossMonster::BaseAttackCheck()
 			// 데미지 전달
 			UGameplayStatics::ApplyDamage(Target.GetActor(), Damage, GetController(), this, UDamageType::StaticClass());
 		}
-
-		DrawDebugSphere(GetWorld(), End, 100.0f, 12, FColor::Red, false, 2.0f);
 	}
 }
 
@@ -173,8 +200,6 @@ void ATA_BossMonster::KnockbackAttackCheck()
 			// 데미지 전달
 			UGameplayStatics::ApplyDamage(Target.GetActor(), Damage, GetController(), this, UDT_Knockback::StaticClass());
 		}
-
-		DrawDebugSphere(GetWorld(), End, 100.0f, 12, FColor::Red, false, 2.0f);
 	}
 }
 
@@ -205,8 +230,6 @@ void ATA_BossMonster::JumpAttackCheck()
 			// 데미지 전달
 			UGameplayStatics::ApplyDamage(Target.GetActor(), Damage, GetController(), this, UDamageType::StaticClass());
 		}
-
-		DrawDebugSphere(GetWorld(), Start, 300.0f, 12, FColor::Red, false, 2.0f);
 	}
 }
 
@@ -227,6 +250,8 @@ float ATA_BossMonster::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 void ATA_BossMonster::Hit(float HitDamage)
 {
 	CurrentHp -= HitDamage;
+
+	OnChangedBossHpDelegate.Broadcast(CurrentHp / MaxHp);
 
 	if (CurrentHp <= 0.0f)
 	{

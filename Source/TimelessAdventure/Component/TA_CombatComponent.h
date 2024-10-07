@@ -7,6 +7,8 @@
 #include "TA_CombatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnZeroHealthDelegate);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeHpDelegate, float Percent);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeStaminaDelegate, float Percent);
 
 UENUM(BlueprintType)
 enum class ECombatState : uint8
@@ -70,6 +72,10 @@ public:
 public:
 	// 체력이 0이 되면 사용할 델리게이트
 	FOnZeroHealthDelegate ZeroHealthDelegate;
+	// 체력 변경 델리게이트
+	FOnChangeHpDelegate ChangeHpDelegate;
+	// 스테미나 변경 델리게이트
+	FOnChangeStaminaDelegate ChangeStaminaDelegate;
 
 private:
 	// 게임 시작시 호출되는 초기화 함수 (BeginPlay)
