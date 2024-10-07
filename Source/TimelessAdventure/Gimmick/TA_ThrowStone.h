@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "HR/StopObject/HR_StopObjectBase.h"
 #include "TA_ThrowStone.generated.h"
 
 UCLASS()
-class TIMELESSADVENTURE_API ATA_ThrowStone : public AActor
+class TIMELESSADVENTURE_API ATA_ThrowStone : public AHR_StopObjectBase
 {
 	GENERATED_BODY()
 	
@@ -19,6 +20,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+	virtual void Move(float DeltaTime) override;
 
 public:
 	void Fire(AActor* Target, FVector Direction);
@@ -33,8 +35,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class USphereComponent> SphereComponent;
 
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UStaticMeshComponent> MeshComponent;
+	// 상속받은 Stop object의 Mesh 사용
+	/*UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UStaticMeshComponent> MeshComponent;*/
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UProjectileMovementComponent> ProjectileMovementComponent;

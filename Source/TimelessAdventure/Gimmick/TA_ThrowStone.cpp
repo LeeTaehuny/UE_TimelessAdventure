@@ -20,8 +20,9 @@ ATA_ThrowStone::ATA_ThrowStone()
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	SetRootComponent(SphereComponent);
 
-	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
-	MeshComponent->SetupAttachment(SphereComponent);
+	/*MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+	MeshComponent->SetupAttachment(SphereComponent);*/
+	ObjectMesh->SetupAttachment(SphereComponent);
 
 	InitSpeed = 300.0f;
 	MaxSpeed = 300.0f;
@@ -49,13 +50,17 @@ void ATA_ThrowStone::BeginPlay()
 	FTimerDelegate DeleteDelegate;
 	DeleteDelegate.BindUObject(this, &ATA_ThrowStone::DestroyStone);
 
-	GetWorld()->GetTimerManager().SetTimer(DeleteTimerHandle, DeleteDelegate, 3.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(DeleteTimerHandle, DeleteDelegate, 5.0f, false);
 }
 
 void ATA_ThrowStone::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATA_ThrowStone::Move(float DeltaTime)
+{
 }
 
 void ATA_ThrowStone::Fire(AActor* Target, FVector Direction)

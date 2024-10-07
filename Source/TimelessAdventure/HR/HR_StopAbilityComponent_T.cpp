@@ -207,6 +207,8 @@ void UHR_StopAbilityComponent_T::UseTimeEnergy()
 void UHR_StopAbilityComponent_T::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Display, TEXT("Detect collider overlap other actor : %s"), *OtherActor->GetName());
+	
 	// StopObjectBase인경우 Material Selectable로 변경
 	// Detected 됐는지 체크
 	AHR_StopObjectBase* StopObject = Cast<AHR_StopObjectBase>(OtherActor);
