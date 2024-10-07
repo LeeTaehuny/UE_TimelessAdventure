@@ -55,6 +55,7 @@ void ATA_ItemBase::Interaction(ACharacter* Target)
 	if (IInventoryInterface* InventoryInterface = Cast<IInventoryInterface>(Target))
 	{
 		InventoryInterface->GetInventory()->AddItem(ItemName, Quantity);
+		CheckItem();
 		// 현재 아이템 제거
 		Destroy();
 	}

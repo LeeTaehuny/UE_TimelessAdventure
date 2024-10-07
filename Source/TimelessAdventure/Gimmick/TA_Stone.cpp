@@ -5,6 +5,7 @@
 #include "Player/TA_PlayerController.h"
 #include "UI/TA_StoneMenu.h"
 #include "Game/TA_GameInstance.h"
+#include "Game/TA_MainGameMode.h"
 
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
@@ -48,6 +49,12 @@ void ATA_Stone::BeginPlay()
 		StoneWidget->Init();
 		StoneWidget->AddToViewport();
 		StoneWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	ATA_MainGameMode* GM = Cast<ATA_MainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GM)
+	{
+		GM->AddPoint(Type, GetTransform().TransformPosition(TargetLocation));
 	}
 }
 
@@ -112,12 +119,18 @@ void ATA_Stone::SetVisibilityStoneMenu(bool Value)
 		{
 			StoneWidget->UpdateWidget();
 			PC->bShowMouseCursor = true;
-			PC->SetInputMode(FInputModeGameAndUI());
+			PC->SetIgnoreLookInput(true);
+			PC->SetIgnoreMoveInput(true);
+		
+			PC->SetInputMode(FInputModeUIOnly());
+			StoneWidget->Init();
 			StoneWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 		else
 		{
 			PC->bShowMouseCursor = false;
+			PC->SetIgnoreLookInput(false);
+			PC->SetIgnoreMoveInput(false);
 			PC->SetInputMode(FInputModeGameOnly());
 			StoneWidget->SetVisibility(ESlateVisibility::Hidden);
 		}

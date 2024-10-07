@@ -16,6 +16,8 @@ enum class ECombatState : uint8
 	CS_Roll,			// 구르기 (회피)
 	CS_Attack,			// 공격
 	CS_Special,			// 특수 동작
+	CS_Hit,				// 피격
+	CS_Die,				// 사망
 };
 
 UENUM(BlueprintType)
@@ -97,6 +99,9 @@ public:
 	void MiddleClickStart();
 	void MiddleClickEnd();
 
+	// Respawn
+	void Respawn();
+
 // ComboAttack
 private:
 	// 점프 공격
@@ -171,6 +176,16 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Anims")
 	TObjectPtr<class UAnimMontage> PickupMontage;
 
+	// Hit Montage
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> HitMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> GuardHitMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Anims")
+	TObjectPtr<class UAnimMontage> DeathMontage;
+
 // Stat
 private:
 	void UseStamina(float InValue);
@@ -242,12 +257,19 @@ public:
 	void TakeDamage(float DamageAmount, AActor* DamageCauser, FDamageEvent const& DamageEvent);
 	
 private:
-	void Hit();
+	void Hit(float InDamage, float InPlaySpeed);
+	void HitEnd(class UAnimMontage* Montage, bool IsEnded);
 	void Die();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UParticleSystem> HitFX;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float AttackDistance;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float AttackDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float LaunchDistance;
 };

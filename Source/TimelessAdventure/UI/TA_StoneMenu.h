@@ -47,4 +47,7 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTA_Shop> Shop;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTA_Teleport> Teleport;
 };

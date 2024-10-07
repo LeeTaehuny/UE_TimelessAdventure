@@ -66,6 +66,8 @@ protected:
 	virtual void BaseAttackCheck() override;
 	// 공격 체크 - 넉백
 	virtual void KnockbackAttackCheck() override;
+	// 공격 체크 - 점프
+	virtual void JumpAttackCheck() override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
