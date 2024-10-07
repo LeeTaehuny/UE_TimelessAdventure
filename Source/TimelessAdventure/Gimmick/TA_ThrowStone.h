@@ -58,4 +58,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Setting")
 	float HomingAccelerationMagnitude;
 
+protected:
+	// override 함수
+	virtual void Stop() override;
+
 };

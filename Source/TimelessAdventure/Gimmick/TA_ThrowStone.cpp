@@ -12,6 +12,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h" 
 #include "NiagaraSystem.h" 
+#include "HR/HR_StopAbilityComponent_T.h"
 
 ATA_ThrowStone::ATA_ThrowStone()
 {
@@ -49,6 +50,13 @@ void ATA_ThrowStone::BeginPlay()
 	FTimerHandle DeleteTimerHandle;
 	FTimerDelegate DeleteDelegate;
 	DeleteDelegate.BindUObject(this, &ATA_ThrowStone::DestroyStone);
+
+	// test
+	/*ProjectileMovementComponent->SetActive(true);
+	FVector dir = FVector::ZeroVector - GetActorLocation();
+	dir.Normalize();
+	ProjectileMovementComponent->Velocity = dir * 100;
+	UE_LOG(LogTemp, Warning, TEXT("velocity : %s"), *ProjectileMovementComponent->Velocity.ToString());*/
 
 	GetWorld()->GetTimerManager().SetTimer(DeleteTimerHandle, DeleteDelegate, 5.0f, false);
 }
@@ -106,5 +114,30 @@ void ATA_ThrowStone::DestroyStone()
 
 	// ����
 	Destroy();
+}
+
+void ATA_ThrowStone::Stop()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ThrowStone stop"));
+	
+	if(!bIsDetected) return;
+
+	// Default
+	bIsStopped = true;
+	ChangeMaterialToStop();
+	StopAbilityComponent->UseTimeEnergy();
+	StopAbilityComponent->StopAbilityEnd();
+	
+	// projectile movement 설정
+	ProjectileMovementComponent->SetActive(false);
+	ProjectileMovementComponent->StopMovementImmediately();
+	
+	GetWorld()->GetTimerManager().SetTimer(StopTimer, FTimerDelegate::CreateLambda([this](){
+		ProjectileMovementComponent->SetActive(true);
+		ChangeMaterialToDefault();
+		UE_LOG(LogTemp, Warning, TEXT("언제 변하지?"));
+	}), 5.0f, false);
+
+	
 }
 

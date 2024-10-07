@@ -74,6 +74,9 @@ protected:
 	UFUNCTION()
 	void OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed);
 
+	// OnMouseClicked에서 호출할 함수
+	virtual void Stop();
+	
 // Material 변경 함수
 public:
 	void ChangeMaterialToSelectable();

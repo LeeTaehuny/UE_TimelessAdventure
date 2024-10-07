@@ -89,8 +89,11 @@ void AHR_StopObjectBase::OnEndMouse(AActor* TouchedActor)
 
 void AHR_StopObjectBase::OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	
+	Stop();
+}
 
+void AHR_StopObjectBase::Stop()
+{
 	if(!bIsDetected) return;
 	
 	// @ Player character or StopAbilityComp에서의 정지 time을 가지고 와서 정지 시간을 설정해 주면 좋을 듯
@@ -110,8 +113,6 @@ void AHR_StopObjectBase::OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed
 		bIsStopped = false;
 		ChangeMaterialToDefault();
 	}), 5.0f, false);
-
-	
 }
 
 void AHR_StopObjectBase::ChangeMaterialToSelectable()
