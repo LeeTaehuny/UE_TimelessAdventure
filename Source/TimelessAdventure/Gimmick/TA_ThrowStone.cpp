@@ -60,25 +60,30 @@ void ATA_ThrowStone::Tick(float DeltaTime)
 
 void ATA_ThrowStone::Fire(AActor* Target, FVector Direction)
 {
-	// Å¸°Ù ¼³Á¤
+	// Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	ProjectileMovementComponent->HomingTargetComponent = Target->GetRootComponent();
 	
-	// ¹æÇâ ¹× ¼Óµµ ÁöÁ¤
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
 	ProjectileMovementComponent->Velocity = Direction * InitSpeed;
 
-	// ¹ß»ç
+	// ï¿½ß»ï¿½
 	ProjectileMovementComponent->SetActive(true);
 }
 
 void ATA_ThrowStone::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// ¸ÂÀº ¾×ÅÍ°¡ Ä³¸¯ÅÍÀÎ °æ¿ì
+	// Timeì´ë©´ ë¬´ì‹œ
+	if(OtherComp->GetCollisionProfileName() == "Time") return;
+
+	UE_LOG(LogTemp, Warning, TEXT("thorwstone overlap"));
+	
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í°ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-		// ¸ó½ºÅÍ ÀÎÅÍÆäÀÌ½º ¹Þ¾Æ¿À±â
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½Þ¾Æ¿ï¿½ï¿½ï¿½
 		if (IMonsterInterface* MI = Cast<IMonsterInterface>(GetOwner()))
 		{
-			// µ¥¹ÌÁö Àü´Þ
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			UGameplayStatics::ApplyDamage(Character, MI->GetDamage(), GetOwner()->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
 		}
 	}
@@ -88,13 +93,13 @@ void ATA_ThrowStone::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 
 void ATA_ThrowStone::DestroyStone()
 {
-	// ÀÌÆåÆ® ½ºÆù
+	// ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 	if (HitFX)
 	{
 		FXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitFX, GetActorLocation(), GetActorRotation());
 	}
 
-	// »èÁ¦
+	// ï¿½ï¿½ï¿½ï¿½
 	Destroy();
 }
 

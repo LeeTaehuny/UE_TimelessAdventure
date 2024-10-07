@@ -51,11 +51,13 @@ void UHR_StopAbilityComponent_T::OnRegister()
 	DetectCollider = NewObject<USphereComponent>(this, USphereComponent::StaticClass(), TEXT("Detect Collider"));
 	DetectCollider->SetSphereRadius(Radius);
 	DetectCollider->SetupAttachment(this);
+	DetectCollider->SetCollisionProfileName(TEXT("Time"));
 	DetectCollider->RegisterComponent();
 
 	// sm 등록
 	OverlayMesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), TEXT("Overlay mesh"));
 	OverlayMesh->SetupAttachment(this);
+	OverlayMesh->SetCollisionProfileName(TEXT("NoCollision"));
 	OverlayMesh->RegisterComponent();
 
 	/*ConstructorHelpers::FObjectFinder<UStaticMesh>SMSphere(TEXT("/Script/Engine.StaticMesh'/Game/HR/Material/Sphere.Sphere'"));

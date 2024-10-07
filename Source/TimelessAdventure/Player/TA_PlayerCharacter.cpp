@@ -10,7 +10,6 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "HR/HR_StopAbilityComponent_Error.h"
 #include "HR/HR_StopAbilityComponent_T.h"
 #include "Gimmick/Sangeon/TA_GrapRotateComponent.h"
 
@@ -35,10 +34,6 @@ ATA_PlayerCharacter::ATA_PlayerCharacter()
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	SpringArmComp->bUsePawnControlRotation = true;
-
-
-	TA_StopAbilityComponent = CreateDefaultSubobject<UHR_StopAbilityComponent_Error>(TEXT("StopComp"));
-	TA_StopAbilityComponent->SetupAttachment(RootComponent);
 
 	TA_StopAbilityComponent_T = CreateDefaultSubobject<UHR_StopAbilityComponent_T>(TEXT("Stop Ability"));
 	TA_StopAbilityComponent_T->SetupAttachment(RootComponent);

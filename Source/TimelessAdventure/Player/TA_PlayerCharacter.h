@@ -49,8 +49,6 @@ protected:
 // Stop Ability Scene Comp
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	TObjectPtr<class UHR_StopAbilityComponent_Error> TA_StopAbilityComponent;
-	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UHR_StopAbilityComponent_T> TA_StopAbilityComponent_T;
 
 
