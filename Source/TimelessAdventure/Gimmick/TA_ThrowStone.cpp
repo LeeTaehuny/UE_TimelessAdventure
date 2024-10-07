@@ -12,7 +12,6 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h" 
 #include "NiagaraSystem.h" 
-#include "HR/HR_StopAbilityComponent_T.h"
 
 ATA_ThrowStone::ATA_ThrowStone()
 {
@@ -59,85 +58,43 @@ void ATA_ThrowStone::Tick(float DeltaTime)
 
 }
 
-void ATA_ThrowStone::Move(float DeltaTime)
-{
-	
-}
-
 void ATA_ThrowStone::Fire(AActor* Target, FVector Direction)
 {
-	// Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// Å¸°Ù ¼³Á¤
 	ProjectileMovementComponent->HomingTargetComponent = Target->GetRootComponent();
 	
-	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
+	// ¹æÇâ ¹× ¼Óµµ ÁöÁ¤
 	ProjectileMovementComponent->Velocity = Direction * InitSpeed;
 
-	// ï¿½ß»ï¿½
+	// ¹ß»ç
 	ProjectileMovementComponent->SetActive(true);
 }
 
 void ATA_ThrowStone::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("otherComp Name %s"), *OtherComp->GetName());
-	if (OtherComp->GetCollisionProfileName() == TEXT("Time"))
-	{
-		return;
-	}
-	
-	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í°ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+	// ¸ÂÀº ¾×ÅÍ°¡ Ä³¸¯ÅÍÀÎ °æ¿ì
 	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½Þ¾Æ¿ï¿½ï¿½ï¿½
+		// ¸ó½ºÅÍ ÀÎÅÍÆäÀÌ½º ¹Þ¾Æ¿À±â
 		if (IMonsterInterface* MI = Cast<IMonsterInterface>(GetOwner()))
 		{
-			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			// µ¥¹ÌÁö Àü´Þ
 			UGameplayStatics::ApplyDamage(Character, MI->GetDamage(), GetOwner()->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
 		}
 	}
-	
+
 	DestroyStone();
 }
 
 void ATA_ThrowStone::DestroyStone()
 {
-	// ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
+	// ÀÌÆåÆ® ½ºÆù
 	if (HitFX)
 	{
 		FXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitFX, GetActorLocation(), GetActorRotation());
 	}
 
-	// ï¿½ï¿½ï¿½ï¿½
+	// »èÁ¦
 	Destroy();
 }
-
-// void ATA_ThrowStone::OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed)
-// {
-// 	// Physics ë©ˆì¶”ê¸°
-// 	
-// 	if(!bIsDetected) return;
-// 	
-// 	// @ Player character or StopAbilityCompì—ì„œì˜ ì •ì§€ timeì„ ê°€ì§€ê³  ì™€ì„œ ì •ì§€ ì‹œê°„ì„ ì„¤ì •í•´ ì£¼ë©´ ì¢‹ì„ ë“¯
-// 	// 1) bIsStopped ì„¤ì •
-// 	// 2) Timer ì„¤ì •
-// 	// 3) ìƒ‰ë„ ë³€ê²½
-// 	// 4) ì‹œê°„ ê²Œì´ì§€ ì‚¬ìš©
-// 	
-// 	bIsStopped = true;
-// 	ChangeMaterialToStop();
-// 	StopAbilityComponent->UseTimeEnergy();
-// 	StopAbilityComponent->StopAbilityEnd();
-//
-// 	// physic ì„¤ì •
-// 	ProjectileMovementComponent->SetActive(false);
-// 	ProjectileMovementComponent->StopMovementImmediately();
-// 	
-// 	
-// 	// Projectile movement comp ì¡°ì ˆ 
-// 	GetWorld()->GetTimerManager().SetTimer(StopTimer, FTimerDelegate::CreateLambda([this](){
-// 		ProjectileMovementComponent->SetActive(true);
-// 		ChangeMaterialToDefault();
-// 	}), 5.0f, false);
-//
-// 	
-//}
 

@@ -44,8 +44,8 @@ private:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Collider");
 	TObjectPtr<class USphereComponent> DetectCollider;
-	/*UPROPERTY(VisibleAnywhere, Category = "Collider");
-	TObjectPtr<class UStaticMeshComponent> OverlayMesh;*/
+	UPROPERTY(VisibleAnywhere, Category = "Collider");
+	TObjectPtr<class UStaticMeshComponent> OverlayMesh;
 	
 // Stop Object Collider Radius
 protected:

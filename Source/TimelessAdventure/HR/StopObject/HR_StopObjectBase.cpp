@@ -73,7 +73,6 @@ void AHR_StopObjectBase::Tick(float DeltaTime)
 // StopAbility의 Detect collider의 안에 들어와야지 동작해야함 
 void AHR_StopObjectBase::OnBeginMouse(AActor* TouchedActor)
 {
-	UE_LOG(LogTemp, Error, TEXT("OnBeginMouse"));
 	if(!bIsDetected) return;
 	
 	// Actor의 Material Clickable Color로 변경
@@ -82,7 +81,6 @@ void AHR_StopObjectBase::OnBeginMouse(AActor* TouchedActor)
 
 void AHR_StopObjectBase::OnEndMouse(AActor* TouchedActor)
 {
-	UE_LOG(LogTemp, Error, TEXT("OnEndMouse"));
 	if(!bIsDetected) return;
 	
 	// Actor의 Material Selectable Color로 변경 
@@ -91,7 +89,7 @@ void AHR_StopObjectBase::OnEndMouse(AActor* TouchedActor)
 
 void AHR_StopObjectBase::OnMouseClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	UE_LOG(LogTemp, Error, TEXT("OnMouseClicked"));
+	
 
 	if(!bIsDetected) return;
 	
