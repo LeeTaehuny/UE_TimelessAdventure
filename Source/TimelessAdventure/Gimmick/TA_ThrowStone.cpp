@@ -91,6 +91,7 @@ void ATA_ThrowStone::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 {
 	// Time이면 무시
 	if(OtherComp->GetCollisionProfileName() == "Time") return;
+	if (OtherActor == this ) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("thorwstone overlap"));
 	
@@ -103,8 +104,6 @@ void ATA_ThrowStone::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComp
 			// ������ ����
 			UGameplayStatics::ApplyDamage(Character, MI->GetDamage(), GetOwner()->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
 		}
-
-		DestroyStone();
 	}
 
 	if (AudioComp)

@@ -4,6 +4,7 @@
 #include "Gimmick/TA_EndingActor.h"
 #include "Interface/CombatComponentInterface.h"
 #include "Component/TA_CombatComponent.h"
+#include "Game/TA_MainGameMode.h"
 
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
@@ -104,6 +105,7 @@ void ATA_EndingActor::Interaction(ACharacter* Target)
 void ATA_EndingActor::OpenDoor()
 {
 	bIsOpen = true;
+	
 }
 
 void ATA_EndingActor::VisibleFirstCrystal()
@@ -119,7 +121,14 @@ void ATA_EndingActor::VisibleSecondCrystal()
 void ATA_EndingActor::VisibleThirdCrystal()
 {
 	Crystal3->SetVisibility(true);
+	StartEnding();
 
+	ATA_MainGameMode* GM = Cast<ATA_MainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GM)
+	{
+		GM->StopBGM();
+	}
+	
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ATA_EndingActor::OpenDoor, 2.0f, false);
 }

@@ -29,6 +29,10 @@ public:
 	void VisibleSecondCrystal();
 	void VisibleThirdCrystal();
 
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartEnding();
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	TObjectPtr<class USphereComponent> InteractionCollider;

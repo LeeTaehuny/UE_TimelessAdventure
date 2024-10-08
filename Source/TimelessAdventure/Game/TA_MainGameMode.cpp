@@ -28,6 +28,14 @@ void ATA_MainGameMode::BeginPlay()
 	}
 }
 
+void ATA_MainGameMode::StopBGM()
+{
+	if (AudioComp)
+	{
+		AudioComp->Stop();
+	}
+}
+
 void ATA_MainGameMode::RespawnPlayer()
 {
 	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);

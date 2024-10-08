@@ -22,6 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	void StopBGM();
 	void RespawnPlayer();
 	void TeleportPlayer(EMapType MapType);
 	void AddPoint(EMapType MapType, FVector NewLocation);
