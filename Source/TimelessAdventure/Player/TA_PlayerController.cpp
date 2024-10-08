@@ -186,8 +186,19 @@ void ATA_PlayerController::SetVisibleStateChangeWidget(bool Value)
 {
 	if (StateChangeWidget)
 	{
-		if(Value) {StateChangeWidget->SetVisibility(ESlateVisibility::Visible);}
-		else StateChangeWidget->SetVisibility(ESlateVisibility::Hidden);
+		if(Value)
+		{
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(StateChangeWidget->TakeWidget());
+			SetInputMode(InputMode);
+			StateChangeWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			StateChangeWidget->SetVisibility(ESlateVisibility::Hidden);
+			FInputModeGameOnly InputMode;
+			SetInputMode(InputMode);
+		}
 	}
 }
 

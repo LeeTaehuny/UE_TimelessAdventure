@@ -51,13 +51,16 @@ void UHR_StateChange::OnClickedCombat()
 		{
 			player->GetInputComponent()->ChangeStateToCombat();
 		}
+		// UI 닫기
+		ATA_PlayerController* pc = Cast<ATA_PlayerController>(player->GetController());
+		if(pc)
+		{
+			pc->SetVisibleStateChangeWidget(false);
+			pc->SetShowMouseCursor(false);
+		}
 	}
-	// 마우스 커서, UI 닫기
-	ATA_PlayerController* PC = Cast<ATA_PlayerController>(player->GetController());
-	PC->SetShowMouseCursor(false);
-	SetVisibility(ESlateVisibility::Hidden);
+
 	
-	UE_LOG(LogTemp, Warning, TEXT("Combat Clicked"));
 }
 
 void UHR_StateChange::OnClickedStopObject()
@@ -72,11 +75,14 @@ void UHR_StateChange::OnClickedStopObject()
 			player->GetInputComponent()->ChangeStateToStopObject();
 			player->GetStopAbilityComponent()->StopAbilityBegin();
 		}
+		// UI 닫기
+		ATA_PlayerController* pc = Cast<ATA_PlayerController>(player->GetController());
+		if(pc)
+		{
+			pc->SetVisibleStateChangeWidget(false);
+		}
 	}
-	// UI 닫기
-	SetVisibility(ESlateVisibility::Hidden);
 
-	UE_LOG(LogTemp, Warning, TEXT("StopObject Clicked"));
 }
 
 void UHR_StateChange::OnClickedGrapObject()
@@ -89,12 +95,14 @@ void UHR_StateChange::OnClickedGrapObject()
 		{
 			player->GetInputComponent()->ChangeStateToGrabObject();
 		}
+		// UI 닫기
+		ATA_PlayerController* pc = Cast<ATA_PlayerController>(player->GetController());
+		if(pc)
+		{
+			pc->SetVisibleStateChangeWidget(false);
+			pc->SetShowMouseCursor(false);
+		}
 	}
-	// 마우스 커서, UI 닫기
-	ATA_PlayerController* PC = Cast<ATA_PlayerController>(player->GetController());
-	PC->SetShowMouseCursor(false);
-	SetVisibility(ESlateVisibility::Hidden);
 
-	UE_LOG(LogTemp, Warning, TEXT("Grap Clicked"));
 }
 
