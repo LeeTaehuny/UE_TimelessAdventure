@@ -71,4 +71,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	int32 Gold;
+
+private:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class USoundWave> PurchaseSound;
 };

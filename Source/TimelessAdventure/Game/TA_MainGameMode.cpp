@@ -5,12 +5,27 @@
 
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundWave.h"
 
 ATA_MainGameMode::ATA_MainGameMode()
 {
 	bCanTeleportPrairie = true;
 	bCanTeleportRuins = false;
 	bCanTeleportCave = false;
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
+}
+
+void ATA_MainGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (BGM_Basic && AudioComp)
+	{
+		AudioComp->SetSound(BGM_Basic);
+		AudioComp->Play();
+	}
 }
 
 void ATA_MainGameMode::RespawnPlayer()
@@ -49,6 +64,18 @@ void ATA_MainGameMode::SetRespawnLocation(FVector NewLocation)
 void ATA_MainGameMode::SetBoss(AActor* BossActor)
 {
 	Boss = BossActor;
+
+	if (AudioComp)
+	{
+		AudioComp->Stop();
+
+		if (BGM_Boss)
+		{
+			AudioComp->SetSound(BGM_Boss);
+			AudioComp->Play();
+		}
+		
+	}
 }
 
 void ATA_MainGameMode::DeathBoss()
@@ -56,6 +83,17 @@ void ATA_MainGameMode::DeathBoss()
 	if (IsValid(Boss))
 	{
 		Boss->Destroy();
+	}
+
+	if (AudioComp)
+	{
+		AudioComp->Stop();
+
+		if (BGM_Boss)
+		{
+			AudioComp->SetSound(BGM_Basic);
+			AudioComp->Play();
+		}
 	}
 }
 

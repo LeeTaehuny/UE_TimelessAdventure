@@ -17,6 +17,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h" 
 #include "NiagaraSystem.h" 
+#include "Components/AudioComponent.h"
+#include "Sound/SoundWave.h"
 
 
 ATA_BossMonster::ATA_BossMonster()
@@ -45,6 +47,8 @@ ATA_BossMonster::ATA_BossMonster()
 	// 점프 회피 관련 변수 초기화
 	JumpBackCoolTime = 15.0f;
 	bCanJumpBack = true;
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
 }
 
 void ATA_BossMonster::BeginPlay()
@@ -320,6 +324,12 @@ void ATA_BossMonster::TeleportAttack()
 		FXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), FX, GetActorLocation(), GetActorRotation());
 	}
 
+	if (TeleportSound && AudioComp)
+	{
+		AudioComp->SetSound(TeleportSound);
+		AudioComp->Play();
+	}
+
 	SetActorHiddenInGame(true);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -342,6 +352,13 @@ void ATA_BossMonster::TeleportCallBack()
 		if (BossController)
 		{
 			SetActorHiddenInGame(false);
+
+			if (TeleportSound && AudioComp)
+			{
+				AudioComp->SetSound(TeleportSound);
+				AudioComp->Play();
+			}
+
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 			AActor* TargetActor = Cast<AActor>(BossController->GetBlackboardComponent()->GetValueAsObject(BBKEY_PLAYER));

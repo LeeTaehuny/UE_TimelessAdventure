@@ -62,4 +62,10 @@ protected:
 	// override 함수
 	virtual void Stop() override;
 
+private:
+	UPROPERTY()
+	TObjectPtr<class UAudioComponent> AudioComp;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class USoundWave> ExplosionSound;
 };

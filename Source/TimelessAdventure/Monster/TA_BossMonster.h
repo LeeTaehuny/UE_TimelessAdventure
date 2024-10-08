@@ -153,4 +153,11 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UTA_BossHp> BossHpWidget;
+
+private:
+	UPROPERTY()
+	TObjectPtr<class UAudioComponent> AudioComp;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class USoundWave> TeleportSound;
 };
