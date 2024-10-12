@@ -3,9 +3,11 @@
 
 #include "Game/TA_MainGameMode.h"
 
+#include "EditorDirectories.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
+#include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "Sound/SoundWave.h"
 
 ATA_MainGameMode::ATA_MainGameMode()
@@ -26,7 +28,9 @@ void ATA_MainGameMode::BeginPlay()
 		AudioComp->SetSound(BGM_Basic);
 		AudioComp->Play();
 	}
+	//AddPoint(EMapType::MT_Cave, FVector(700.0f, 800.0f, 900.0f));
 }
+
 
 void ATA_MainGameMode::StopBGM()
 {
@@ -44,23 +48,134 @@ void ATA_MainGameMode::RespawnPlayer()
 		Player->SetActorLocation(RespawnLocation);
 	}
 }
+/*
+void ATA_MainGameMode::LevelLoad()
+{
+	if(levelToLoad != "")
+	{
 
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "overlapping actor");
+		//		UGameplayStatics::OpenLevel(this, levelToLoad);
+		FLatentActionInfo LatentInfo;
+		LatentInfo.CallbackTarget = this;
+		LatentInfo.ExecutionFunction = FName("OnLevelLoad");
+		LatentInfo.Linkage = 0;
+		LatentInfo.UUID = __LINE__;
+		UGameplayStatics::LoadStreamLevel(this, levelToLoad, true, true, LatentInfo);
+
+			
+	}
+}
+*/
+/*
+void ATA_MainGameMode::OnLevelLoad()
+{
+	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (!Player) return;
+	Player->SetActorLocation(SpawnPoints[MapType_temp]);
+
+	// 리스폰 위치 저장
+	SetRespawnLocation(SpawnPoints[MapType_temp]);
+	
+}
+
+*/
+/*
 void ATA_MainGameMode::TeleportPlayer(EMapType MapType)
 {
 	if (SpawnPoints.Find(MapType))
 	{
+		MapType_temp = MapType;
+		
+
+		
+		
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "overlapping actor");
+
+
+		LevelLoad();
+
+	}
+	
+}
+*/
+void ATA_MainGameMode::TeleportPlayer(EMapType MapType)
+{
+
+	//if(SpawnPoints.Find(MapType))
+	//{
+		//MapType_temp = MapType;
+
+		if (levelToLoad.IsValid())
+		{
+			FLatentActionInfo LatentInfo;
+			LatentInfo.CallbackTarget = this;
+			LatentInfo.ExecutionFunction = FName("OnLevelLoaded");
+			LatentInfo.Linkage = 0;
+			LatentInfo.UUID = __LINE__;
+
+			UGameplayStatics::LoadStreamLevel(this, levelToLoad, true, true, LatentInfo);
+		}
+		else
+		{
+			/*
+			ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+			if (Player)
+			{
+				Player->SetActorLocation(SpawnPoints[MapType]);
+				//UE_LOG(LogTemp, Warning, TEXT("%s",*SpawnPoints[MapType].ToString()));
+				SetRespawnLocation(SpawnPoints[MapType]);
+			}
+			*/
+		}
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("No spawn point found for MapType: %d"), (int32)MapType);
+	//}
+}
+void ATA_MainGameMode::OnLevelLoaded()
+{
+
+	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (Player && SpawnPoints.Find(MapType_temp))
+	{
+		FVector SpawnLocation = SpawnPoints[MapType_temp];
+		Player->SetActorLocation(SpawnLocation);
+		SetRespawnLocation(SpawnLocation);
+        
+		UE_LOG(LogTemp, Log, TEXT("Player teleported to location: %s"), *SpawnLocation.ToString());
+	}
+}
+/*
+void ATA_MainGameMode::TeleportPlayer(EMapType MapType)
+{
+	if (SpawnPoints.Find(MapType))
+	{
+		MapType_temp = MapType;
+		//if(levelToLoad != "")
+		//{
+			FLatentActionInfo LatentInfo;
+			UGameplayStatics::LoadStreamLevel(this, levelToLoad, true, true, LatentInfo);
+		//}
 		ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 		if (!Player) return;
+
 
 		Player->SetActorLocation(SpawnPoints[MapType]);
 
 		// 리스폰 위치 저장
 		SetRespawnLocation(SpawnPoints[MapType]);
-	}
-}
 
+
+	}
+	
+}
+*/
 void ATA_MainGameMode::AddPoint(EMapType MapType, FVector NewLocation)
 {
+	// 스폰 포인트가 추가되는지 확인하는 디버그 메시지
+	UE_LOG(LogTemp, Log, TEXT("Added spawn point for MapType: %d at location: %s"), (int32)MapType, *NewLocation.ToString());
 	SpawnPoints.Add({ MapType, NewLocation });
 }
 

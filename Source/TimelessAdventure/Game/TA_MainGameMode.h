@@ -24,13 +24,17 @@ protected:
 public:
 	void StopBGM();
 	void RespawnPlayer();
+	void LevelLoad();
 	void TeleportPlayer(EMapType MapType);
+	UFUNCTION()
+	void OnLevelLoaded();
 	void AddPoint(EMapType MapType, FVector NewLocation);
 	void SetRespawnLocation(FVector NewLocation);
 	void SetBoss(AActor* BossActor);
 	void DeathBoss();
 	FVector GetPoint(EMapType MapType);
-
+	EMapType MapType_temp;
+	
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetTeleportRuins() { bCanTeleportRuins = true; }
 	UFUNCTION(BlueprintCallable)
@@ -61,6 +65,10 @@ private:
 	UPROPERTY()
 	TObjectPtr<AActor> Boss;
 
+
+	
+	UPROPERTY(EditAnywhere, Category = "Level")
+	FName levelToLoad;
 private:
 	UPROPERTY()
 	TObjectPtr<class UAudioComponent> AudioComp;
